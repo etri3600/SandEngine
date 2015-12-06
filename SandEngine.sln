@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SandEngine", "SandEngine\SandEngine.vcxproj", "{00811F15-74D4-4AC4-A143-D494E48C8FB5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "App", "App\App.vcxproj", "{C6675D28-CAAC-4D43-9E26-A865430C391D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{00811F15-74D4-4AC4-A143-D494E48C8FB5} = {00811F15-74D4-4AC4-A143-D494E48C8FB5}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{00811F15-74D4-4AC4-A143-D494E48C8FB5}.Debug|x64.ActiveCfg = Debug|x64
+		{00811F15-74D4-4AC4-A143-D494E48C8FB5}.Debug|x64.Build.0 = Debug|x64
+		{00811F15-74D4-4AC4-A143-D494E48C8FB5}.Release|x64.ActiveCfg = Release|x64
+		{00811F15-74D4-4AC4-A143-D494E48C8FB5}.Release|x64.Build.0 = Release|x64
+		{C6675D28-CAAC-4D43-9E26-A865430C391D}.Debug|x64.ActiveCfg = Debug|x64
+		{C6675D28-CAAC-4D43-9E26-A865430C391D}.Debug|x64.Build.0 = Debug|x64
+		{C6675D28-CAAC-4D43-9E26-A865430C391D}.Release|x64.ActiveCfg = Release|x64
+		{C6675D28-CAAC-4D43-9E26-A865430C391D}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://etri3600.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = SandEngine\\SandEngine.vcxproj
+		SccProjectName1 = SandEngine
+		SccLocalPath1 = SandEngine
+		SccProjectUniqueName2 = App\\App.vcxproj
+		SccProjectName2 = App
+		SccLocalPath2 = App
+	EndGlobalSection
+EndGlobal
