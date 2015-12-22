@@ -9,12 +9,14 @@ void SSceneManager::Init(SIGraphicsInterface * pGraphicsInterface)
 	}
 }
 
-void SSceneManager::Tick(const double delta)
+void SSceneManager::Tick()
 {
+	auto delta = m_Time > 0 ? STime::GetTime() - m_Time : 0LL;
 	if (m_pGraphicsInterface)
 	{
 		m_pGraphicsInterface->Update(delta);
 	}
+	m_Time = STime::GetTime();
 }
 
 void SSceneManager::Queue(const SModel & model)

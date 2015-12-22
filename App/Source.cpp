@@ -31,11 +31,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			//SceneManager->Queue(tri);
 
 			SceneManager->Draw();
-
+			
 			while (true)
 			{
 				framework->Tick();
-				SceneManager->Tick(0.0);
+				SceneManager->Tick();
 				pGraphics->Render();
 				pGraphics->Present();
 			}
