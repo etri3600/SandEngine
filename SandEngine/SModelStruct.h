@@ -150,15 +150,15 @@ public:
 	SCube::SCube()
 	{
 		SModelVertex point1, point2, point3, point4, point5, point6, point7, point8;
-		point1.position = SVector3(-1.0f, 1.0f, 1.0f);
+		point1.position = { -1.0f, 1.0f, 1.0f };
 		point1.color = {1.0f, 1.0f, 1.0f};
-		point1.normal = SVector3(0.0f, 0.0f, 1.0f);
-		point1.uv = SVector2(0.0f, 0.0f);
+		point1.normal = { 0.0f, 0.0f, 1.0f };
+		point1.uv = { 0.0f, 0.0f };
 
-		point2.position = SVector3(-1.0f, -1.0f, 1.0f);
+		point2.position = { -1.0f, -1.0f, 1.0f };
 		point2.color = { 0.0f, 1.0f, 1.0f };
-		point2.normal = SVector3(0.0f, 0.0f, 1.0f);
-		point2.uv = SVector2(0.0f, 1.0f);
+		point2.normal = { 0.0f, 0.0f, 1.0f };
+		point2.uv = { 0.0f, 1.0f };
 
 		point3.position = SVector3(1.0f, 1.0f, 1.0f);
 		point3.color = { 1.0f, 0.0f, 1.0f };

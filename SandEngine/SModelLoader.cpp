@@ -45,10 +45,10 @@ SModel SModelLoader::LoadModelFromFile(const wchar_t* file)
 		const auto pMesh = pScene->mMeshes[i];
 		if (pMesh)
 		{
-			for (int j = 0;j < pMesh->mNumFaces; ++j)
+			for (unsigned int j = 0;j < pMesh->mNumFaces; ++j)
 			{
 				const auto face = pMesh->mFaces[j];
-				for (int k = 0; k < face.mNumIndices; ++k)
+				for (unsigned int k = 0; k < face.mNumIndices; ++k)
 				{
 					const auto index = face.mIndices[k];
 

@@ -398,7 +398,7 @@ bool SDirectX12::CreateSwapChain(const SPlatformSystem* pPlatformSystem, const i
 void SDirectX12::CreateViewProjection()
 {
 	float aspectRatio = static_cast<float>(m_ScreenWidth) / static_cast<float>(m_ScreenHeight);
-	float fovAngleY = 70.0f * M_PI / 180.0f;
+	float fovAngleY = static_cast<float>(70.0f * M_PI) / 180.0f;
 
 	if (aspectRatio < 1.0f)
 	{
@@ -434,10 +434,7 @@ bool SDirectX12::Update(const double delta)
 void SDirectX12::Draw(std::vector<SModel>& models)
 {
 	HRESULT hResult;
-
-	std::vector<SModelVertex> Vertices;
-	std::vector<unsigned int> Indices;
-	std::vector<STexture*> Textures;
+	m_SceneProxy.resize(models.size());
 
 	// Setting Default, Upload Heap
 	D3D12_HEAP_PROPERTIES defaultHeapProperties;
@@ -451,9 +448,12 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 
 	// Vertex Buffer
-	unsigned long long vertexBufferSize = 0;
-	for (auto model : models)
-		vertexBufferSize += model.VertexSize();
+	unsigned int vertexBufferSize = 0;
+	for (unsigned int i = 0;i < models.size(); ++i)
+	{
+		m_SceneProxy[i].BaseVertexLocation = vertexBufferSize;
+		vertexBufferSize += static_cast<unsigned int>(models[i].VertexSize());
+	}
 
 	ID3D12Resource* vertexBufferUpload = nullptr;
 
@@ -507,10 +507,11 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 	m_pCommandList->ResourceBarrier(1, &vertexBufferResourceBarrier);
 
 	// Index Buffer
-	unsigned long long indexBufferSize = 0;
-	for (auto model : models)
+	unsigned int indexBufferSize = 0;
+	for (unsigned int i = 0;i < models.size(); ++i)
 	{
-		indexBufferSize += model.IndexSize();
+		m_SceneProxy[i].StartIndexLocation = indexBufferSize;
+		indexBufferSize += static_cast<unsigned int>(models[i].IndexSize());
 	}
 
 	ID3D12Resource* indexbufferUpload = nullptr;
@@ -554,12 +555,9 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 
 	m_pCommandList->ResourceBarrier(1, &indexBufferResourceBarrier);
 
-	m_IndexInfo.IndexCountPerInstance = 0;
-	m_IndexInfo.InstanceCount = 0;
-	for (auto model : models)
+	for (unsigned int i = 0; i < models.size(); ++i)
 	{
-		m_IndexInfo.IndexCountPerInstance += model.IndexCount();
-		++m_IndexInfo.InstanceCount;
+		m_SceneProxy[i].IndexCountPerInstance += static_cast<unsigned int>(models[i].IndexCount());
 	}
 
 	// Create Texture
@@ -625,10 +623,10 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 
 	for (auto model : models)
 	{
-		m_VertexBufferView.StrideInBytes += model.VertexBaseSize();
-		m_VertexBufferView.SizeInBytes += model.VertexSize();
+		m_VertexBufferView.StrideInBytes += static_cast<unsigned int>(model.VertexBaseSize());
+		m_VertexBufferView.SizeInBytes += static_cast<unsigned int>(model.VertexSize());
 
-		m_IndexBufferView.SizeInBytes += model.IndexSize();
+		m_IndexBufferView.SizeInBytes += static_cast<unsigned int>(model.IndexSize());
 	}
 
 	//MVP.Model.Translation(model.Location);
@@ -644,49 +642,50 @@ bool SDirectX12::Render()
 	hResult = m_pCommandList->Reset(GetCommandAllocator(), m_pPipelineState);
 	SWindows::OutputErrorMessage(hResult);
 
+	m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
+	ID3D12DescriptorHeap* ppHeaps[] = { m_pCBVHeap };
+	m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
+
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;
+	gpuHandle.ptr = m_pCBVHeap->GetGPUDescriptorHandleForHeapStart().ptr + m_BufferIndex * m_uiCBVDescriptorSize;
+	m_pCommandList->SetGraphicsRootDescriptorTable(0, gpuHandle);
+
+	m_pCommandList->RSSetViewports(1, &m_Viewport);
+	D3D12_RECT ScissorRect = { 0L, 0L, static_cast<long>(m_Viewport.Width), static_cast<long>(m_Viewport.Height) };
+	m_pCommandList->RSSetScissorRects(1, &ScissorRect);
+
+	D3D12_RESOURCE_BARRIER renderTargetResourceBarrier = {};
+	renderTargetResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	renderTargetResourceBarrier.Transition.pResource = GetRenderTarget();
+	renderTargetResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	renderTargetResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	renderTargetResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	renderTargetResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	m_pCommandList->ResourceBarrier(1, &renderTargetResourceBarrier);
+
+	const float color[4] = { 0.1f, 0.5f, 0.7f, 1.0f };
+	D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
+	renderTargetViewHandle.ptr = m_pRenderTargetViewHeap->GetCPUDescriptorHandleForHeapStart().ptr + m_BufferIndex * m_RenderTargetViewDescriptorSize;
+	m_pCommandList->ClearRenderTargetView(renderTargetViewHandle, color, 0, nullptr);
+	m_pCommandList->OMSetRenderTargets(1, &renderTargetViewHandle, false, nullptr);
+
+	m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView);
+	m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
+
+	for(auto sceneProxy : m_SceneProxy)
 	{
-		m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
-		ID3D12DescriptorHeap* ppHeaps[] = { m_pCBVHeap };
-		m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
-
-		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;
-		gpuHandle.ptr = m_pCBVHeap->GetGPUDescriptorHandleForHeapStart().ptr + m_BufferIndex * m_uiCBVDescriptorSize;
-		m_pCommandList->SetGraphicsRootDescriptorTable(0, gpuHandle);
-
-		m_pCommandList->RSSetViewports(1, &m_Viewport);
-		D3D12_RECT ScissorRect = { 0, 0, m_Viewport.Width, m_Viewport.Height };
-		m_pCommandList->RSSetScissorRects(1, &ScissorRect);
-
-		D3D12_RESOURCE_BARRIER renderTargetResourceBarrier = {};
-		renderTargetResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		renderTargetResourceBarrier.Transition.pResource = GetRenderTarget();
-		renderTargetResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-		renderTargetResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		renderTargetResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		renderTargetResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		m_pCommandList->ResourceBarrier(1, &renderTargetResourceBarrier);
-
-		const float color[4] = { 0.1f, 0.5f, 0.7f, 1.0f };
-		D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
-		renderTargetViewHandle.ptr = m_pRenderTargetViewHeap->GetCPUDescriptorHandleForHeapStart().ptr + m_BufferIndex * m_RenderTargetViewDescriptorSize;
-		m_pCommandList->ClearRenderTargetView(renderTargetViewHandle, color, 0, nullptr);
-		m_pCommandList->OMSetRenderTargets(1, &renderTargetViewHandle, false, nullptr);
-
-		m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView);
-		m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
-		m_pCommandList->DrawIndexedInstanced(m_IndexInfo.IndexCountPerInstance, m_IndexInfo.InstanceCount, 0, 0, 0);
-
-		D3D12_RESOURCE_BARRIER presentResourceBarrier = {};
-		presentResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		presentResourceBarrier.Transition.pResource = GetRenderTarget();
-		presentResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		presentResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-		presentResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		presentResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		m_pCommandList->ResourceBarrier(1, &presentResourceBarrier);
-
+		m_pCommandList->DrawIndexedInstanced(sceneProxy.IndexCountPerInstance, 1, sceneProxy.StartIndexLocation, sceneProxy.BaseVertexLocation, 0);
 	}
+
+	D3D12_RESOURCE_BARRIER presentResourceBarrier = {};
+	presentResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	presentResourceBarrier.Transition.pResource = GetRenderTarget();
+	presentResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	presentResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	presentResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	presentResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	m_pCommandList->ResourceBarrier(1, &presentResourceBarrier);
 
 	m_pCommandList->Close();
 	ID3D12CommandList* ppCommandLists[] = { m_pCommandList };

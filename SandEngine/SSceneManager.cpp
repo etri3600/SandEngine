@@ -11,10 +11,12 @@ void SSceneManager::Init(SIGraphicsInterface * pGraphicsInterface)
 
 void SSceneManager::Tick()
 {
-	auto delta = m_Time > 0 ? STime::GetTime() - m_Time : 0LL;
+	auto nanoseconds = m_Time > 0 ? STime::GetTime() - m_Time : 0LL;
 	if (m_pGraphicsInterface)
 	{
-		m_pGraphicsInterface->Update(delta);
+		m_pGraphicsInterface->Update(nanoseconds / 1000000.0);
+		m_pGraphicsInterface->Render();
+		m_pGraphicsInterface->Present();
 	}
 	m_Time = STime::GetTime();
 }

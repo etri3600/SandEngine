@@ -1,11 +1,6 @@
 
 #include "../SandEngine/SandEngine.h"
 
-
-#include <memory>
-#include <type_traits>
-
-
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -25,20 +20,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			auto&& model = ModelLoader->LoadModelFromFile(LR"(Lara_Croft_default_outfit\Lara_Croft_default.dae)");
 			//SceneManager->Queue(model);
 			SCube cube;
-			cube.Location = SVector3{1.0f, 0.0f, 0.0f};
+			cube.Location = { 3.0f, 0.0f, 0.0f };
 			SceneManager->Queue(cube);
 			STriangle tri;
-			//SceneManager->Queue(tri);
+			SceneManager->Queue(tri);
 
 			SceneManager->Draw();
 			
-			while (true)
+			do
 			{
-				framework->Tick();
+				if (framework->Tick() == false)
+					break;
 				SceneManager->Tick();
-				pGraphics->Render();
-				pGraphics->Present();
-			}
+			} while (true);
 
 			SceneManager->Reset();
 		}

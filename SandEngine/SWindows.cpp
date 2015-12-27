@@ -60,11 +60,10 @@ bool SWindows::Tick()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+
+	if (msg.message == WM_QUIT)
+		return false;
 	
-
-	{
-	}
-
 	return true;
 }
 

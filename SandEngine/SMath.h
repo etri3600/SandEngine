@@ -89,7 +89,7 @@ struct SVector3
 	}
 };
 
-struct alignas(16) SVector4
+struct SVector4
 {
 	SVector4()
 	{}
@@ -152,6 +152,7 @@ struct alignas(16) SVector4
 		case 2: return z;
 		case 3: return w;
 		}
+		return w;
 	}
 
 	float squaredSize() const
@@ -300,9 +301,9 @@ inline void ScalarSinCos
 	assert(pSin);
 	assert(pCos);
 
-	static constexpr double SM_1DIV2PI = 1.0 / 2.0 * M_PI;
-	static constexpr double SM_2PI = M_PI * 2.0;
-	static constexpr double SM_PIDIV2 = M_PI / 2.0;
+	static constexpr float SM_1DIV2PI = 1.0f / 2.0f * static_cast<float>(M_PI);
+	static constexpr float SM_2PI = static_cast<float>(M_PI) * 2.0f;
+	static constexpr float SM_PIDIV2 = static_cast<float>(M_PI) / 2.0f;
 
 	// Map Value to y in [-pi,pi], x = 2*pi*quotient + remainder.
 	float quotient = SM_1DIV2PI * Value;
@@ -320,12 +321,12 @@ inline void ScalarSinCos
 	float sign;
 	if (y > SM_PIDIV2)
 	{
-		y = M_PI - y;
+		y = static_cast<float>(M_PI) - y;
 		sign = -1.0f;
 	}
 	else if (y < -SM_PIDIV2)
 	{
-		y = -M_PI - y;
+		y = -static_cast<float>(M_PI) - y;
 		sign = -1.0f;
 	}
 	else

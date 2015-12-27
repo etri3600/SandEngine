@@ -3,10 +3,13 @@
 #include "SGraphicsInterface.h"
 #include "SDirectX12Device.h"
 
-struct SIndexStruct
+struct SDX12SceneProxy
 {
+	unsigned int CBVDescriptorSize = 0;
+	unsigned int RTVDescriptorSize = 0;
+	unsigned int BaseVertexLocation = 0;
 	unsigned int IndexCountPerInstance = 0;
-	unsigned int InstanceCount = 0;
+	unsigned int StartIndexLocation = 0;
 };
 
 class SDirectX12 : public SIGraphicsInterface
@@ -60,15 +63,14 @@ private:
 	unsigned int m_RenderTargetViewDescriptorSize = 0;
 	D3D12_VIEWPORT m_Viewport;
 
-	ID3D12Resource* m_pVertexBuffer;
 	D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
+	ID3D12Resource* m_pVertexBuffer;
 	std::vector<byte> m_vertexShader;
 
 	std::vector<byte> m_pixelShader;
 
-	ID3D12Resource* m_pIndexBuffer;
 	D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
-	SIndexStruct m_IndexInfo;
+	ID3D12Resource* m_pIndexBuffer;
 
 	ID3D12DescriptorHeap* m_pCBVHeap;
 	unsigned int m_uiCBVDescriptorSize = 0;
@@ -77,6 +79,7 @@ private:
 
 	ID3D12DescriptorHeap* m_pSamplerHeap;
 
+	std::vector<SDX12SceneProxy> m_SceneProxy;
 
 	HANDLE m_hFenceEvent;
 	bool m_bVSync;

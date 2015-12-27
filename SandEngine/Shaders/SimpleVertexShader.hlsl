@@ -19,7 +19,7 @@ struct VertexShaderInput
 struct PixelShaderInput
 {
 	float4 pos : SV_POSITION;
-	float3 color : COLOR0;
+	float4 color : COLOR0;
 };
 
 PixelShaderInput main(VertexShaderInput input)

@@ -16,6 +16,24 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{4f0e3cf3-f1b2-42a2-b17b-630aff08d4da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics">
+      <UniqueIdentifier>{da8e48b0-1cf6-457b-afa3-30e85a08c2e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{8dec6d30-6e1a-4a80-9bdd-ad3253286016}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\DirectX12">
+      <UniqueIdentifier>{487173d8-4c6b-4084-9497-596ab1a50127}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\DirectX12">
+      <UniqueIdentifier>{28143fc9-f54e-448d-991e-ab0555412006}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform">
+      <UniqueIdentifier>{f2653c77-10bd-43ad-b2bc-5b174ea7a7d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Platform">
+      <UniqueIdentifier>{d4c84b46-3f28-4e8f-b592-277688e33dad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SHeader.h">
@@ -27,31 +45,13 @@
     <ClInclude Include="SInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SWindows.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SLinux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SandEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SPlatformSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SPlatformManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SInputManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SDirectX12.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SGraphics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SGraphicsInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SUtils.h">
@@ -84,23 +84,32 @@
     <ClInclude Include="SImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDirectX12Device.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="STime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SGraphics.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="SGraphicsInterface.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="SDirectX12.h">
+      <Filter>Header Files\Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="SDirectX12Device.h">
+      <Filter>Header Files\Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="SWindows.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="SPlatformSystem.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="SPlatformManager.h">
+      <Filter>Header Files\Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SWindows.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SDirectX12.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SGraphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -119,8 +128,17 @@
     <ClCompile Include="SImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SGraphics.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="SDirectX12.cpp">
+      <Filter>Source Files\Graphics\DirectX12</Filter>
+    </ClCompile>
     <ClCompile Include="SDirectX12Device.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="SWindows.cpp">
+      <Filter>Source Files\Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
