@@ -10,6 +10,7 @@ struct SDX12SceneProxy
 	unsigned int BaseVertexLocation = 0;
 	unsigned int IndexCountPerInstance = 0;
 	unsigned int StartIndexLocation = 0;
+	SMatrix Tranformation;
 };
 
 class SDirectX12 : public SIGraphicsInterface
@@ -30,6 +31,10 @@ public:
 	void Present() override;
 
 	std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob);
+
+protected:
+	VOID CreateConstantBuffer(std::vector<SModel>& models);
+	void UpdateConstantBuffer();
 
 private:
 	unsigned __int64 UpdateSubresource(ID3D12GraphicsCommandList* pCmdList, ID3D12Resource* pDestinationResource, ID3D12Resource* pIntermediate, unsigned __int64 IntermediateOffset, unsigned int FirstSubresource, unsigned int NumSubresources, D3D12_SUBRESOURCE_DATA* pSrcData);

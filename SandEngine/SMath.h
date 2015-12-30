@@ -242,11 +242,20 @@ struct alignas(16) SMatrix
 		return mat;
 	}
 
-	void Translation(SVector3 location)
+	SMatrix& Translation(const SVector3& location)
 	{
-		m[3].x = location.x;
-		m[3].y = location.y;
-		m[3].z = location.z;
+		m[3].x += location.x;
+		m[3].y += location.y;
+		m[3].z += location.z;
+		return *this;
+	}
+
+	SMatrix& Scale(const SVector3& scale)
+	{
+		m[0][0] *= scale.x;
+		m[1][1] *= scale.y;
+		m[2][2] *= scale.z;
+		return *this;
 	}
 };
 
@@ -343,3 +352,33 @@ inline void ScalarSinCos
 	float p = ((((-2.6051615e-07f * y2 + 2.4760495e-05f) * y2 - 0.0013888378f) * y2 + 0.041666638f) * y2 - 0.5f) * y2 + 1.0f;
 	*pCos = sign*p;
 }
+
+namespace SMath
+{
+	inline SMatrix Translation(const SVector3& location)
+	{
+		SMatrix m(SMatrix::Identity);
+		m.Translation(location);
+		return m;
+	}
+
+	inline SMatrix Scale(const SVector3& scale)
+	{
+		SMatrix m(SMatrix::Identity);
+		m.Scale(scale);
+		return m;
+	}
+
+	inline SMatrix Rotation(const SQuaternion& quat)
+	{
+		SMatrix m(SMatrix::Identity);
+		return m;
+	}
+
+	inline SMatrix Transform(const SVector3& scale, const SVector3& location, const SQuaternion& quat)
+	{
+		SMatrix m(SMatrix::Identity);
+
+		return m.Scale(scale).Translation(location);
+	}
+};

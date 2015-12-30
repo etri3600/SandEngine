@@ -1,6 +1,9 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
+#pragma comment(lib, "dxguid.lib")
+
+#include <d3d12shader.h>
 
 #include "SDirectX12.h"
 #include "SMath.h"
@@ -136,8 +139,6 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0},
 	};
 
-	
-	
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
 	pipelineStateDesc.InputLayout = { inputLayout, sizeof(inputLayout) / sizeof(inputLayout[0]) };
 	pipelineStateDesc.pRootSignature = m_pRootSignature;
@@ -189,56 +190,6 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	hResult = m_pDevice->GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_BUNDLE, m_pBundleAllocator, m_pPipelineState, IID_PPV_ARGS(&m_pBundleList));
 	SWindows::OutputErrorMessage(hResult);
 
-	// Create Constant buffer
-	D3D12_DESCRIPTOR_HEAP_DESC cbheapDesc = {};
-	cbheapDesc.NumDescriptors = c_BufferingCount;
-	cbheapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	cbheapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	hResult = m_pDevice->GetDevice()->CreateDescriptorHeap(&cbheapDesc, IID_PPV_ARGS(&m_pCBVHeap));
-	SWindows::OutputErrorMessage(hResult);
-	m_pCBVHeap->SetName(L"Constnat Buffer View Descriptor Heap");
-
-	D3D12_HEAP_PROPERTIES uploadHeapProperties;
-	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
-	uploadHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	uploadHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	uploadHeapProperties.CreationNodeMask = 1;
-	uploadHeapProperties.VisibleNodeMask = 1;
-
-	D3D12_RESOURCE_DESC constantBufferDesc = {};
-	constantBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	constantBufferDesc.Alignment = 0;
-	constantBufferDesc.Width = c_BufferingCount * c_MVPAlign;
-	constantBufferDesc.Height = 1;
-	constantBufferDesc.DepthOrArraySize = 1;
-	constantBufferDesc.MipLevels = 1;
-	constantBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-	constantBufferDesc.SampleDesc.Count = 1;
-	constantBufferDesc.SampleDesc.Quality = 0;
-	constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pConstantBuffer));
-	SWindows::OutputErrorMessage(hResult);
-	m_pConstantBuffer->SetName(L"Constant Buffer");
-
-	D3D12_GPU_VIRTUAL_ADDRESS cbvGPUAddress = m_pConstantBuffer->GetGPUVirtualAddress();
-	D3D12_CPU_DESCRIPTOR_HANDLE cbvCPUHandle = m_pCBVHeap->GetCPUDescriptorHandleForHeapStart();
-	m_uiCBVDescriptorSize = m_pDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-	for (int i = 0;i < c_BufferingCount; ++i)
-	{
-		D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
-		desc.BufferLocation = cbvGPUAddress;
-		desc.SizeInBytes = c_MVPAlign;
-		m_pDevice->GetDevice()->CreateConstantBufferView(&desc, cbvCPUHandle);
-
-		cbvGPUAddress += desc.SizeInBytes;
-		cbvCPUHandle.ptr += m_uiCBVDescriptorSize;
-	}
-
-	m_pConstantBuffer->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedConstantBuffer));
-	ZeroMemory(m_mappedConstantBuffer, c_BufferingCount * c_MVPAlign);
-
 	// Create Sampler
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapSampler = {};
 	descHeapSampler.NumDescriptors = 1;
@@ -279,6 +230,7 @@ void SDirectX12::Finalize()
 	{
 		m_pConstantBuffer->Unmap(0, nullptr);
 		m_pConstantBuffer->Release();
+		m_mappedConstantBuffer = nullptr;
 	}
 
 	if (m_pSwapChain)
@@ -425,8 +377,7 @@ void SDirectX12::CreateViewProjection()
 
 bool SDirectX12::Update(const double delta)
 {
- 	unsigned char* destination = m_mappedConstantBuffer + (m_BufferIndex * c_MVPAlign);
-	memcpy(destination, &MVP, sizeof(MVP));
+	UpdateConstantBuffer();
 
 	return true;
 }
@@ -614,22 +565,25 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 	m_pCommandQueue->ExecuteCommandLists(sizeof(ppCommandList) / sizeof(ppCommandList[0]), ppCommandList);
 
 	m_VertexBufferView.BufferLocation = m_pVertexBuffer->GetGPUVirtualAddress();
-	m_VertexBufferView.StrideInBytes = 0;
+	m_VertexBufferView.StrideInBytes = sizeof(SModelVertex);
 	m_VertexBufferView.SizeInBytes = 0;
 
 	m_IndexBufferView.BufferLocation = m_pIndexBuffer->GetGPUVirtualAddress();
 	m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT;
 	m_IndexBufferView.SizeInBytes = 0;
 
-	for (auto model : models)
+	for (unsigned int i = 0;i < models.size(); ++i)
 	{
-		m_VertexBufferView.StrideInBytes += static_cast<unsigned int>(model.VertexBaseSize());
-		m_VertexBufferView.SizeInBytes += static_cast<unsigned int>(model.VertexSize());
-
-		m_IndexBufferView.SizeInBytes += static_cast<unsigned int>(model.IndexSize());
+		m_VertexBufferView.SizeInBytes += static_cast<unsigned int>(models[i].VertexSize());
+		m_IndexBufferView.SizeInBytes += static_cast<unsigned int>(models[i].IndexSize());
 	}
 
-	//MVP.Model.Translation(model.Location);
+	for (unsigned int i = 0;i < models.size(); ++i)
+	{
+		m_SceneProxy[i].Tranformation = SMath::Transform(models[i].Scale, models[i].Location, models[i].Rotation);
+	}
+
+	CreateConstantBuffer(models);
 
 	WaitForGPU();
 }
@@ -690,6 +644,7 @@ bool SDirectX12::Render()
 	m_pCommandList->Close();
 	ID3D12CommandList* ppCommandLists[] = { m_pCommandList };
 	m_pCommandQueue->ExecuteCommandLists(sizeof(ppCommandLists) / sizeof(ppCommandLists[0]), ppCommandLists);
+
 
 	return true;
 }
@@ -758,7 +713,89 @@ std::vector<byte>&& SDirectX12::CompileShader(const wchar_t* fileName, const cha
 		*pBlob = pShaderCode;
 	}
 
+#if defined(_DEBUG)
+	ID3D12ShaderReflection* pReflection = nullptr;
+	if (SUCCEEDED(D3DReflect(pShaderCode->GetBufferPointer(), pShaderCode->GetBufferSize(), IID_ID3D12ShaderReflection, (void**)&pReflection)))
+	{
+		D3D12_SIGNATURE_PARAMETER_DESC desc[4];
+		pReflection->GetInputParameterDesc(0, &desc[0]);
+		pReflection->GetInputParameterDesc(1, &desc[1]);
+		pReflection->GetInputParameterDesc(2, &desc[2]);
+		pReflection->GetInputParameterDesc(3, &desc[3]);
+		OutputDebugStringA(desc[0].SemanticName);
+	}
+#endif
+	
 	return std::move(shader);
+}
+
+VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
+{
+	// Create Constant buffer
+	D3D12_DESCRIPTOR_HEAP_DESC cbheapDesc = {};
+	cbheapDesc.NumDescriptors = c_BufferingCount;
+	cbheapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	cbheapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	HRESULT hResult = m_pDevice->GetDevice()->CreateDescriptorHeap(&cbheapDesc, IID_PPV_ARGS(&m_pCBVHeap));
+	SWindows::OutputErrorMessage(hResult);
+	m_pCBVHeap->SetName(L"Constnat Buffer View Descriptor Heap");
+
+	D3D12_HEAP_PROPERTIES uploadHeapProperties;
+	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+	uploadHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	uploadHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	uploadHeapProperties.CreationNodeMask = 1;
+	uploadHeapProperties.VisibleNodeMask = 1;
+
+	D3D12_RESOURCE_DESC constantBufferDesc = {};
+	constantBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	constantBufferDesc.Alignment = 0;
+	constantBufferDesc.Width = c_BufferingCount * c_MVPAlign * models.size();
+	constantBufferDesc.Height = 1;
+	constantBufferDesc.DepthOrArraySize = 1;
+	constantBufferDesc.MipLevels = 1;
+	constantBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	constantBufferDesc.SampleDesc.Count = 1;
+	constantBufferDesc.SampleDesc.Quality = 0;
+	constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pConstantBuffer));
+	SWindows::OutputErrorMessage(hResult);
+	m_pConstantBuffer->SetName(L"Constant Buffer");
+
+	D3D12_GPU_VIRTUAL_ADDRESS cbvGPUAddress = m_pConstantBuffer->GetGPUVirtualAddress();
+	D3D12_CPU_DESCRIPTOR_HANDLE cbvCPUHandle = m_pCBVHeap->GetCPUDescriptorHandleForHeapStart();
+	m_uiCBVDescriptorSize = m_pDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	for (unsigned int i = 0; i < c_BufferingCount; ++i)
+	{
+		D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
+		desc.BufferLocation = cbvGPUAddress;
+		desc.SizeInBytes = c_MVPAlign;
+		m_pDevice->GetDevice()->CreateConstantBufferView(&desc, cbvCPUHandle);
+
+		cbvGPUAddress += desc.SizeInBytes;
+		cbvCPUHandle.ptr += m_uiCBVDescriptorSize;
+	}
+
+	D3D12_RANGE readRange;
+	readRange.Begin = readRange.End = 0;
+	m_pConstantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_mappedConstantBuffer));
+	ZeroMemory(m_mappedConstantBuffer, c_BufferingCount * c_MVPAlign);
+}
+
+void SDirectX12::UpdateConstantBuffer()
+{
+	//unsigned char* destination = m_mappedConstantBuffer + (m_BufferIndex * c_MVPAlign);
+	//memcpy(destination, &MVP, c_MVPAlign);
+
+	const unsigned int ConstantSizeInByte = c_MVPAlign * m_SceneProxy.size();
+	for (unsigned int i = 0; i < m_SceneProxy.size(); ++i)
+	{
+		MVP.Model = m_SceneProxy[i].Tranformation;
+		unsigned char* destination = m_mappedConstantBuffer + (m_BufferIndex * ConstantSizeInByte + i * c_MVPAlign);
+		memcpy(destination, &MVP, c_MVPAlign);
+	}
 }
 
 unsigned __int64 SDirectX12::UpdateSubresource(ID3D12GraphicsCommandList * pCmdList, ID3D12Resource * pDestinationResource, ID3D12Resource * pIntermediate, unsigned __int64 IntermediateOffset, unsigned int FirstSubresource, unsigned int NumSubresources, D3D12_SUBRESOURCE_DATA * pSrcData)
