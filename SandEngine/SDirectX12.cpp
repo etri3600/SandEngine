@@ -11,7 +11,7 @@
 
 SDirectX12::SDirectX12()
 {
-	ZeroMemory(m_nFenceValue, sizeof(m_nFenceValue));
+	memset(m_nFenceValue, 0, sizeof(m_nFenceValue));
 }
 
 SDirectX12::~SDirectX12()
@@ -230,7 +230,7 @@ void SDirectX12::Finalize()
 	{
 		m_pConstantBuffer->Unmap(0, nullptr);
 		m_pConstantBuffer->Release();
-		m_mappedConstantBuffer = nullptr;
+		MVP = nullptr;
 	}
 
 	if (m_pSwapChain)
@@ -364,15 +364,13 @@ void SDirectX12::CreateViewProjection()
 		100.0f
 		);
 
-	MVP.Projection = perspectiveMatrix;
+	Projection = perspectiveMatrix;
 
 	const SVector3 eye = { 1.0f, 3.0f, 5.f };
 	const SVector3 at = { 0.0f, 0.0f, -1.0f };
 	const SVector3 up = { 0.0f, 1.0f, 0.0f };
 
-	MVP.View = MatrixLookAt(eye, at, up);
-
-	MVP.Model = SMatrix::Identity;
+	View = MatrixLookAt(eye, at, up);
 }
 
 bool SDirectX12::Update(const double delta)
@@ -402,7 +400,7 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 	unsigned int vertexBufferSize = 0;
 	for (unsigned int i = 0;i < models.size(); ++i)
 	{
-		m_SceneProxy[i].BaseVertexLocation = vertexBufferSize;
+		m_SceneProxy[i].BaseVertexLocation = vertexBufferSize / sizeof(SModelVertex);
 		vertexBufferSize += static_cast<unsigned int>(models[i].VertexSize());
 	}
 
@@ -461,7 +459,7 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 	unsigned int indexBufferSize = 0;
 	for (unsigned int i = 0;i < models.size(); ++i)
 	{
-		m_SceneProxy[i].StartIndexLocation = indexBufferSize;
+		m_SceneProxy[i].StartIndexLocation = indexBufferSize / sizeof(unsigned int);
 		indexBufferSize += static_cast<unsigned int>(models[i].IndexSize());
 	}
 
@@ -600,10 +598,6 @@ bool SDirectX12::Render()
 	ID3D12DescriptorHeap* ppHeaps[] = { m_pCBVHeap };
 	m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
 
-	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;
-	gpuHandle.ptr = m_pCBVHeap->GetGPUDescriptorHandleForHeapStart().ptr + m_BufferIndex * m_uiCBVDescriptorSize;
-	m_pCommandList->SetGraphicsRootDescriptorTable(0, gpuHandle);
-
 	m_pCommandList->RSSetViewports(1, &m_Viewport);
 	D3D12_RECT ScissorRect = { 0L, 0L, static_cast<long>(m_Viewport.Width), static_cast<long>(m_Viewport.Height) };
 	m_pCommandList->RSSetScissorRects(1, &ScissorRect);
@@ -627,9 +621,13 @@ bool SDirectX12::Render()
 	m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView);
 	m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
 
-	for(auto sceneProxy : m_SceneProxy)
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;
+
+	for (unsigned int i = 0;i < m_SceneProxy.size(); ++i)
 	{
-		m_pCommandList->DrawIndexedInstanced(sceneProxy.IndexCountPerInstance, 1, sceneProxy.StartIndexLocation, sceneProxy.BaseVertexLocation, 0);
+		gpuHandle.ptr = m_pCBVHeap->GetGPUDescriptorHandleForHeapStart().ptr + m_BufferIndex + (m_uiCBVDescriptorSize * i);
+		m_pCommandList->SetGraphicsRootDescriptorTable(0, gpuHandle);
+		m_pCommandList->DrawIndexedInstanced(m_SceneProxy[i].IndexCountPerInstance, 1, m_SceneProxy[i].StartIndexLocation, m_SceneProxy[i].BaseVertexLocation, 0);
 	}
 
 	D3D12_RESOURCE_BARRIER presentResourceBarrier = {};
@@ -750,7 +748,7 @@ VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
 	D3D12_RESOURCE_DESC constantBufferDesc = {};
 	constantBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 	constantBufferDesc.Alignment = 0;
-	constantBufferDesc.Width = c_BufferingCount * c_MVPAlign * models.size();
+	constantBufferDesc.Width = c_BufferingCount * sizeof(SModelViewProjection) * models.size();
 	constantBufferDesc.Height = 1;
 	constantBufferDesc.DepthOrArraySize = 1;
 	constantBufferDesc.MipLevels = 1;
@@ -771,7 +769,7 @@ VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
 	{
 		D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
 		desc.BufferLocation = cbvGPUAddress;
-		desc.SizeInBytes = c_MVPAlign;
+		desc.SizeInBytes = sizeof(SModelViewProjection);
 		m_pDevice->GetDevice()->CreateConstantBufferView(&desc, cbvCPUHandle);
 
 		cbvGPUAddress += desc.SizeInBytes;
@@ -780,21 +778,25 @@ VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
 
 	D3D12_RANGE readRange;
 	readRange.Begin = readRange.End = 0;
-	m_pConstantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_mappedConstantBuffer));
-	ZeroMemory(m_mappedConstantBuffer, c_BufferingCount * c_MVPAlign);
+	m_pConstantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&MVP));
+	memset(MVP, 0, c_BufferingCount * sizeof(SModelViewProjection));
 }
 
 void SDirectX12::UpdateConstantBuffer()
 {
-	//unsigned char* destination = m_mappedConstantBuffer + (m_BufferIndex * c_MVPAlign);
+	//unsigned char* destination = m_mappedConstantBuffer + (m_BufferIndex * sizeof(SModelViewProjection));
 	//memcpy(destination, &MVP, c_MVPAlign);
 
-	const unsigned int ConstantSizeInByte = c_MVPAlign * m_SceneProxy.size();
+	SModelViewProjection mvp;
+	memset(&mvp, 0, sizeof(SModelViewProjection));
+	mvp.View = View;
+	mvp.Projection = Projection;
+
+	const unsigned int ConstantSizeInByte = sizeof(SModelViewProjection) * m_SceneProxy.size();
 	for (unsigned int i = 0; i < m_SceneProxy.size(); ++i)
 	{
-		MVP.Model = m_SceneProxy[i].Tranformation;
-		unsigned char* destination = m_mappedConstantBuffer + (m_BufferIndex * ConstantSizeInByte + i * c_MVPAlign);
-		memcpy(destination, &MVP, c_MVPAlign);
+		mvp.Model = m_SceneProxy[i].Tranformation;
+		memcpy(&MVP[m_BufferIndex * m_SceneProxy.size() + i], &mvp, sizeof(SModelViewProjection));
 	}
 }
 

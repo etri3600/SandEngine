@@ -19,11 +19,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			auto&& model = ModelLoader->LoadModelFromFile(LR"(Lara_Croft_default_outfit\Lara_Croft_default.dae)");
 			//SceneManager->Queue(model);
+			STriangle tri;
+			tri.Location = { -1.0f, 0.0f, 0.0f };
+			SceneManager->Queue(tri);
 			SCube cube;
 			cube.Location = { 3.0f, 0.0f, 0.0f };
 			SceneManager->Queue(cube);
-			STriangle tri;
-			SceneManager->Queue(tri);
+
 
 			SceneManager->Draw();
 			

@@ -29,12 +29,11 @@ public:
 
 protected:
 	SModelLoader* ModelLoader = nullptr;
-	SModelViewProjection MVP;
+	SModelViewProjection* MVP;
+	SMatrix View, Projection;
 
 	static constexpr unsigned int c_BufferingCount = 3;
 	unsigned int m_BufferIndex = 0;
-
-	static constexpr unsigned int c_MVPAlign = (sizeof(SModelViewProjection) + 255) & ~255;
 
 	unsigned int m_ScreenWidth = 0, m_ScreenHeight = 0;
 };

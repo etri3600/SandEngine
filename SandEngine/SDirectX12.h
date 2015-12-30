@@ -80,7 +80,6 @@ private:
 	ID3D12DescriptorHeap* m_pCBVHeap;
 	unsigned int m_uiCBVDescriptorSize = 0;
 	ID3D12Resource* m_pConstantBuffer;
-	unsigned char* m_mappedConstantBuffer;
 
 	ID3D12DescriptorHeap* m_pSamplerHeap;
 

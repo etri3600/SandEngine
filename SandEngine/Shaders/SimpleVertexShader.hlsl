@@ -1,12 +1,12 @@
-cbuffer ModelViewProjectionConstantBuffer : register(b0)
+cbuffer ViewProjectionConstantBuffer : register(b0)
 {
 	column_major matrix model;
 	column_major matrix view;
 	column_major matrix projection;
 };
 
-Texture2D<float4> tex : register(t3);
-SamplerState samp : register(s5);
+Texture2D<float4> tex : register(t0);
+SamplerState samp : register(s0);
 
 struct VertexShaderInput
 {
