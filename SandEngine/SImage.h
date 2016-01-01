@@ -24,12 +24,19 @@ struct STexture : public SImage
 		TF_BGRA,
 	};
 
-	unsigned int MipLevels = 0;
-	unsigned int Size = 0;
-	unsigned char* pTexData = nullptr;
+	struct SMipTexture
+	{
+		unsigned char* pTexData = nullptr;
+		unsigned int Size = 0;
+	};
+
 	TextureLayout eTextureLayout = TextureLayout::TL_TEX_2D;
 	TextureFormat eTextureFormat = TextureFormat::TF_RGBA;
+	unsigned int MipLevels = 0;
+	unsigned int CurrentMipLevel = 0;
+	std::vector<SMipTexture*> MipTextures;
 
+	SMipTexture* GetCurrentMipTexture() { return MipTextures.size() > CurrentMipLevel ? MipTextures[CurrentMipLevel] : nullptr; }
 	unsigned int GetTextureFormat() const;
 };
 

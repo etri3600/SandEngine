@@ -33,20 +33,21 @@ public:
 	std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob);
 
 protected:
+	VOID CreateShaderResources(std::vector<SModel>& models);
 	VOID CreateConstantBuffer(std::vector<SModel>& models);
 	void UpdateConstantBuffer();
 
 private:
-	unsigned __int64 UpdateSubresource(ID3D12GraphicsCommandList* pCmdList, ID3D12Resource* pDestinationResource, ID3D12Resource* pIntermediate, unsigned __int64 IntermediateOffset, unsigned int FirstSubresource, unsigned int NumSubresources, D3D12_SUBRESOURCE_DATA* pSrcData);
-	unsigned __int64 UpdateSubresource(ID3D12GraphicsCommandList* pCmdList, ID3D12Resource* pDestinationResource, ID3D12Resource* pIntermediate, unsigned int FirstSubresource, unsigned int NumSubresources, unsigned __int64 RequiredSize, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT* pLayouts, const unsigned int* pNumRows, const unsigned __int64* pRowSizeInBytes, const D3D12_SUBRESOURCE_DATA* pSrcData);
-	inline void MemcpySubresource(const D3D12_MEMCPY_DEST* pDest, const D3D12_SUBRESOURCE_DATA* pSrc, size_t RowSizeInBytes, unsigned int NumRows, unsigned int NumSlices);
-	
 	void WaitForGPU();
 	void InitBundle();
 
-
 	ID3D12CommandAllocator* GetCommandAllocator() const { return m_pCommandAllocator[m_BufferIndex]; }
 	ID3D12Resource* GetRenderTarget() const { return m_pBackBufferRenterTarget[m_BufferIndex]; }
+
+	unsigned __int64 UpdateSubresource(ID3D12GraphicsCommandList* pCmdList, ID3D12Resource* pDestinationResource, ID3D12Resource* pIntermediate, unsigned __int64 IntermediateOffset, unsigned int FirstSubresource, unsigned int NumSubresources, D3D12_SUBRESOURCE_DATA* pSrcData);
+	unsigned __int64 UpdateSubresource(ID3D12GraphicsCommandList* pCmdList, ID3D12Resource* pDestinationResource, ID3D12Resource* pIntermediate, unsigned int FirstSubresource, unsigned int NumSubresources, unsigned __int64 RequiredSize, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT* pLayouts, const unsigned int* pNumRows, const unsigned __int64* pRowSizeInBytes, const D3D12_SUBRESOURCE_DATA* pSrcData);
+	inline void MemcpySubresource(const D3D12_MEMCPY_DEST* pDest, const D3D12_SUBRESOURCE_DATA* pSrc, size_t RowSizeInBytes, unsigned int NumRows, unsigned int NumSlices);
+	inline unsigned __int64 GetRequiredIntermediateSize(ID3D12Resource* pDestinationResource, unsigned int FirstSubresource, unsigned int NumSubresources);
 
 private:
 	SDirectX12Device* m_pDevice;
@@ -80,6 +81,10 @@ private:
 	ID3D12DescriptorHeap* m_pCBVHeap;
 	unsigned int m_uiCBVDescriptorSize = 0;
 	ID3D12Resource* m_pConstantBuffer;
+
+	ID3D12DescriptorHeap* m_pSRVHeap;
+	unsigned int m_uiSRVDescriptorSize = 0;
+	ID3D12Resource* m_pSRVBuffer;
 
 	ID3D12DescriptorHeap* m_pSamplerHeap;
 

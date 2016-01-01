@@ -6,8 +6,12 @@
 
 STexture::~STexture()
 {
-	delete[] pTexData;
-	pTexData = nullptr;
+	for (auto MipTexture : MipTextures)
+	{
+		delete MipTexture->pTexData;
+		MipTexture->pTexData = nullptr;
+	}
+	MipTextures.clear();
 }
 
 unsigned int STexture::GetTextureFormat() const

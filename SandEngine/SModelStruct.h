@@ -23,7 +23,7 @@ public:
 	SQuaternion Rotation;
 	SVector3 Scale{ 1.0f, 1.0f, 1.0f };
 	
-	constexpr std::size_t VertexBaseSize() const {
+	static constexpr std::size_t VertexBaseSize() {
 		return sizeof(SModelVertex);
 	}
 
@@ -39,7 +39,7 @@ public:
 		return static_cast<void*>(Vertices.data());
 	}
 
-	constexpr std::size_t IndexBaseSize() const {
+	static constexpr std::size_t IndexBaseSize() {
 		return sizeof(unsigned int);
 	}
 
@@ -56,7 +56,7 @@ public:
 	}
 
 	unsigned int TextureSize(unsigned int nTextureIndex) const {
-		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->Size : 0U;
+		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetCurrentMipTexture()->Size : 0U;
 	}
 
 	unsigned int TextureWidth(unsigned int nTextureIndex) const {
@@ -66,7 +66,7 @@ public:
 			switch (Textures[nTextureIndex]->eTextureLayout)
 			{
 			case STexture::TextureLayout::TL_TEX_1D:
-				Width = Textures[nTextureIndex]->Size;
+				Width = Textures[nTextureIndex]->GetCurrentMipTexture()->Size;
 				break;
 			case STexture::TextureLayout::TL_TEX_2D:
 			case STexture::TextureLayout::TL_TEX_3D:
@@ -84,7 +84,7 @@ public:
 			switch (Textures[nTextureIndex]->eTextureLayout)
 			{
 			case STexture::TextureLayout::TL_TEX_1D:
-				Height = Textures[nTextureIndex]->Size;
+				Height = Textures[nTextureIndex]->GetCurrentMipTexture()->Size;
 				break;
 			case STexture::TextureLayout::TL_TEX_2D:
 			case STexture::TextureLayout::TL_TEX_3D:
@@ -96,7 +96,7 @@ public:
 	}
 
 	void* TextureSerialize(unsigned int nTextureIndex) {
-		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->pTexData : nullptr;
+		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetCurrentMipTexture()->pTexData : nullptr;
 	}
 
 	unsigned int TextureFormat(unsigned int nTextureIndex) {
