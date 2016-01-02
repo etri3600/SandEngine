@@ -56,7 +56,7 @@ public:
 	}
 
 	unsigned int TextureSize(unsigned int nTextureIndex) const {
-		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetCurrentMipTexture()->Size : 0U;
+		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetCurrentMipTexture().Size : 0U;
 	}
 
 	unsigned int TextureWidth(unsigned int nTextureIndex) const {
@@ -66,11 +66,11 @@ public:
 			switch (Textures[nTextureIndex]->eTextureLayout)
 			{
 			case STexture::TextureLayout::TL_TEX_1D:
-				Width = Textures[nTextureIndex]->GetCurrentMipTexture()->Size;
+				Width = Textures[nTextureIndex]->GetCurrentMipTexture().Size;
 				break;
 			case STexture::TextureLayout::TL_TEX_2D:
 			case STexture::TextureLayout::TL_TEX_3D:
-				Width = static_cast<STexture2D*>(Textures[nTextureIndex])->Width;
+				Width = Textures[nTextureIndex]->GetCurrentMipTexture().Width;
 				break;
 			}
 		}
@@ -84,11 +84,11 @@ public:
 			switch (Textures[nTextureIndex]->eTextureLayout)
 			{
 			case STexture::TextureLayout::TL_TEX_1D:
-				Height = Textures[nTextureIndex]->GetCurrentMipTexture()->Size;
+				Height = Textures[nTextureIndex]->GetCurrentMipTexture().Size;
 				break;
 			case STexture::TextureLayout::TL_TEX_2D:
 			case STexture::TextureLayout::TL_TEX_3D:
-				Height = static_cast<STexture2D*>(Textures[nTextureIndex])->Height;
+				Height = Textures[nTextureIndex]->GetCurrentMipTexture().Height;
 				break;
 			}
 		}
@@ -96,7 +96,7 @@ public:
 	}
 
 	void* TextureSerialize(unsigned int nTextureIndex) {
-		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetCurrentMipTexture()->pTexData : nullptr;
+		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetCurrentMipTexture().pTexData : nullptr;
 	}
 
 	unsigned int TextureFormat(unsigned int nTextureIndex) {

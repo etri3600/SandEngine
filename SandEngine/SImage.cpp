@@ -36,8 +36,3 @@ unsigned int STexture::GetTextureFormat() const
 
 	return 0;
 }
-
-STexture2D::~STexture2D()
-{
-
-}

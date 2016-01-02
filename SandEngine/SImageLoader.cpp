@@ -26,19 +26,20 @@ bool SImageLoader::LoadImageFromFile(const wchar_t* file, SImage* pImage)
 
 bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 {
-	ILuint imageId;
-	ilGenImages(1, &imageId);
-	ilBindImage(imageId);
-	
-	if (ilLoadImage((DirPath + file).c_str()))
+	if (pTexture)
 	{
-		ILinfo info = {};
-		iluGetImageInfo(&info);
 
-		STexture2D* pTexture2D = static_cast<STexture2D*>(pTexture);
-		if (pTexture2D)
+		ILuint imageId;
+		ilGenImages(1, &imageId);
+		ilBindImage(imageId);
+
+		if (ilLoadImage((DirPath + file).c_str()))
 		{
-			pTexture2D->eTextureLayout = STexture::TextureLayout::TL_TEX_2D;
+			ILinfo info = {};
+			iluGetImageInfo(&info);
+
+			pTexture->MipTextures.reserve(info.NumMips);
+			pTexture->eTextureLayout = STexture::TextureLayout::TL_TEX_2D;
 			STexture::TextureFormat eFormat;
 			switch (info.Format)
 			{
@@ -53,17 +54,21 @@ bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 			default:
 				assert(false);
 			}
-			pTexture2D->eTextureFormat = eFormat;
-			pTexture2D->MipLevels = info.NumMips;
-			pTexture2D->Width = info.Width;
-			pTexture2D->Height = info.Height;
-			pTexture2D->Size = info.SizeOfData;
-			pTexture2D->pTexData = new unsigned char[pTexture2D->Size];
-			memcpy(pTexture2D->pTexData, ilGetData(), pTexture2D->Size);
-		}
-	}
+			pTexture->eTextureFormat = eFormat;
+			pTexture->MipLevels = info.NumMips;
 
-	ilBindImage(0);
+			for (unsigned int i = 0;i < info.NumMips; ++i)
+			{
+				pTexture->MipTextures[i]->Width = info.Width;
+				pTexture->MipTextures[i]->Height = info.Height;
+				pTexture->MipTextures[i]->Size = info.SizeOfData;
+				pTexture->MipTextures[i]->pTexData = new unsigned char[info.SizeOfData];
+				memcpy(pTexture->MipTextures[i]->pTexData, ilGetData(), info.SizeOfData);
+			}
+		}
+
+		ilBindImage(0);
+	}
 
 	return true;
 }

@@ -1,9 +1,11 @@
-cbuffer ViewProjectionConstantBuffer : register(b0)
+struct ViewProjection
 {
 	column_major matrix model;
 	column_major matrix view;
 	column_major matrix projection;
 };
+
+ConstantBuffer<ViewProjection> ViewProjectionConstantBuffer : register(b0);
 
 struct VertexShaderInput
 {
@@ -24,9 +26,9 @@ PixelShaderInput main(VertexShaderInput input)
 	PixelShaderInput output;
 	float4 pos = float4(input.pos, 1.0f);
 
-	pos = mul(model, pos);
-	pos = mul(view, pos);
-	pos = mul(projection, pos);
+	pos = mul(ViewProjectionConstantBuffer.model, pos);
+	pos = mul(ViewProjectionConstantBuffer.view, pos);
+	pos = mul(ViewProjectionConstantBuffer.projection, pos);
 
 	output.pos = pos;
 	output.color = input.color;
