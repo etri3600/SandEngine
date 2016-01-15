@@ -4,6 +4,7 @@
 #include "SUtils.h"
 #include "SModelLoader.h"
 #include "SModelViewProjection.h"
+#include "SShaderResourceManager.h"
 
 enum class GraphicsInterfaceEnum
 {

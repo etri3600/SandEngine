@@ -149,6 +149,7 @@
     <ClInclude Include="SandEngine.h" />
     <ClInclude Include="SDirectX12.h" />
     <ClInclude Include="SDirectX12Device.h" />
+    <ClInclude Include="SDX12ShaderResourceManager.h" />
     <ClInclude Include="SGraphics.h" />
     <ClInclude Include="SGraphicsInterface.h" />
     <ClInclude Include="SHeader.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="SPlatformSystem.h" />
     <ClInclude Include="SSceneManager.h" />
     <ClInclude Include="SSceneNode.h" />
+    <ClInclude Include="SShaderResourceManager.h" />
     <ClInclude Include="SSingletone.h" />
     <ClInclude Include="SImageLoader.h" />
     <ClInclude Include="STime.h" />
@@ -180,6 +182,7 @@
     <ClCompile Include="SMath.cpp" />
     <ClCompile Include="SModelLoader.cpp" />
     <ClCompile Include="SSceneManager.cpp" />
+    <ClCompile Include="SShaderResourceManager.cpp" />
     <ClCompile Include="SUtils.cpp" />
     <ClCompile Include="SWindows.cpp" />
   </ItemGroup>

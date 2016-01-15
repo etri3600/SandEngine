@@ -1,12 +1,14 @@
 #pragma once
 
+#include "SLoader.h"
+
 #include "IL\ilu.h"
 
 #include <string>
 
 #include "SImage.h"
 
-class SImageLoader
+class SImageLoader : public SLoader
 {
 public:
 	bool Initialize();
