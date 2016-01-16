@@ -149,6 +149,7 @@
     <ClInclude Include="SandEngine.h" />
     <ClInclude Include="SDirectX12.h" />
     <ClInclude Include="SDirectX12Device.h" />
+    <ClInclude Include="SDX12Helper.h" />
     <ClInclude Include="SDX12ShaderResourceManager.h" />
     <ClInclude Include="SGraphics.h" />
     <ClInclude Include="SGraphicsInterface.h" />
@@ -176,6 +177,8 @@
   <ItemGroup>
     <ClCompile Include="SDirectX12.cpp" />
     <ClCompile Include="SDirectX12Device.cpp" />
+    <ClCompile Include="SDX12Helper.cpp" />
+    <ClCompile Include="SDX12ShaderResourceManager.cpp" />
     <ClCompile Include="SGraphics.cpp" />
     <ClCompile Include="SImage.cpp" />
     <ClCompile Include="SImageLoader.cpp" />

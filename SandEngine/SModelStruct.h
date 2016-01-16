@@ -55,6 +55,14 @@ public:
 		return static_cast<void*>(Indices.data());
 	}
 
+	auto GetTextures() const {
+		return Textures;
+	}
+
+	STexture* GetTexture(unsigned int nTextureIndex) const {
+		return Textures.size() > nTextureIndex ? Textures[nTextureIndex] : nullptr;
+	}
+
 	unsigned int TextureSize(unsigned int nTextureIndex) const {
 		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetCurrentMipTexture().Size : 0U;
 	}
@@ -95,11 +103,11 @@ public:
 		return Height;
 	}
 
-	void* TextureSerialize(unsigned int nTextureIndex) {
+	void* TextureSerialize(unsigned int nTextureIndex) const {
 		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetCurrentMipTexture().pTexData : nullptr;
 	}
 
-	unsigned int TextureFormat(unsigned int nTextureIndex) {
+	unsigned int TextureFormat(unsigned int nTextureIndex) const {
 		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTextureFormat() : 0;
 	}
 

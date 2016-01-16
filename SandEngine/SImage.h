@@ -43,4 +43,5 @@ struct STexture : public SImage
 
 	SMipTexture GetCurrentMipTexture() { return MipTextures.size() > CurrentMipLevel ? *MipTextures[CurrentMipLevel] : SMipTexture(); }
 	unsigned int GetTextureFormat() const;
+	unsigned int GetTexturePixelSize() const;
 };

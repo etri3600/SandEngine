@@ -28,12 +28,14 @@ public:
 	virtual bool CreateSwapChain(const SPlatformSystem* pPlatformSystem, const int nNumerator, const int nDenominator) = 0;
 	virtual void CreateViewProjection() = 0;
 
+public:
+	static constexpr unsigned int c_BufferingCount = 3;
+
 protected:
 	SModelLoader* ModelLoader = nullptr;
 	SModelViewProjection* MVP;
 	SMatrix View, Projection;
 
-	static constexpr unsigned int c_BufferingCount = 3;
 	unsigned int m_BufferIndex = 0;
 
 	unsigned int m_ScreenWidth = 0, m_ScreenHeight = 0;

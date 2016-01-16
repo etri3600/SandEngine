@@ -105,6 +105,9 @@
     <ClInclude Include="SModelViewProjection.h">
       <Filter>Asset</Filter>
     </ClInclude>
+    <ClInclude Include="SDX12Helper.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDirectX12.cpp">
@@ -135,6 +138,12 @@
     </ClCompile>
     <ClCompile Include="SImage.cpp">
       <Filter>Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="SDX12ShaderResourceManager.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="SDX12Helper.cpp">
+      <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

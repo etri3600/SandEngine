@@ -36,3 +36,19 @@ unsigned int STexture::GetTextureFormat() const
 
 	return 0;
 }
+
+unsigned int STexture::GetTexturePixelSize() const
+{
+	unsigned int size = 0;
+	switch (eTextureFormat)
+	{
+	case TextureFormat::TF_RGB:
+	case TextureFormat::TF_BGR: size = 4 * 3;
+		break;
+	case TextureFormat::TF_RGBA:
+	case TextureFormat::TF_BGRA: size = 4 * 4;
+		break;
+	}
+
+	return size;
+}

@@ -9,4 +9,3 @@ public:
 	virtual void BindShaderResource() = 0;
 };
 
-extern SShaderResourceManager* gShaderResourceManager;

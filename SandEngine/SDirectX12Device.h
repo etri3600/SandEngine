@@ -4,6 +4,7 @@
 #include <dxgi1_4.h>
 #include <d3dcompiler.h>
 
+#define RELEASE_DX(ptr) {if(ptr) ptr->Release(); ptr = nullptr;}
 
 class SDirectX12Device
 {
