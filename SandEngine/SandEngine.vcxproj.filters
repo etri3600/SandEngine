@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
@@ -16,138 +12,129 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{4f0e3cf3-f1b2-42a2-b17b-630aff08d4da}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Graphics">
+    <Filter Include="Graphics">
       <UniqueIdentifier>{da8e48b0-1cf6-457b-afa3-30e85a08c2e4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Graphics">
-      <UniqueIdentifier>{8dec6d30-6e1a-4a80-9bdd-ad3253286016}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Graphics\DirectX12">
+    <Filter Include="Graphics\DirectX12">
       <UniqueIdentifier>{487173d8-4c6b-4084-9497-596ab1a50127}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Graphics\DirectX12">
-      <UniqueIdentifier>{28143fc9-f54e-448d-991e-ab0555412006}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Platform">
+    <Filter Include="Platform">
       <UniqueIdentifier>{f2653c77-10bd-43ad-b2bc-5b174ea7a7d8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Platform">
-      <UniqueIdentifier>{d4c84b46-3f28-4e8f-b592-277688e33dad}</UniqueIdentifier>
+    <Filter Include="Loader">
+      <UniqueIdentifier>{3bd61dfe-3103-45c8-ab9d-c42a55bda1f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{af7c7b4e-d730-4cbd-bdf6-f8477fd90bf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{a8a4a40d-14f9-4a0c-9470-f88faa40dbda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Asset">
+      <UniqueIdentifier>{cdbcc363-4744-4706-a26b-bdca859d4ab0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SMath.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SInput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SLinux.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SandEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SInputManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SSceneNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SSceneManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SModelLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SModelStruct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SModelViewProjection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SSingletone.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SImageLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SImage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="STime.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SGraphics.h">
-      <Filter>Header Files\Graphics</Filter>
+      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="SGraphicsInterface.h">
-      <Filter>Header Files\Graphics</Filter>
+      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="SDirectX12.h">
-      <Filter>Header Files\Graphics\DirectX12</Filter>
+      <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
     <ClInclude Include="SDirectX12Device.h">
-      <Filter>Header Files\Graphics\DirectX12</Filter>
+      <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
     <ClInclude Include="SWindows.h">
-      <Filter>Header Files\Platform</Filter>
+      <Filter>Platform</Filter>
     </ClInclude>
     <ClInclude Include="SPlatformSystem.h">
-      <Filter>Header Files\Platform</Filter>
+      <Filter>Platform</Filter>
     </ClInclude>
     <ClInclude Include="SPlatformManager.h">
-      <Filter>Header Files\Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="SShaderResourceManager.h">
-      <Filter>Source Files\Graphics</Filter>
+      <Filter>Platform</Filter>
     </ClInclude>
     <ClInclude Include="SDX12ShaderResourceManager.h">
-      <Filter>Source Files\Graphics\DirectX12</Filter>
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="SShaderResourceManager.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="SLinux.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="SUtils.h" />
+    <ClInclude Include="STime.h" />
+    <ClInclude Include="SSingletone.h" />
+    <ClInclude Include="SMath.h" />
+    <ClInclude Include="SSceneNode.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SSceneManager.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SImageLoader.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="SLoader.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="SModelLoader.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="SInput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SInputManager.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SImage.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="SModelStruct.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="SModelViewProjection.h">
+      <Filter>Asset</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SModelLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SMath.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SSceneManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SImageLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SImage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SGraphics.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="SDirectX12.cpp">
-      <Filter>Source Files\Graphics\DirectX12</Filter>
+      <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="SDirectX12Device.cpp">
-      <Filter>Source Files\Graphics\DirectX12</Filter>
+      <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
-    <ClCompile Include="SWindows.cpp">
-      <Filter>Source Files\Platform</Filter>
+    <ClCompile Include="SGraphics.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="SShaderResourceManager.cpp">
-      <Filter>Source Files\Graphics</Filter>
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="SWindows.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="SUtils.cpp" />
+    <ClCompile Include="SMath.cpp" />
+    <ClCompile Include="SSceneManager.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SImageLoader.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="SModelLoader.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="SImage.cpp">
+      <Filter>Asset</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
