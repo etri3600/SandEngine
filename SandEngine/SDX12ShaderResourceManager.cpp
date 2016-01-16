@@ -26,7 +26,7 @@ void SDX12ShaderResourceManager::CreateShaderResource(const SModel& model)
 
 	// Create Texture
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-	srvHeapDesc.NumDescriptors = TextureSize;
+	srvHeapDesc.NumDescriptors = textures.size();
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	HRESULT hResult = m_pDevice->GetDevice()->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_pSRVHeap));
@@ -56,13 +56,18 @@ void SDX12ShaderResourceManager::CreateShaderResource(const SModel& model)
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&texturebuffer));
-	SWindows::OutputErrorMessage(hResult);
-	texturebuffer->SetName(L"Upload Texture2D");
 
 	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_pSRVBuffer));
 	SWindows::OutputErrorMessage(hResult);
 	m_pSRVBuffer->SetName(L"Texture2D");
+
+	auto uploadBufferSize = GetRequiredIntermediateSize(m_pSRVBuffer, 0, 1);
+
+	textureDesc.Width = uploadBufferSize;
+	textureDesc.Height = 1;
+	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&texturebuffer));
+	SWindows::OutputErrorMessage(hResult);
+	texturebuffer->SetName(L"Upload Texture2D");
 
 	D3D12_SUBRESOURCE_DATA textureData = {};
 	textureData.pData = model.TextureSerialize(0);

@@ -7,9 +7,9 @@
 #include "assimp\Importer.hpp"
 
 #include "SUtils.h"
-#include "SModelStruct.h"
 #include "SImageLoader.h"
 
+class SModel;
 class SModelLoader : public SLoader
 {
 public:

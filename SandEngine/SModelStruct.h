@@ -3,6 +3,7 @@
 #include "SMath.h"
 #include "SUtils.h"
 #include "SImage.h"
+#include "SBoneStruct.h"
 
 struct SModelVertex
 {
@@ -18,6 +19,7 @@ public:
 	std::vector<SModelVertex> Vertices;
 	std::vector<unsigned int> Indices;
 	std::vector<STexture*> Textures;
+	std::vector<SBone> Bones;
 
 	SVector3 Location;
 	SQuaternion Rotation;

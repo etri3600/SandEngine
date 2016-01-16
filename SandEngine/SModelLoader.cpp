@@ -1,5 +1,7 @@
 #include "SModelLoader.h"
 
+#include "SModelStruct.h"
+
 namespace {
 	const std::wstring WDirPath = LR"(..\Model\)";
 	const std::string DirPath = R"(..\Model\)";
@@ -38,8 +40,6 @@ SModel SModelLoader::LoadModelFromFile(const wchar_t* file)
 		return std::move(model);
 	}
 
-	int nTotalVertices = 0;
-
 	for (unsigned int i = 0; i < pScene->mNumMeshes; ++i)
 	{
 		const auto pMesh = pScene->mMeshes[i];
@@ -64,6 +64,17 @@ SModel SModelLoader::LoadModelFromFile(const wchar_t* file)
 					model.Indices.push_back(index);
 				}
 			}
+
+			for (unsigned int j = 0;j < pMesh->mNumBones; ++j)
+			{
+				std::string name(pMesh->mBones[j]->mName.data);
+				for (unsigned int k = 0;k < pMesh->mBones[j]->mNumWeights; ++k)
+				{
+					SBone bone;
+					bone.BoneWeightMap.insert(std::pair<unsigned int,float>(pMesh->mBones[j]->mWeights[i].mVertexId, pMesh->mBones[j]->mWeights[i].mWeight));
+					model.Bones.push_back(bone);
+				}
+			}
 		}
 	}
 
@@ -82,6 +93,11 @@ SModel SModelLoader::LoadModelFromFile(const wchar_t* file)
 				model.Textures.push_back(texture);
 			}
 		}
+	}
+
+	for (unsigned int i = 0;i < pScene->mNumAnimations;++i)
+	{
+		pScene->mAnimations[i];
 	}
 
 	LoadModelFromNode(&model, pScene->mRootNode);

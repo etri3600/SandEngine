@@ -108,6 +108,9 @@
     <ClInclude Include="SDX12Helper.h">
       <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
+    <ClInclude Include="SBoneStruct.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDirectX12.cpp">
