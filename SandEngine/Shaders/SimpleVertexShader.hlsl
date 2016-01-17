@@ -13,12 +13,16 @@ struct VertexShaderInput
 	float4 color : COLOR0;
 	float3 normal : NORMAL0;
 	float2 uv : TEXCOORD0;
+	uint4 bone : BLENDINDICES0;
+	float wieght : BLENDWEIGHT0;
 };
 
 struct PixelShaderInput
 {
 	float4 pos : SV_POSITION;
 	float4 color : COLOR0;
+	float3 normal : NORMAL0;
+	float2 uv : TEXCOORD0;
 };
 
 PixelShaderInput main(VertexShaderInput input)
@@ -32,6 +36,8 @@ PixelShaderInput main(VertexShaderInput input)
 
 	output.pos = pos;
 	output.color = input.color;
+	output.normal = input.normal;
+	output.uv = input.uv;
 
 	return output;
 }

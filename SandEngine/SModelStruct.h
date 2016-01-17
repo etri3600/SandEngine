@@ -11,6 +11,8 @@ struct SModelVertex
 	SVector4 color;
 	SVector3 normal;
 	SVector2 uv;
+	unsigned int bone[4];
+	float wieght = 0.0f;
 };
 
 class SModel
@@ -20,6 +22,8 @@ public:
 	std::vector<unsigned int> Indices;
 	std::vector<STexture*> Textures;
 	std::vector<SBone> Bones;
+	std::map<std::string, unsigned int> BoneMap;
+	unsigned int BoneNums;
 
 	SVector3 Location;
 	SQuaternion Rotation;
