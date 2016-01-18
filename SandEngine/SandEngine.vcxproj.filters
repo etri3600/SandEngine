@@ -108,7 +108,7 @@
     <ClInclude Include="SDX12Helper.h">
       <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
-    <ClInclude Include="SBoneStruct.h">
+    <ClInclude Include="SAnimator.h">
       <Filter>Asset</Filter>
     </ClInclude>
   </ItemGroup>

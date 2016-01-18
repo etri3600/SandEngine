@@ -3,7 +3,26 @@
 #include "SMath.h"
 #include "SUtils.h"
 #include "SImage.h"
-#include "SBoneStruct.h"
+
+#define BONES_PER_VERTEX 4
+
+struct SBoneWeight
+{
+	SBoneWeight(unsigned int boneIndex, float weight)
+		:boneIndex(boneIndex), weight(weight)
+	{}
+	unsigned int boneIndex;
+	float weight;
+};
+
+struct SBone
+{
+	std::string name;
+	SMatrix boneOffset;
+	SMatrix localTransform, globalTransform, originLocalTransform;
+	SBone* parent;
+	std::vector<SBone> children;
+};
 
 struct SModelVertex
 {
@@ -11,8 +30,8 @@ struct SModelVertex
 	SVector4 color;
 	SVector3 normal;
 	SVector2 uv;
-	unsigned int bone[4];
-	float wieght = 0.0f;
+	unsigned int boneIDs[BONES_PER_VERTEX]{};
+	float wieghts = 0.0f;
 };
 
 class SModel
@@ -22,7 +41,6 @@ public:
 	std::vector<unsigned int> Indices;
 	std::vector<STexture*> Textures;
 	std::vector<SBone> Bones;
-	std::map<std::string, unsigned int> BoneMap;
 	unsigned int BoneNums;
 
 	SVector3 Location;

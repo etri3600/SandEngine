@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <cassert>
+#include <algorithm>
 
 struct SVector2
 {
@@ -55,6 +56,17 @@ struct SVector3
 	SVector3 operator/(const float& t) const
 	{
 		return SVector3(x / t, y / t, z / t);
+	}
+
+	const float& operator[](const unsigned int index) const
+	{
+		assert(0 <= index && index <= 2);
+		switch (index)
+		{
+		case 0: return x;
+		case 1: return y;
+		case 2: return z;
+		}
 	}
 
 	float& operator[](const unsigned int index)
@@ -142,6 +154,19 @@ struct SVector4
 		return SVector4(x/t, y/t, z/t, w/t);
 	}
 
+	const float& operator[](const unsigned int index) const
+	{
+		assert(0 <= index && index <= 3);
+		switch (index)
+		{
+		case 0: return x;
+		case 1: return y;
+		case 2: return z;
+		case 3: return w;
+		}
+		return w;
+	}
+
 	float& operator[](const unsigned int index)
 	{
 		assert(0 <= index && index <= 3);
@@ -205,7 +230,7 @@ struct alignas(16) SMatrix
 		m[3] = SVector4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	SVector4 operator *(SVector4& rhs)
+	SVector4 operator *(const SVector4& rhs)
 	{
 		SVector4 result;
 		result.x = m[0][0] * rhs.x + m[1][0] * rhs.y + m[2][0] * rhs.z + m[3][0] * rhs.z;
@@ -216,7 +241,7 @@ struct alignas(16) SMatrix
 		return result;
 	}
 
-	SMatrix operator *(SMatrix& rhs)
+	SMatrix operator *(const SMatrix& rhs)
 	{
 		SMatrix mat;
 		mat.m[0][0] = m[0][0] * rhs.m[0][0] + m[1][0] * rhs.m[0][1] + m[2][0] * rhs.m[0][2] + m[3][0] * rhs.m[0][3];
@@ -242,6 +267,13 @@ struct alignas(16) SMatrix
 		return mat;
 	}
 
+	SMatrix& operator *=(const SMatrix& rhs)
+	{
+		SMatrix mat = *this;
+		*this = mat * rhs;
+		return *this;
+	}
+
 	SMatrix& Translation(const SVector3& location)
 	{
 		m[3].x += location.x;
@@ -261,7 +293,12 @@ struct alignas(16) SMatrix
 
 struct SQuaternion
 {
-	float x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
+	SQuaternion()
+	{}
+	SQuaternion(const float x, const float y, const float z, const float w)
+		:x(x), y(y), z(z), w(w)
+	{}
+	float x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f;
 
 	SQuaternion operator*(const SQuaternion& rhs)
 	{
@@ -380,5 +417,18 @@ namespace SMath
 		SMatrix m(SMatrix::Identity);
 
 		return m.Scale(scale).Translation(location);
+	}
+
+	inline SMatrix Transpose(const SMatrix& matrix)
+	{
+		SMatrix mat = matrix;
+		std::swap(mat.m[0][1], mat.m[1][0]);
+		std::swap(mat.m[0][2], mat.m[2][0]);
+		std::swap(mat.m[0][3], mat.m[3][0]);
+		std::swap(mat.m[1][2], mat.m[2][1]);
+		std::swap(mat.m[1][3], mat.m[3][1]);
+		std::swap(mat.m[2][3], mat.m[3][2]);
+
+		return mat;
 	}
 };

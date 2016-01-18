@@ -147,7 +147,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="SandEngine.h" />
-    <ClInclude Include="SBoneStruct.h" />
+    <ClInclude Include="SAnimator.h" />
     <ClInclude Include="SDirectX12.h" />
     <ClInclude Include="SDirectX12Device.h" />
     <ClInclude Include="SDX12Helper.h" />

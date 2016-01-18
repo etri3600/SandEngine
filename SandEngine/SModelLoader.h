@@ -6,11 +6,16 @@
 #include "assimp\postprocess.h"
 #include "assimp\Importer.hpp"
 
-#include "SUtils.h"
-#include "SImageLoader.h"
+#include <map>
+#include <vector>
+
 #include "SMath.h"
+#include "SModelStruct.h"
+#include "SAnimator.h"
 
 class SModel;
+class SAnimator;
+class SImageLoader;
 class SModelLoader : public SLoader
 {
 public:
@@ -20,11 +25,18 @@ public:
 
 
 private:
-	void	LoadModelFromNode(SModel* model , aiNode* node);
-	void	LoadMeshes(SModel* model, const aiScene* pScene);
-	void	LoadBones(SModel* model, aiMesh* pMesh);
+	void	LoadMeshes(SModel* model, SAnimator* animator, const aiScene* pScene);
+	void	LoadBones(SModel* model, SAnimator* animator, aiMesh* pMesh, std::map<unsigned int, std::vector<SBoneWeight>>& vertexBoneWeight);
+
+	void	LoadAnimation(SAnimator* animator, const aiScene* pScene);
+	SBone	CreateBoneTree(SAnimator* animator, aiNode* node);
+	void	CreateGlobalTransformation(SBone& child);
 
 	SMatrix MatrixFromAI(const aiMatrix4x4& aiMatrix);
+	SVector3 Vector3FromAI(const aiVector3D& aiVector3);
+	SQuaternion QuatFromAI(const aiQuaternion& aiQuat);
+	std::vector<SAnimTimelineVector> ATVFromAI(const aiVectorKey* pVectorKey, const unsigned int num);
+	std::vector<SAnimTimelineQuat> ATQFromAI(const aiQuatKey* pQuatKey, const unsigned int num);
 
 protected:
 	SImageLoader* m_ImageLoader;
