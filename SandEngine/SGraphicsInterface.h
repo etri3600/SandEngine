@@ -3,7 +3,7 @@
 #include "SPlatformSystem.h"
 #include "SUtils.h"
 #include "SModelLoader.h"
-#include "SModelViewProjection.h"
+#include "SConstantBuffer.h"
 #include "SShaderResourceManager.h"
 
 enum class GraphicsInterfaceEnum
@@ -13,7 +13,6 @@ enum class GraphicsInterfaceEnum
 	//GI_GL_4,
 	//GI_BULKAN
 };
-
 class SIGraphicsInterface
 {
 public:
@@ -34,6 +33,7 @@ public:
 protected:
 	SModelLoader* ModelLoader = nullptr;
 	SModelViewProjection* MVP;
+	SBoneTransform* BoneTransform;
 	SMatrix View, Projection;
 
 	unsigned int m_BufferIndex = 0;

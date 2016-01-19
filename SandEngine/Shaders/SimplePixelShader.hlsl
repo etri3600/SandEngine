@@ -1,8 +1,10 @@
 struct PixelShaderInput
 {
-	float4 pos : SV_POSITION;
+	float4 fragPos : SV_POSITION;
+	float3 pos : POSITION0;
 	float4 color : COLOR0;
 	float3 normal : NORMAL0;
+	float3 tangent : TANGENT0;
 	float2 uv : TEXCOORD0;
 };
 

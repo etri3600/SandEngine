@@ -12,6 +12,7 @@ struct SDX12SceneProxy
 	unsigned int IndexCountPerInstance = 0;
 	unsigned int StartIndexLocation = 0;
 	SMatrix Tranformation;
+	SMatrix BoneTransform[MAX_BONES];
 };
 
 class SDirectX12 : public SIGraphicsInterface
@@ -34,9 +35,11 @@ public:
 	std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob);
 
 protected:
-	VOID CreateShaderResources(std::vector<SModel>& models);
-	VOID CreateConstantBuffer(std::vector<SModel>& models);
+	void CreateShaderResources(std::vector<SModel>& models);
+	void CreateConstantBuffer(std::vector<SModel>& models);
+
 	void UpdateConstantBuffer();
+	void UpdateBoneBuffer();
 
 private:
 	void WaitForGPU();

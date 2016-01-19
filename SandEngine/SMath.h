@@ -119,6 +119,7 @@ struct SVector4
 		x = vec3.x;
 		y = vec3.y;
 		z = vec3.z;
+		w = 0.0f;
 		return *this;
 	}
 

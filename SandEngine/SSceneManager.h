@@ -12,6 +12,9 @@ public:
 	void Draw();
 	void Reset();
 
+private:
+	void UpdateObjects(double delta);
+
 	SIGraphicsInterface* m_pGraphicsInterface = nullptr;
 
 	std::vector<SModel> m_Models;

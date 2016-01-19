@@ -21,8 +21,8 @@ void SDX12ShaderResourceManager::CreateShaderResource(const SModel& model)
 	if (textures.size() == 0)
 		return;
 
-	unsigned int TextureSize = model.Textures.size();
-	unsigned int TextureWidth = model.TextureWidth(0), TextureHeight = model.TextureHeight(0);
+	unsigned int TextureSize = static_cast<unsigned int>(model.Textures.size());
+	unsigned int TextureWidth = static_cast<unsigned int>(model.TextureWidth(0)), TextureHeight = static_cast<unsigned int>(model.TextureHeight(0));
 
 	// Create Texture
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};

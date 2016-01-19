@@ -29,11 +29,14 @@ struct SModelVertex
 	SVector3 position;
 	SVector4 color;
 	SVector3 normal;
+	SVector4 tangent;
 	SVector2 uv;
 	unsigned int boneIDs[BONES_PER_VERTEX]{};
 	float wieghts = 0.0f;
 };
 
+class SAnimationStruct;
+class SAnimator;
 class SModel
 {
 public:
@@ -41,11 +44,14 @@ public:
 	std::vector<unsigned int> Indices;
 	std::vector<STexture*> Textures;
 	std::vector<SBone> Bones;
-	unsigned int BoneNums;
+	SAnimationStruct* AnimationStruct;
+	SAnimator* Animator;
 
 	SVector3 Location;
 	SQuaternion Rotation;
 	SVector3 Scale{ 1.0f, 1.0f, 1.0f };
+
+	void Update(double delta);
 	
 	static constexpr std::size_t VertexBaseSize() {
 		return sizeof(SModelVertex);
@@ -137,14 +143,24 @@ public:
 
 	void Release()
 	{
-		Vertices.empty();
-		Indices.empty();
+		Vertices.clear();
+		Indices.clear();
 		for (auto it = Textures.begin(); it != Textures.end(); ++it)
 		{
 			delete[] *it;
 			(*it) = nullptr;
 		}
-		Textures.empty();
+		Textures.clear();
+		if (AnimationStruct)
+		{
+			delete AnimationStruct;
+			AnimationStruct = nullptr;
+		}
+		if (Animator)
+		{
+			delete Animator;
+			Animator = nullptr;
+		}
 	}
 };
 

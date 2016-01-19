@@ -70,7 +70,7 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	// Create Root Signal
 	D3D12_DESCRIPTOR_RANGE range[3];
 	range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-	range[0].NumDescriptors = 1;
+	range[0].NumDescriptors = 2;
 	range[0].BaseShaderRegister = 0;
 	range[0].RegisterSpace = 0;
 	range[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
@@ -136,11 +136,12 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	D3D12_INPUT_ELEMENT_DESC inputLayout[]=
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0},
-		{ "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT, 0, 48, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
-		{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32_FLOAT, 0, 52, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0},
+		{ "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
+		{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
 	};
 
 
@@ -383,6 +384,7 @@ void SDirectX12::CreateViewProjection()
 bool SDirectX12::Update(const double delta)
 {
 	UpdateConstantBuffer();
+	UpdateBoneBuffer();
 
 	return true;
 }
@@ -763,6 +765,21 @@ void SDirectX12::UpdateConstantBuffer()
 		mvp.Model = m_SceneProxy[i].Tranformation;
 		auto index = m_BufferIndex * m_SceneProxy.size() + i;
 		memcpy(&MVP[index], &mvp, sizeof(SModelViewProjection));
+	}
+}
+
+void SDirectX12::UpdateBoneBuffer()
+{
+	SBoneTransform bones;
+	for (unsigned int i = 0;i < m_SceneProxy.size(); ++i)
+	{
+		for (unsigned int j = 0;j < MAX_BONES; ++j)
+		{
+			bones.transform[j] = m_SceneProxy[i].BoneTransform[j];
+		}
+
+		auto index = m_BufferIndex * m_SceneProxy.size() + i;
+		memcpy(&BoneTransform[index], &bones, sizeof(SBoneTransform));
 	}
 }
 

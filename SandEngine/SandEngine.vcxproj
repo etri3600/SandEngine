@@ -163,7 +163,7 @@
     <ClInclude Include="SMath.h" />
     <ClInclude Include="SModelLoader.h" />
     <ClInclude Include="SModelStruct.h" />
-    <ClInclude Include="SModelViewProjection.h" />
+    <ClInclude Include="SConstantBuffer.h" />
     <ClInclude Include="SPlatformManager.h" />
     <ClInclude Include="SPlatformSystem.h" />
     <ClInclude Include="SSceneManager.h" />
@@ -176,6 +176,7 @@
     <ClInclude Include="SWindows.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SAnimator.cpp" />
     <ClCompile Include="SDirectX12.cpp" />
     <ClCompile Include="SDirectX12Device.cpp" />
     <ClCompile Include="SDX12Helper.cpp" />
@@ -185,6 +186,7 @@
     <ClCompile Include="SImageLoader.cpp" />
     <ClCompile Include="SMath.cpp" />
     <ClCompile Include="SModelLoader.cpp" />
+    <ClCompile Include="SModelStruct.cpp" />
     <ClCompile Include="SSceneManager.cpp" />
     <ClCompile Include="SShaderResourceManager.cpp" />
     <ClCompile Include="SUtils.cpp" />
