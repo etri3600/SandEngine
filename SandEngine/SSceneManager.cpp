@@ -16,6 +16,7 @@ void SSceneManager::Tick()
 	UpdateObjects(delta);
 	if (m_pGraphicsInterface)
 	{
+		m_pGraphicsInterface->UpdateBoneTransform(m_Models);
 		m_pGraphicsInterface->Update(delta);
 		m_pGraphicsInterface->Render();
 		m_pGraphicsInterface->Present();

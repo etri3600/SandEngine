@@ -27,6 +27,8 @@ public:
 	bool CreateSwapChain(const SPlatformSystem* pPlatformSystem, const int nNumerator, const int nDenominator) override;
 	void CreateViewProjection() override;
 
+	void UpdateBoneTransform(const std::vector<SModel>& models) override;
+
 	bool Update(const double delta) override;
 	void Draw(std::vector<SModel>& models) override;
 	bool Render() override;
@@ -39,7 +41,6 @@ protected:
 	void CreateConstantBuffer(std::vector<SModel>& models);
 
 	void UpdateConstantBuffer();
-	void UpdateBoneBuffer();
 
 private:
 	void WaitForGPU();
@@ -78,9 +79,9 @@ private:
 	D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
 	ID3D12Resource* m_pIndexBuffer;
 
-	ID3D12DescriptorHeap* m_pCBVHeap;
+	ID3D12DescriptorHeap* m_pCBVHeap[2];
+	ID3D12Resource* m_pCBVBuffer[2];
 	unsigned int m_uiCBVDescriptorSize = 0;
-	ID3D12Resource* m_pConstantBuffer;
 
 	ID3D12DescriptorHeap* m_pSRVHeap;
 	unsigned int m_uiSRVDescriptorSize = 0;

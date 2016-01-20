@@ -21,7 +21,7 @@ struct SBone
 	SMatrix boneOffset;
 	SMatrix localTransform, globalTransform, originLocalTransform;
 	SBone* parent;
-	std::vector<SBone> children;
+	std::vector<SBone*> children;
 };
 
 struct SModelVertex
@@ -35,7 +35,7 @@ struct SModelVertex
 	float wieghts = 0.0f;
 };
 
-class SAnimationStruct;
+class SAnimation;
 class SAnimator;
 class SModel
 {
@@ -43,8 +43,7 @@ public:
 	std::vector<SModelVertex> Vertices;
 	std::vector<unsigned int> Indices;
 	std::vector<STexture*> Textures;
-	std::vector<SBone> Bones;
-	SAnimationStruct* AnimationStruct;
+	SAnimation* Animation;
 	SAnimator* Animator;
 
 	SVector3 Location;
@@ -151,10 +150,10 @@ public:
 			(*it) = nullptr;
 		}
 		Textures.clear();
-		if (AnimationStruct)
+		if (Animation)
 		{
-			delete AnimationStruct;
-			AnimationStruct = nullptr;
+			delete Animation;
+			Animation = nullptr;
 		}
 		if (Animator)
 		{

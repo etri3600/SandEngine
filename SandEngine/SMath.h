@@ -5,6 +5,8 @@
 #include <cassert>
 #include <algorithm>
 
+#include "SUtils.h"
+
 struct SVector2
 {
 	SVector2()
@@ -220,7 +222,6 @@ struct alignas(16) SMatrix
 
 	SMatrix::SMatrix()
 	{
-
 	}
 
 	SMatrix::SMatrix(const SVector3& X_Axis, const SVector3& Y_Axis, const SVector3& Z_Axis)
@@ -290,6 +291,13 @@ struct alignas(16) SMatrix
 		m[2][2] *= scale.z;
 		return *this;
 	}
+
+	auto Determinant() const
+	{
+		return m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[2][1])
+			- m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[2][2])
+			+ m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
+	}
 };
 
 struct SQuaternion
@@ -331,6 +339,14 @@ struct SQuaternion
 	auto Size() const
 	{
 		return sqrt(SizeSquared());
+	}
+
+	void Normalize()
+	{
+		auto imaginarySize = sqrt(x*x + y*y + z*z);
+		x = x / imaginarySize;
+		y = y / imaginarySize;
+		z = z / imaginarySize;
 	}
 };
 
@@ -431,5 +447,69 @@ namespace SMath
 		std::swap(mat.m[2][3], mat.m[3][2]);
 
 		return mat;
+	}
+
+	inline SMatrix Inverse(const SMatrix& matrix)
+	{
+		SMatrix ret;
+		auto det = matrix.Determinant();
+		if (Sand::Equal(det, 1.0f))
+			ret = Transpose(matrix);
+		else
+		{
+			ret.m[0][0] = matrix.m[1][1] * matrix.m[2][2] - matrix.m[2][1] * matrix.m[1][2];
+			ret.m[0][1] = matrix.m[2][1] * matrix.m[0][2] - matrix.m[2][2] * matrix.m[0][1];
+			ret.m[0][2] = matrix.m[0][1] * matrix.m[1][2] - matrix.m[0][2] * matrix.m[1][1];
+			ret.m[1][0] = matrix.m[2][0] * matrix.m[1][2] - matrix.m[2][2] * matrix.m[1][0];
+			ret.m[1][1] = matrix.m[0][0] * matrix.m[2][2] - matrix.m[0][2] * matrix.m[2][0];
+			ret.m[1][2] = matrix.m[1][0] * matrix.m[0][2] - matrix.m[1][2] * matrix.m[0][0];
+			ret.m[2][0] = matrix.m[1][0] * matrix.m[2][1] - matrix.m[1][1] * matrix.m[2][0];
+			ret.m[2][1] = matrix.m[2][0] * matrix.m[0][1] - matrix.m[2][1] * matrix.m[0][0];
+			ret.m[2][2] = matrix.m[0][0] * matrix.m[1][1] - matrix.m[0][1] * matrix.m[1][0];
+			ret.m[3][3] = 1.0f;
+		}
+
+		return ret;
+	}
+
+	/// inverse transpose
+	inline SMatrix NormalMatrix(const SMatrix& matrix)
+	{
+		SMatrix normalMatrix = matrix;
+		normalMatrix.m[0][3] = normalMatrix.m[1][3] = normalMatrix.m[1][3] = 0.0f;
+		normalMatrix.m[3][3] = 1.0f;
+		return Transpose(Inverse(normalMatrix));
+	}
+
+	inline SQuaternion Slerp(const SQuaternion& qa, const SQuaternion& qb, float factor)
+	{
+		SQuaternion quat;
+		// Calculate angle between them.
+		double cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
+		// if qa=qb or qa=-qb then theta = 0 and we can return qa
+		if (abs(cosHalfTheta) >= 1.0) {
+			quat.w = qa.w;quat.x = qa.x;quat.y = qa.y;quat.z = qa.z;
+			return quat;
+		}
+		// Calculate temporary values.
+		double halfTheta = acos(cosHalfTheta);
+		double sinHalfTheta = sqrt(1.0 - cosHalfTheta*cosHalfTheta);
+		// if theta = 180 degrees then result is not fully defined
+		// we could rotate around any axis normal to qa or qb
+		if (fabs(sinHalfTheta) < 0.001) { // fabs is floating point absolute
+			quat.w = (qa.w * 0.5 + qb.w * 0.5);
+			quat.x = (qa.x * 0.5 + qb.x * 0.5);
+			quat.y = (qa.y * 0.5 + qb.y * 0.5);
+			quat.z = (qa.z * 0.5 + qb.z * 0.5);
+			return quat;
+		}
+		double ratioA = sin((1 - factor) * halfTheta) / sinHalfTheta;
+		double ratioB = sin(factor * halfTheta) / sinHalfTheta;
+		//calculate Quaternion.
+		quat.w = (qa.w * ratioA + qb.w * ratioB);
+		quat.x = (qa.x * ratioA + qb.x * ratioB);
+		quat.y = (qa.y * ratioA + qb.y * ratioB);
+		quat.z = (qa.z * ratioA + qb.z * ratioB);
+		return quat;
 	}
 };

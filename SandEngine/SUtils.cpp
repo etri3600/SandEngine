@@ -24,10 +24,10 @@ namespace Sand
 		return converter.to_bytes(*wstr);
 	}
 
-
 	bool Equal(const double& a, const double& b)
 	{
 #define EPSILON (1.e-6)
 		return fabs(a - b) < EPSILON;
 	}
+
 }

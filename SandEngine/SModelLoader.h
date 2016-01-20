@@ -14,7 +14,7 @@
 #include "SAnimator.h"
 
 class SModel;
-class SAnimationStruct;
+class SAnimation;
 class SImageLoader;
 class SModelLoader : public SLoader
 {
@@ -25,12 +25,11 @@ public:
 
 
 private:
-	void	LoadMeshes(SModel* model, SAnimationStruct* animStruct, const aiScene* pScene);
-	void	LoadBones(SModel* model, SAnimationStruct* animStruct, aiMesh* pMesh, std::map<unsigned int, std::vector<SBoneWeight>>& vertexBoneWeight);
+	void	LoadMeshes(SModel* model, SAnimation* animStruct, const aiScene* pScene);
+	void	LoadBones(SModel* model, SAnimation* animStruct, aiMesh* pMesh, std::map<unsigned int, std::vector<SBoneWeight>>& vertexBoneWeight);
 
-	void	LoadAnimation(SAnimationStruct* animStruct, const aiScene* pScene);
-	SBone	CreateBoneTree(SAnimationStruct* animStruct, aiNode* node);
-	void	CreateGlobalTransformation(SBone& child);
+	void	LoadAnimation(SAnimation* animation, const aiScene* pScene);
+	SBone*	CreateBoneTree(SAnimation* animation, SBone* pBone, aiNode* node);
 
 	SMatrix MatrixFromAI(const aiMatrix4x4& aiMatrix);
 	SVector3 Vector3FromAI(const aiVector3D& aiVector3);

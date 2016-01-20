@@ -17,16 +17,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			SSceneManager* SceneManager = new SSceneManager();
 			SceneManager->Init(pGraphics);
 
-			auto&& model = ModelLoader->LoadModelFromFile(LR"(Lara_Croft_default_outfit\Lara_Croft_default.dae)");
-			//SceneManager->Queue(model);
-			STriangle tri;
-			tri.Location = { 2.0f, 0.0f, 1.0f };
-			SceneManager->Queue(tri);
-			SCube cube1, cube2;
-			cube1.Location = { -3.0f, 0.0f, 0.0f };
-			SceneManager->Queue(cube1);
-			cube2.Location = { -1.0f, 2.0f, -1.0f };
-			SceneManager->Queue(cube2);
+			auto&& model = ModelLoader->LoadModelFromFile(LR"(Jet_Animation.FBX)");
+			model.Location = { 0.0f, 0.0f, -5.0f };
+			SceneManager->Queue(model);
+			//STriangle tri;
+			//tri.Location = { 2.0f, 0.0f, 1.0f };
+			//SceneManager->Queue(tri);
+			//SCube cube1, cube2;
+			//cube1.Location = { -3.0f, 0.0f, 0.0f };
+			//SceneManager->Queue(cube1);
+			//cube2.Location = { -1.0f, 2.0f, -1.0f };
+			//SceneManager->Queue(cube2);
 
 
 			SceneManager->Draw();

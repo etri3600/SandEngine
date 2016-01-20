@@ -8,7 +8,7 @@ struct SModelViewProjection
 	SMatrix Model;
 	SMatrix View;
 	SMatrix Projection;
-	SMatrix invetTransposeModel;
+	SMatrix NormalMatrix;
 };
 
 #define MAX_BONES 96

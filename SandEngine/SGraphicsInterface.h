@@ -27,13 +27,14 @@ public:
 	virtual bool CreateSwapChain(const SPlatformSystem* pPlatformSystem, const int nNumerator, const int nDenominator) = 0;
 	virtual void CreateViewProjection() = 0;
 
+	virtual void UpdateBoneTransform(const std::vector<SModel>& models) = 0;
+
 public:
 	static constexpr unsigned int c_BufferingCount = 3;
 
 protected:
 	SModelLoader* ModelLoader = nullptr;
-	SModelViewProjection* MVP;
-	SBoneTransform* BoneTransform;
+	char* MappedConstantBuffer[2];
 	SMatrix View, Projection;
 
 	unsigned int m_BufferIndex = 0;
