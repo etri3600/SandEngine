@@ -6,9 +6,11 @@ struct ViewProjection
 	column_major matrix normalMatrix;
 };
 
+#define MAX_BONES 128
+
 struct BoneTransform
 {
-	column_major matrix transform[96];
+	column_major matrix transform[MAX_BONES];
 };
 
 ConstantBuffer<ViewProjection> ViewProjectionConstantBuffer : register(b0);

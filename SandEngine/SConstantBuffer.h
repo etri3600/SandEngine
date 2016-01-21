@@ -11,7 +11,7 @@ struct SModelViewProjection
 	SMatrix NormalMatrix;
 };
 
-#define MAX_BONES 96
+#define MAX_BONES 128
 
 struct SBoneTransform
 {

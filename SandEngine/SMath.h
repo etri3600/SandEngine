@@ -208,6 +208,7 @@ SVector3 Cross(const SVector3& a, const SVector3& b);
 float Dot(const SVector3& a, const SVector3& b);
 float Dot(const SVector4& a, const SVector4& b);
 
+struct SQuaternion;
 struct alignas(16) SMatrix
 {
 	//Column Major Matrix
@@ -222,6 +223,10 @@ struct alignas(16) SMatrix
 
 	SMatrix::SMatrix()
 	{
+		m[0][0] = 1.0f;
+		m[1][1] = 1.0f;
+		m[2][2] = 1.0f;
+		m[3][3] = 1.0f;
 	}
 
 	SMatrix::SMatrix(const SVector3& X_Axis, const SVector3& Y_Axis, const SVector3& Z_Axis)
@@ -276,28 +281,10 @@ struct alignas(16) SMatrix
 		return *this;
 	}
 
-	SMatrix& Translation(const SVector3& location)
-	{
-		m[3].x += location.x;
-		m[3].y += location.y;
-		m[3].z += location.z;
-		return *this;
-	}
-
-	SMatrix& Scale(const SVector3& scale)
-	{
-		m[0][0] *= scale.x;
-		m[1][1] *= scale.y;
-		m[2][2] *= scale.z;
-		return *this;
-	}
-
-	auto Determinant() const
-	{
-		return m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[2][1])
-			- m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[2][2])
-			+ m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
-	}
+	SMatrix& Scale(const SVector3& scale);
+	SMatrix& Rotate(const SQuaternion& rot);
+	SMatrix& Translate(const SVector3& location);
+	float Determinant() const;
 };
 
 struct SQuaternion
@@ -412,7 +399,7 @@ namespace SMath
 	inline SMatrix Translation(const SVector3& location)
 	{
 		SMatrix m(SMatrix::Identity);
-		m.Translation(location);
+		m.Translate(location);
 		return m;
 	}
 
@@ -433,7 +420,7 @@ namespace SMath
 	{
 		SMatrix m(SMatrix::Identity);
 
-		return m.Scale(scale).Translation(location);
+		return m.Scale(scale).Rotate(quat).Translate(location);
 	}
 
 	inline SMatrix Transpose(const SMatrix& matrix)

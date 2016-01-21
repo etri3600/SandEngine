@@ -77,11 +77,13 @@ public:
 protected:
 	SBone* m_Skeleton = nullptr;
 	std::map<std::string, SBone*> m_BoneNameMap;
-	std::map<std::string, unsigned int> m_BoneIndex;
-	std::map<std::string, unsigned int> m_AnimNameIdMap;
-	std::vector<SBone*> m_Bones;
-	std::vector<SAnimInfo> m_Animations;
+	unsigned int m_nEmptyNameId = 0;
 
+	std::map<std::string, unsigned int> m_BoneIndex;
+	std::vector<SBone*> m_Bones;
+
+	std::map<std::string, unsigned int> m_AnimNameIdMap;
+	std::vector<SAnimInfo> m_Animations;
 	unsigned int m_CurrentAnimIndex = 0;
 
 	friend class SModelLoader;

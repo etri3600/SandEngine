@@ -17,8 +17,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			SSceneManager* SceneManager = new SSceneManager();
 			SceneManager->Init(pGraphics);
 
-			auto&& model = ModelLoader->LoadModelFromFile(LR"(Jet_Animation.FBX)");
-			model.Location = { 0.0f, 0.0f, -5.0f };
+			auto&& model = ModelLoader->LoadModelFromFile(LR"(drone.X)");
+			model.Scale = {0.02f, 0.02f, 0.02f};
+			model.Location = { 0.0f, -20.0f, -50.0f };
+			model.Rotation = { 1.0f, 0.0f, 0.0f, std::cos(45.0f)};
 			SceneManager->Queue(model);
 			//STriangle tri;
 			//tri.Location = { 2.0f, 0.0f, 1.0f };

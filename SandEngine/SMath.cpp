@@ -3,6 +3,36 @@
 
 const SMatrix SMatrix::Identity(SVector3(1.0f,0.0f,0.0f), SVector3(0.0f, 1.0f, 0.0f), SVector3(0.0f, 0.0f, 1.0f));
 
+SMatrix& SMatrix::Scale(const SVector3& scale)
+{
+	m[0][0] *= scale.x;
+	m[1][1] *= scale.y;
+	m[2][2] *= scale.z;
+	return *this;
+}
+
+SMatrix& SMatrix::Rotate(const SQuaternion& rot)
+{
+	SMatrix temp = *this;
+	*this = rot.RotationMatrix() * temp;
+	return *this;
+}
+
+SMatrix& SMatrix::Translate(const SVector3& location)
+{
+	m[3].x += location.x;
+	m[3].y += location.y;
+	m[3].z += location.z;
+	return *this;
+}
+
+float SMatrix::Determinant() const
+{
+	return m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[2][1])
+		- m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[2][2])
+		+ m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
+}
+
 SVector3 Cross(const SVector3& a, const SVector3& b)
 {	
 	SVector3 v;

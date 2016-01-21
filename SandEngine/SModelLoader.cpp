@@ -82,6 +82,7 @@ void SModelLoader::LoadMeshes(SModel* model, SAnimation* animStruct, const aiSce
 		const auto pMesh = pScene->mMeshes[i];
 		if (pMesh)
 		{
+			LoadBones(model, animStruct, pMesh, VertexToBoneWeight);
 			for (unsigned int j = 0;j < pMesh->mNumVertices; ++j)
 			{
 				SModelVertex vertex;
@@ -96,6 +97,14 @@ void SModelLoader::LoadMeshes(SModel* model, SAnimation* animStruct, const aiSce
 				vertex.color = SVector4(color.g, color.b, color.r, color.a);
 				vertex.normal = SVector3(normal.x, normal.y, normal.z);
 				vertex.uv = SVector2(uv.x, uv.y);
+				if (VertexToBoneWeight.size() > j && VertexToBoneWeight[j].size() > 0)
+				{
+					vertex.wieghts = VertexToBoneWeight[j][0].weight;
+					for (unsigned int k = 0;k < std::min(static_cast<unsigned int>(VertexToBoneWeight[j].size()), BONES_PER_VERTEX); ++k)
+					{
+						vertex.boneIDs[k] = VertexToBoneWeight[j][k].boneIndex;
+					}
+				}
 				model->Vertices.push_back(vertex);
 			}
 			for (unsigned int j = 0;j < pMesh->mNumFaces; ++j)
@@ -107,22 +116,23 @@ void SModelLoader::LoadMeshes(SModel* model, SAnimation* animStruct, const aiSce
 					model->Indices.push_back(index);
 				}
 			}
-
-			LoadBones(model, animStruct, pMesh, VertexToBoneWeight);
 		}
 	}
 }
 
-void SModelLoader::LoadBones(SModel* model, SAnimation* animStruct, aiMesh* pMesh, std::map<unsigned int, std::vector<SBoneWeight>>& vertexBoneWeight)
+void SModelLoader::LoadBones(SModel* model, SAnimation* animation, aiMesh* pMesh, std::map<unsigned int, std::vector<SBoneWeight>>& vertexBoneWeight)
 {
 	for (unsigned int i = 0;i < pMesh->mNumBones; ++i)
 	{
-		unsigned int boneIndex = animStruct->m_BoneIndex[pMesh->mBones[i]->mName.data];
-
-		for (unsigned int j = 0;j < pMesh->mBones[i]->mNumWeights; ++j)
+		if (animation->m_BoneIndex.find(pMesh->mBones[i]->mName.data) != animation->m_BoneIndex.end())
 		{
-			auto VertexId = pMesh->mBones[i]->mWeights[j].mVertexId;
-			vertexBoneWeight[VertexId].push_back({ boneIndex, pMesh->mBones[i]->mWeights[j].mWeight });
+			unsigned int boneIndex = animation->m_BoneIndex[pMesh->mBones[i]->mName.data];
+			for (unsigned int j = 0;j < pMesh->mBones[i]->mNumWeights; ++j)
+			{
+				auto VertexId = pMesh->mBones[i]->mWeights[j].mVertexId;
+				float weight = pMesh->mBones[i]->mWeights[j].mWeight;
+				vertexBoneWeight[VertexId].push_back({ boneIndex, weight });
+			}
 		}
 	}
 }
@@ -149,10 +159,10 @@ void SModelLoader::LoadAnimation(SAnimation * animation, const aiScene * pScene)
 				}
 				if (bSkip) continue;
 
-				SBone* newBone = new SBone();
-				newBone->boneOffset = SMath::Transpose(MatrixFromAI(pScene->mMeshes[i]->mBones[j]->mOffsetMatrix));
-				animation->m_Bones.push_back(newBone);
-				animation->m_BoneIndex[newBone->name] = animation->m_Bones.size() - 1;
+				auto& pBone = animation->m_BoneNameMap[pScene->mMeshes[i]->mBones[j]->mName.data];
+				pBone->boneOffset = MatrixFromAI(pScene->mMeshes[i]->mBones[j]->mOffsetMatrix);
+				animation->m_Bones.push_back(pBone);
+				animation->m_BoneIndex[pBone->name] = animation->m_Bones.size() - 1;
 			}
 		}
 		for (auto boneName : animation->m_BoneNameMap)
@@ -172,7 +182,7 @@ void SModelLoader::LoadAnimation(SAnimation * animation, const aiScene * pScene)
 		pScene->mAnimations[i]->mName.data;
 		SAnimInfo info;
 		info.name = pScene->mAnimations[i]->mName.data;
-		info.tickPerSeconds = pScene->mAnimations[i]->mTicksPerSecond;
+		info.tickPerSeconds = pScene->mAnimations[i]->mTicksPerSecond > 0.0 ? pScene->mAnimations[i]->mTicksPerSecond : 920.0;
 		info.duration = pScene->mAnimations[i]->mDuration;
 		for (unsigned int j = 0;j < pScene->mAnimations[i]->mNumChannels; ++j)
 		{
@@ -196,12 +206,11 @@ SBone* SModelLoader::CreateBoneTree(SAnimation* animation, SBone* pBone, aiNode*
 	{
 		SBone* bone = new SBone();
 		bone->name = node->mName.data;
+		if (bone->name.size() == 0)
+			bone->name = std::string("EMPTY") + std::to_string(animation->m_nEmptyNameId);
 		bone->parent = pBone;
 		animation->m_BoneNameMap[bone->name] = bone;
-		SMatrix localMat = MatrixFromAI(node->mTransformation);
-		auto inverLocalMat = SMath::Transpose(localMat);
-		bone->localTransform = localMat;
-		bone->originLocalTransform = bone->localTransform;
+		bone->localTransform = MatrixFromAI(node->mTransformation);
 		animation->CalculateBoneToWorldTransform(bone);
 
 		for (unsigned int i = 0;i < node->mNumChildren; ++i)
@@ -209,6 +218,7 @@ SBone* SModelLoader::CreateBoneTree(SAnimation* animation, SBone* pBone, aiNode*
 			SBone* child = CreateBoneTree(animation, bone, node->mChildren[i]);
 			bone->children.push_back(child);
 		}
+
 
 		return bone;
 	}

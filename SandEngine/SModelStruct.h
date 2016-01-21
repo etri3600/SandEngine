@@ -4,7 +4,7 @@
 #include "SUtils.h"
 #include "SImage.h"
 
-#define BONES_PER_VERTEX 4
+#define BONES_PER_VERTEX 4U
 
 struct SBoneWeight
 {
@@ -19,7 +19,7 @@ struct SBone
 {
 	std::string name;
 	SMatrix boneOffset;
-	SMatrix localTransform, globalTransform, originLocalTransform;
+	SMatrix localTransform, globalTransform;
 	SBone* parent;
 	std::vector<SBone*> children;
 };

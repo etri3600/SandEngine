@@ -79,7 +79,7 @@ private:
 	D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
 	ID3D12Resource* m_pIndexBuffer;
 
-	ID3D12DescriptorHeap* m_pCBVHeap[2];
+	ID3D12DescriptorHeap* m_pCBVHeap;
 	ID3D12Resource* m_pCBVBuffer[2];
 	unsigned int m_uiCBVDescriptorSize = 0;
 
