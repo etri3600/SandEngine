@@ -25,10 +25,12 @@ public:
 
 
 private:
-	void	LoadMeshes(SModel* model, SAnimation* animStruct, const aiScene* pScene);
-	void	LoadBones(SModel* model, SAnimation* animStruct, aiMesh* pMesh, std::map<unsigned int, std::vector<SBoneWeight>>& vertexBoneWeight);
+	void	LoadMeshes(SModel* model, const aiScene* pScene);
+	void	LoadBones(SModel* model, aiMesh* pMesh, unsigned int meshIndex);
+	void	LoadTextures(SModel* model, std::wstring& directory, const aiScene* pScene);
 
 	void	LoadAnimation(SAnimation* animation, const aiScene* pScene);
+
 	SBone*	CreateBoneTree(SAnimation* animation, SBone* pBone, aiNode* node);
 
 	SMatrix MatrixFromAI(const aiMatrix4x4& aiMatrix);

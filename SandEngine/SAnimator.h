@@ -30,19 +30,7 @@ struct SAnimChannel
 class SAnimInfo
 {
 public:
-	std::vector<SMatrix> GetTransform(double delta) { return transforms[GetFrameIndexAt(delta)]; }
-	unsigned int GetFrameIndexAt(double delta)	{
-		delta *= tickPerSeconds;
-		double time = 0.0f;
-		if (duration > 0.0f)
-		{
-			time = std::fmod(delta, duration);
-		}
-		auto percent = time / duration;
-		return static_cast<unsigned int>(transforms.size() * percent);
-	}
 	std::string GetName() const { return name; }
-	void Evaluate(double delta, std::map<std::string, SBone*> bones);
 
 protected:
 	std::string name;
@@ -65,19 +53,25 @@ public:
 	std::string AnimName() const { return m_Animations[m_CurrentAnimIndex].name; }
 	double AnimSpeed() const { return m_Animations[m_CurrentAnimIndex].tickPerSeconds; }
 	double AnimDuration() const { return m_Animations[m_CurrentAnimIndex].duration / AnimSpeed(); }
-	std::vector<SMatrix> GetTransform(double delta) { return m_Animations[m_CurrentAnimIndex].GetTransform(delta); }
+	std::vector<SMatrix> GetTransform() const { return Transforms; }
 	bool SetAnimation(const std::string clipName);
 	void SetAnimationIndex(const unsigned int index) { if(m_Animations.size() > index) m_CurrentAnimIndex = index; }
+	SAnimInfo GetCurrentAnimInfo() const { return m_Animations[m_CurrentAnimIndex]; }
 
-	void ExtractAnimation();
-	void CalculateAnimTime(double delta);
-	void UpdateBoneTransform(SBone* bone);
+	void Update(double delta);
 	void CalculateBoneToWorldTransform(SBone* child);
+
+private:
+	void ReadNodeHeirarchy(double AnimationTime, const SBone* pNode, const SMatrix& ParentTransform);
+	SAnimChannel FindNodeChannel(const SAnimInfo* pAnimInfo, const std::string animName);
+
+	void CalcInterpolatedScaling(SVector3& Out, double AnimationTime, const SAnimChannel& channel);
+	void CalcInterpolatedRotation(SQuaternion& Out, double AnimationTime, const SAnimChannel& channel);
+	void CalcInterpolatedPosition(SVector3& Out, double AnimationTime, const SAnimChannel& channel);
 
 protected:
 	SBone* m_Skeleton = nullptr;
 	std::map<std::string, SBone*> m_BoneNameMap;
-	unsigned int m_nEmptyNameId = 0;
 
 	std::map<std::string, unsigned int> m_BoneIndex;
 	std::vector<SBone*> m_Bones;
@@ -86,33 +80,8 @@ protected:
 	std::vector<SAnimInfo> m_Animations;
 	unsigned int m_CurrentAnimIndex = 0;
 
+	std::vector<SMatrix> Transforms;
+
 	friend class SModelLoader;
-	friend class SAnimator;
-};
-
-class SAnimator
-{
-public:
-	SAnimator(std::string clipName, SMatrix world, SModel model)
-		:m_clipName(clipName), m_world(world), m_model(model)
-	{}
-
-	void Update(double delta);
-
-	std::string GetClipName() const { return m_clipName; }
-	void SetClipName(const std::string clipName);
-	std::vector<std::string> GetClips() const;
-	void AddClip(const std::string& clip) { m_clipQueue.push(clip); }
-	void ClearClip() { std::queue<std::string> empty; std::swap(m_clipQueue, empty); }
-
-	bool HasAnimation() const { return m_model.Animation->HasAnimation(); }
-	std::vector<SMatrix> GetFinalTransform() { return m_model.Animation->GetTransform(m_timePoint); }
-
-	SModel m_model;
-	double m_timePoint;
-	SMatrix m_world;
-	std::string m_clipName;
-	std::queue<std::string> m_clipQueue;
-	bool m_bLoopClips;
-
+	friend class SModel;
 };

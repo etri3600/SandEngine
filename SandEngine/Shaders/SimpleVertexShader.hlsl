@@ -24,7 +24,7 @@ struct VertexShaderInput
 	float4 tangent : TANGENT0;
 	float2 uv : TEXCOORD0;
 	uint4 bone : BLENDINDICES0;
-	float weight : BLENDWEIGHT0;
+	float4 weight : BLENDWEIGHT0;
 };
 
 struct PixelShaderInput
@@ -41,31 +41,21 @@ PixelShaderInput main(VertexShaderInput input)
 {
 	PixelShaderInput output;
 
-	float weight0 = input.weight;
-	float weight1 = 1.0f - weight0;
+	column_major matrix boneTransform = mul(BoneTransformConstantBuffer.transform[input.bone[0]], input.weight[0]);
+	boneTransform += mul(BoneTransformConstantBuffer.transform[input.bone[1]], input.weight[1]);
+	boneTransform += mul(BoneTransformConstantBuffer.transform[input.bone[2]], input.weight[2]);
+	boneTransform += mul(BoneTransformConstantBuffer.transform[input.bone[3]], input.weight[3]);
 
-	float4 positionOffset = weight0 * mul(BoneTransformConstantBuffer.transform[input.bone[0]], float4(input.pos, 1.0f));
-	positionOffset += weight1 * mul(BoneTransformConstantBuffer.transform[input.bone[1]], float4(input.pos, 1.0f));
-	positionOffset.w = 1.0f;
-	
-	float4 normalOffset = weight0 * mul(BoneTransformConstantBuffer.transform[input.bone[0]], float4(input.normal, 0.0f));
-	normalOffset += weight1 * mul(BoneTransformConstantBuffer.transform[input.bone[1]], float4(input.normal, 0.0f));
-	normalOffset.w = 0.0f;
-
-	float4 tangetOffset = weight0 * mul(BoneTransformConstantBuffer.transform[input.bone[0]], input.tangent);
-	tangetOffset += weight1 * mul(BoneTransformConstantBuffer.transform[input.bone[1]], input.tangent);
-	tangetOffset.w = 0.0f;
-
-	float4 pos = float4(input.pos, 1.0f);
-	pos = mul(ViewProjectionConstantBuffer.model, pos);
-	pos = mul(ViewProjectionConstantBuffer.view, pos);
+	float4 posW = mul(boneTransform, float4(input.pos, 1.0f));
+	posW = mul(ViewProjectionConstantBuffer.model, posW);
+	float4 pos = mul(ViewProjectionConstantBuffer.view, posW);
 	pos = mul(ViewProjectionConstantBuffer.projection, pos);
 
 	output.fragPos = pos;
-	output.PosW = mul(ViewProjectionConstantBuffer.model, positionOffset).xyz;
+	output.PosW = posW.xyz;
 	output.color = input.color;
-	output.NormalW = mul(ViewProjectionConstantBuffer.normalMatrix, normalOffset).xyz;
-	output.TangentW = mul(ViewProjectionConstantBuffer.model, tangetOffset).xyz;
+	output.NormalW = mul(ViewProjectionConstantBuffer.model, mul(boneTransform, input.normal)).xyz;
+	output.TangentW = mul(ViewProjectionConstantBuffer.normalMatrix, mul(boneTransform, input.tangent)).xyz;
 	output.uv = input.uv;
 
 	return output;

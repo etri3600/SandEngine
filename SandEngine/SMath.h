@@ -237,7 +237,7 @@ struct alignas(16) SMatrix
 		m[3] = SVector4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-	SVector4 operator *(const SVector4& rhs)
+	SVector4 operator *(const SVector4& rhs) const
 	{
 		SVector4 result;
 		result.x = m[0][0] * rhs.x + m[1][0] * rhs.y + m[2][0] * rhs.z + m[3][0] * rhs.z;
@@ -248,7 +248,7 @@ struct alignas(16) SMatrix
 		return result;
 	}
 
-	SMatrix operator *(const SMatrix& rhs)
+	SMatrix operator *(const SMatrix& rhs) const
 	{
 		SMatrix mat;
 		mat.m[0][0] = m[0][0] * rhs.m[0][0] + m[1][0] * rhs.m[0][1] + m[2][0] * rhs.m[0][2] + m[3][0] * rhs.m[0][3];
@@ -281,10 +281,14 @@ struct alignas(16) SMatrix
 		return *this;
 	}
 
+	bool IsOrthogonal() const;
 	SMatrix& Scale(const SVector3& scale);
 	SMatrix& Rotate(const SQuaternion& rot);
 	SMatrix& Translate(const SVector3& location);
 	float Determinant() const;
+	float RotDeterminan() const;
+	SMatrix Inverse() const;
+	SMatrix RotInverse() const;
 };
 
 struct SQuaternion
@@ -436,36 +440,13 @@ namespace SMath
 		return mat;
 	}
 
-	inline SMatrix Inverse(const SMatrix& matrix)
-	{
-		SMatrix ret;
-		auto det = matrix.Determinant();
-		if (Sand::Equal(det, 1.0f))
-			ret = Transpose(matrix);
-		else
-		{
-			ret.m[0][0] = matrix.m[1][1] * matrix.m[2][2] - matrix.m[2][1] * matrix.m[1][2];
-			ret.m[0][1] = matrix.m[2][1] * matrix.m[0][2] - matrix.m[2][2] * matrix.m[0][1];
-			ret.m[0][2] = matrix.m[0][1] * matrix.m[1][2] - matrix.m[0][2] * matrix.m[1][1];
-			ret.m[1][0] = matrix.m[2][0] * matrix.m[1][2] - matrix.m[2][2] * matrix.m[1][0];
-			ret.m[1][1] = matrix.m[0][0] * matrix.m[2][2] - matrix.m[0][2] * matrix.m[2][0];
-			ret.m[1][2] = matrix.m[1][0] * matrix.m[0][2] - matrix.m[1][2] * matrix.m[0][0];
-			ret.m[2][0] = matrix.m[1][0] * matrix.m[2][1] - matrix.m[1][1] * matrix.m[2][0];
-			ret.m[2][1] = matrix.m[2][0] * matrix.m[0][1] - matrix.m[2][1] * matrix.m[0][0];
-			ret.m[2][2] = matrix.m[0][0] * matrix.m[1][1] - matrix.m[0][1] * matrix.m[1][0];
-			ret.m[3][3] = 1.0f;
-		}
-
-		return ret;
-	}
-
 	/// inverse transpose
 	inline SMatrix NormalMatrix(const SMatrix& matrix)
 	{
 		SMatrix normalMatrix = matrix;
 		normalMatrix.m[0][3] = normalMatrix.m[1][3] = normalMatrix.m[1][3] = 0.0f;
 		normalMatrix.m[3][3] = 1.0f;
-		return Transpose(Inverse(normalMatrix));
+		return Transpose(normalMatrix.RotInverse());
 	}
 
 	inline SQuaternion Slerp(const SQuaternion& qa, const SQuaternion& qb, float factor)

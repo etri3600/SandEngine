@@ -4,16 +4,9 @@
 #include "SUtils.h"
 #include "SImage.h"
 
-#define BONES_PER_VERTEX 4U
+#include <queue>
 
-struct SBoneWeight
-{
-	SBoneWeight(unsigned int boneIndex, float weight)
-		:boneIndex(boneIndex), weight(weight)
-	{}
-	unsigned int boneIndex;
-	float weight;
-};
+#define BONES_PER_VERTEX 4U
 
 struct SBone
 {
@@ -32,23 +25,36 @@ struct SModelVertex
 	SVector4 tangent;
 	SVector2 uv;
 	unsigned int boneIDs[BONES_PER_VERTEX]{};
-	float wieghts = 0.0f;
+	float weights[BONES_PER_VERTEX]{};
+};
+
+struct SMeshInfo
+{
+	unsigned int NumIndices = 0;
+	unsigned int BaseVertex = 0;
+	unsigned int BaseIndex = 0;
+	unsigned int MaterialIndex = -1;
 };
 
 class SAnimation;
-class SAnimator;
 class SModel
 {
 public:
+	std::vector<SMeshInfo> MeshInfoes;
 	std::vector<SModelVertex> Vertices;
 	std::vector<unsigned int> Indices;
 	std::vector<STexture*> Textures;
 	SAnimation* Animation;
-	SAnimator* Animator;
 
 	SVector3 Location;
 	SQuaternion Rotation;
 	SVector3 Scale{ 1.0f, 1.0f, 1.0f };
+
+	double m_timePoint;
+	SMatrix m_world;
+	std::string m_clipName;
+	std::queue<std::string> m_clipQueue;
+	bool m_bLoopClips;
 
 	void Update(double delta);
 	
@@ -140,6 +146,17 @@ public:
 		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTextureFormat() : 0;
 	}
 
+	std::string GetClipName() const { return m_clipName; }
+	void SetClipName(const std::string clipName);
+	std::vector<std::string> GetClips() const;
+	void AddClip(const std::string& clip) { m_clipQueue.push(clip); }
+	void ClearClip() { std::queue<std::string> empty; std::swap(m_clipQueue, empty); }
+
+	bool HasAnimation() const;
+	std::vector<SMatrix> GetFinalTransform() const;
+
+	void AddBoneData(unsigned int vertexIndex, unsigned int boneIndex, float weight);
+
 	void Release()
 	{
 		Vertices.clear();
@@ -154,11 +171,6 @@ public:
 		{
 			delete Animation;
 			Animation = nullptr;
-		}
-		if (Animator)
-		{
-			delete Animator;
-			Animator = nullptr;
 		}
 	}
 };

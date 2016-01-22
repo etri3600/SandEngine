@@ -403,10 +403,9 @@ void SDirectX12::UpdateBoneTransform(const std::vector<SModel>& models)
 {
 	for (unsigned int i = 0;i < models.size(); ++i)
 	{
-		if (models[i].Animator->HasAnimation())
+		if (models[i].HasAnimation())
 		{
-			models[i].Animation;
-			const auto& boneTransforms = models[i].Animator->GetFinalTransform();
+			const auto& boneTransforms = models[i].GetFinalTransform();
 			for (unsigned int j = 0;j < std::fmin(MAX_BONES, boneTransforms.size()); ++j)
 			{
 				m_SceneProxy[i].BoneTransform[j] = boneTransforms[j];
