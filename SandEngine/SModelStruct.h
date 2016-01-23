@@ -8,15 +8,6 @@
 
 #define BONES_PER_VERTEX 4U
 
-struct SBone
-{
-	std::string name;
-	SMatrix boneOffset;
-	SMatrix localTransform, globalTransform;
-	SBone* parent;
-	std::vector<SBone*> children;
-};
-
 struct SModelVertex
 {
 	SVector3 position;
@@ -40,6 +31,8 @@ class SAnimation;
 class SModel
 {
 public:
+	~SModel();
+
 	std::vector<SMeshInfo> MeshInfoes;
 	std::vector<SModelVertex> Vertices;
 	std::vector<unsigned int> Indices;
@@ -155,24 +148,10 @@ public:
 	bool HasAnimation() const;
 	std::vector<SMatrix> GetFinalTransform() const;
 
-	void AddBoneData(unsigned int vertexIndex, unsigned int boneIndex, float weight);
+	bool AddBoneData(unsigned int vertexIndex, unsigned int boneIndex, float weight);
+	void SetDefaultBoneWeights();
 
-	void Release()
-	{
-		Vertices.clear();
-		Indices.clear();
-		for (auto it = Textures.begin(); it != Textures.end(); ++it)
-		{
-			delete[] *it;
-			(*it) = nullptr;
-		}
-		Textures.clear();
-		if (Animation)
-		{
-			delete Animation;
-			Animation = nullptr;
-		}
-	}
+	void Release();
 };
 
 class STriangle : public SModel
@@ -185,16 +164,19 @@ public:
 		point1.color = { 1.0f, 0.0f, 0.0f };
 		point1.normal = SVector3(0.0f, 0.0f, 1.0f);
 		point1.uv = SVector2(0.0f, 0.0f);
+		point1.weights[0] = 1.0f;
 
 		point2.position = SVector3(-1.0f, 0.0f, 0.0f);
 		point2.color = { 0.0f, 1.0f, 0.0f };
 		point2.normal = SVector3(0.0f, 0.0f, 1.0f);
 		point2.uv = SVector2(0.0f, 1.0f);
+		point2.weights[0] = 1.0f;
 
 		point3.position = SVector3(1.0f, 0.0f, 0.0f);
 		point3.color = { 0.0f, 0.0f, 1.0f };
 		point3.normal = SVector3(0.0f, 0.0f, 1.0f);
 		point3.uv = SVector2(1.0f, 0.0f);
+		point3.weights[0] = 1.0f;
 		
 		Vertices.push_back(point1);
 		Vertices.push_back(point2);
@@ -216,41 +198,49 @@ public:
 		point1.color = {1.0f, 1.0f, 1.0f};
 		point1.normal = { 0.0f, 0.0f, 1.0f };
 		point1.uv = { 0.0f, 0.0f };
+		point1.weights[0] = 1.0f;
 
 		point2.position = { -1.0f, -1.0f, 1.0f };
 		point2.color = { 0.0f, 1.0f, 1.0f };
 		point2.normal = { 0.0f, 0.0f, 1.0f };
 		point2.uv = { 0.0f, 1.0f };
+		point2.weights[0] = 1.0f;
 
 		point3.position = SVector3(1.0f, 1.0f, 1.0f);
 		point3.color = { 1.0f, 0.0f, 1.0f };
 		point3.normal = SVector3(0.0f, 0.0f, 1.0f);
 		point3.uv = SVector2(1.0f, 0.0f);
+		point3.weights[0] = 1.0f;
 
 		point4.position = SVector3(1.0f, -1.0f, 1.0f);
 		point4.color = { 1.0f, 1.0f, 0.0f };
 		point4.normal = SVector3(0.0f, 0.0f, 1.0f);
 		point4.uv = SVector2(0.0f, 0.0f);
+		point4.weights[0] = 1.0f;
 
 		point5.position = SVector3(1.0f, 1.0f, -1.0f);
 		point5.color = { 0.0f, 0.0f, 1.0f };
 		point5.normal = SVector3(0.0f, 0.0f, -1.0f);
 		point5.uv = SVector2(0.0f, 1.0f);
+		point5.weights[0] = 1.0f;
 
 		point6.position = SVector3(1.0f, -1.0f, -1.0f);
 		point6.color = { 1.0f, 0.0f, 0.0f };
 		point6.normal = SVector3(0.0f, 0.0f, -1.0f);
 		point6.uv = SVector2(1.0f, 0.0f);
+		point6.weights[0] = 1.0f;
 
 		point7.position = SVector3(-1.0f, 1.0f, -1.0f);
 		point7.color = { 0.0f, 1.0f, 0.0f };
 		point7.normal = SVector3(0.0f, 0.0f, -1.0f);
 		point7.uv = SVector2(0.0f, 0.0f);
+		point7.weights[0] = 1.0f;
 
 		point8.position = SVector3(-1.0f, -1.0f, -1.0f);
 		point8.color = { 0.0f, 0.0f, 0.0f };
 		point8.normal = SVector3(0.0f, 0.0f, -1.0f);
 		point8.uv = SVector2(0.0f, 1.0f);
+		point8.weights[0] = 1.0f;
 
 		Vertices.push_back(point1);
 		Vertices.push_back(point2);

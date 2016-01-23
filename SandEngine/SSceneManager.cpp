@@ -1,4 +1,5 @@
 #include "SSceneManager.h"
+#include <Windows.h>
 
 void SSceneManager::Init(SIGraphicsInterface * pGraphicsInterface)
 {
@@ -8,11 +9,12 @@ void SSceneManager::Init(SIGraphicsInterface * pGraphicsInterface)
 		m_pGraphicsInterface->CreateViewProjection();
 	}
 }
-
 void SSceneManager::Tick()
 {
-	auto nanoseconds = m_Time > 0 ? STime::GetTime() - m_Time : 0LL;
-	double delta = nanoseconds / 1000000.0;
+	auto CurrentTime = STime::GetTime();
+	auto milliseconds = m_Time > 0 ? CurrentTime - m_Time : 0LL;
+	m_Time = CurrentTime;
+	double delta = static_cast<double>(milliseconds) / 1000.0;
 	UpdateObjects(delta);
 	if (m_pGraphicsInterface)
 	{
@@ -21,7 +23,6 @@ void SSceneManager::Tick()
 		m_pGraphicsInterface->Render();
 		m_pGraphicsInterface->Present();
 	}
-	m_Time = STime::GetTime();
 }
 
 void SSceneManager::Queue(const SModel & model)

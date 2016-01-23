@@ -22,7 +22,7 @@ SMatrix& SMatrix::Scale(const SVector3& scale)
 SMatrix& SMatrix::Rotate(const SQuaternion& rot)
 {
 	SMatrix temp = *this;
-	*this = rot.RotationMatrix() * temp;
+	*this = rot.Normal().RotationMatrix() * temp;
 	return *this;
 }
 

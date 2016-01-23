@@ -1,13 +1,17 @@
 #include "SModelStruct.h"
-#include "SAnimator.h"
+#include "SAnimation.h"
 
 namespace {
 	const std::string DEFAULT_CLIP_NAME = "idle";
 }
 
+SModel::~SModel()
+{
+}
+
 void SModel::Update(double delta)
 {
-	if (Animation)
+	if (Animation && Animation->HasAnimation())
 	{
 		Animation->Update(delta);
 	}
@@ -41,7 +45,7 @@ std::vector<std::string> SModel::GetClips() const
 
 bool SModel::HasAnimation() const 
 { 
-	return Animation->HasAnimation(); 
+	return Animation ? Animation->HasAnimation() : false;
 }
 
 std::vector<SMatrix> SModel::GetFinalTransform() const
@@ -49,13 +53,39 @@ std::vector<SMatrix> SModel::GetFinalTransform() const
 	return Animation->GetTransform(); 
 }
 
-void SModel::AddBoneData(unsigned int vertexIndex, unsigned int boneIndex, float weight)
+bool SModel::AddBoneData(unsigned int vertexIndex, unsigned int boneIndex, float weight)
 {
 	for (unsigned int i = 0; i < BONES_PER_VERTEX; i++) {
 		if (Vertices[vertexIndex].weights[i] == 0.0f) {
 			Vertices[vertexIndex].boneIDs[i] = boneIndex;
 			Vertices[vertexIndex].weights[i] = weight;
-			return;
+			return true;
 		}
+	}
+	return false;
+}
+
+void SModel::SetDefaultBoneWeights()
+{
+	for (auto& vertex : Vertices)
+	{
+		vertex.weights[0] = 1.0f;
+	}
+}
+
+void SModel::Release()
+{
+	Vertices.clear();
+	Indices.clear();
+	for (auto it = Textures.begin(); it != Textures.end(); ++it)
+	{
+		delete[] * it;
+		(*it) = nullptr;
+	}
+	Textures.clear();
+	if (Animation)
+	{
+		delete Animation;
+		Animation = nullptr;
 	}
 }

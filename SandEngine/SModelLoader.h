@@ -11,7 +11,7 @@
 
 #include "SMath.h"
 #include "SModelStruct.h"
-#include "SAnimator.h"
+#include "SAnimation.h"
 
 class SModel;
 class SAnimation;
@@ -21,7 +21,7 @@ class SModelLoader : public SLoader
 public:
 	bool Initialize();
 
-	SModel	LoadModelFromFile(const wchar_t* file);
+	SModel LoadModelFromFile(const wchar_t* file);
 
 
 private:
@@ -31,7 +31,7 @@ private:
 
 	void	LoadAnimation(SAnimation* animation, const aiScene* pScene);
 
-	SBone*	CreateBoneTree(SAnimation* animation, SBone* pBone, aiNode* node);
+	SBoneNode*	CreateBoneTree(SAnimation* animation, SBoneNode* pBone, aiNode* node);
 
 	SMatrix MatrixFromAI(const aiMatrix4x4& aiMatrix);
 	SVector3 Vector3FromAI(const aiVector3D& aiVector3);

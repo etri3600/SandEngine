@@ -147,7 +147,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="SandEngine.h" />
-    <ClInclude Include="SAnimator.h" />
+    <ClInclude Include="SAnimation.h" />
+    <ClInclude Include="SBone.h" />
     <ClInclude Include="SDirectX12.h" />
     <ClInclude Include="SDirectX12Device.h" />
     <ClInclude Include="SDX12Helper.h" />
@@ -176,7 +177,7 @@
     <ClInclude Include="SWindows.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SAnimator.cpp" />
+    <ClCompile Include="SAnimation.cpp" />
     <ClCompile Include="SDirectX12.cpp" />
     <ClCompile Include="SDirectX12Device.cpp" />
     <ClCompile Include="SDX12Helper.cpp" />

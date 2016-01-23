@@ -297,7 +297,9 @@ struct SQuaternion
 	{}
 	SQuaternion(const float x, const float y, const float z, const float w)
 		:x(x), y(y), z(z), w(w)
-	{}
+	{
+		Normalize();
+	}
 	float x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f;
 
 	SQuaternion operator*(const SQuaternion& rhs)
@@ -308,17 +310,17 @@ struct SQuaternion
 		quat.z = w * rhs.z + x * rhs.y - y * rhs.x + z * rhs.w;
 		quat.w = w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z;
 
+		quat.Normalize();
 		return quat;
 	}
 
 	SMatrix RotationMatrix() const
 	{
 		SMatrix mat;
-		mat.m[0][0] = w*w + x*x - y*y - z*z;	mat.m[1][0] = 2 * x * y - w * w * z;	mat.m[2][0] = 2 * x * z + 2 * w * y;	mat.m[3][0] = 0.0f;
-		mat.m[0][1] = 2 * x * y + w * w * z;	mat.m[1][1] = w*w - x*x + y*y - z*z;	mat.m[2][1] = 2 * y * z + 2 * w * x;	mat.m[3][1] = 0.0f;
-		mat.m[0][2] = 2 * x * z - 2 * w * y;	mat.m[1][2] = 2 * y * z - 2 * w * x;	mat.m[2][2] = w*w - x*x - y*y + z*z;	mat.m[3][2] = 0.0f;
-		mat.m[0][3] = 0.0f;				 		mat.m[1][3] = 0.0f;						mat.m[2][3] = 0.0f;						mat.m[3][3] = 1.0f;
-
+		mat.m[0][0] = 1.0f - 2.0f * (y * y + z * z);	mat.m[1][0] = 2.0f * (x * y - z * w);		mat.m[2][0] = 2.0f * (x * z + y * w);		mat.m[3][0] = 0.0f;
+		mat.m[0][1] = 2.0f * (x * y + z * w);			mat.m[1][1] = 1.0f - 2.0f * (x * x + z * z);mat.m[2][1] = 2.0f * (y * z - x * w);		mat.m[3][1] = 0.0f;
+		mat.m[0][2] = 2.0f * (x * z - y * w);			mat.m[1][2] = 2.0f * (y * z * x * w);		mat.m[2][2] = 1.0f - 2.0f * (x * x + y * y);mat.m[3][2] = 0.0f;
+		mat.m[0][3] = 0.0f;				 				mat.m[1][3] = 0.0f;							mat.m[2][3] = 0.0f;							mat.m[3][3] = 1.0f;
 		return mat;
 	}
 
@@ -334,10 +336,29 @@ struct SQuaternion
 
 	void Normalize()
 	{
-		auto imaginarySize = sqrt(x*x + y*y + z*z);
-		x = x / imaginarySize;
-		y = y / imaginarySize;
-		z = z / imaginarySize;
+		auto size = Size();
+		if (size > 0.0f)
+		{
+			x = x / size;
+			y = y / size;
+			z = z / size;
+			w = w / size;
+		}
+	}
+
+	SQuaternion Normal() const
+	{
+		SQuaternion q = *this;
+		q.Normalize();
+		return q;
+	}
+
+	SQuaternion& Conjugate()
+	{
+		x = -x;
+		y = -y;
+		z = -z;
+		return *this;
 	}
 };
 
@@ -400,6 +421,19 @@ inline void ScalarSinCos
 
 namespace SMath
 {
+	template <typename T>
+	T Clamp(T val, T min, T max)
+	{
+		T result;
+		if (val < min)
+			result = min;
+		else if (max < val)
+			result = max;
+		else
+			result = val;
+		return result;
+	}
+
 	inline SMatrix Translation(const SVector3& location)
 	{
 		SMatrix m(SMatrix::Identity);
@@ -416,8 +450,7 @@ namespace SMath
 
 	inline SMatrix Rotation(const SQuaternion& quat)
 	{
-		SMatrix m(SMatrix::Identity);
-		return m;
+		return quat.Normal().RotationMatrix();
 	}
 
 	inline SMatrix Transform(const SVector3& scale, const SVector3& location, const SQuaternion& quat)
@@ -444,7 +477,7 @@ namespace SMath
 	inline SMatrix NormalMatrix(const SMatrix& matrix)
 	{
 		SMatrix normalMatrix = matrix;
-		normalMatrix.m[0][3] = normalMatrix.m[1][3] = normalMatrix.m[1][3] = 0.0f;
+		normalMatrix.m[3][0] = normalMatrix.m[3][1] = normalMatrix.m[3][2] = 0.0f;
 		normalMatrix.m[3][3] = 1.0f;
 		return Transpose(normalMatrix.RotInverse());
 	}
@@ -453,26 +486,26 @@ namespace SMath
 	{
 		SQuaternion quat;
 		// Calculate angle between them.
-		double cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
+		float cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
 		// if qa=qb or qa=-qb then theta = 0 and we can return qa
-		if (abs(cosHalfTheta) >= 1.0) {
+		if (abs(cosHalfTheta) >= 1.0f) {
 			quat.w = qa.w;quat.x = qa.x;quat.y = qa.y;quat.z = qa.z;
 			return quat;
 		}
 		// Calculate temporary values.
-		double halfTheta = acos(cosHalfTheta);
-		double sinHalfTheta = sqrt(1.0 - cosHalfTheta*cosHalfTheta);
+		float halfTheta = acos(cosHalfTheta);
+		float sinHalfTheta = sqrt(1.0f - cosHalfTheta*cosHalfTheta);
 		// if theta = 180 degrees then result is not fully defined
 		// we could rotate around any axis normal to qa or qb
-		if (fabs(sinHalfTheta) < 0.001) { // fabs is floating point absolute
-			quat.w = (qa.w * 0.5 + qb.w * 0.5);
-			quat.x = (qa.x * 0.5 + qb.x * 0.5);
-			quat.y = (qa.y * 0.5 + qb.y * 0.5);
-			quat.z = (qa.z * 0.5 + qb.z * 0.5);
+		if (fabs(sinHalfTheta) < 0.001f) { // fabs is floating point absolute
+			quat.w = (qa.w * 0.5f + qb.w * 0.5f);
+			quat.x = (qa.x * 0.5f + qb.x * 0.5f);
+			quat.y = (qa.y * 0.5f + qb.y * 0.5f);
+			quat.z = (qa.z * 0.5f + qb.z * 0.5f);
 			return quat;
 		}
-		double ratioA = sin((1 - factor) * halfTheta) / sinHalfTheta;
-		double ratioB = sin(factor * halfTheta) / sinHalfTheta;
+		float ratioA = sin((1.0f - factor) * halfTheta) / sinHalfTheta;
+		float ratioB = sin(factor * halfTheta) / sinHalfTheta;
 		//calculate Quaternion.
 		quat.w = (qa.w * ratioA + qb.w * ratioB);
 		quat.x = (qa.x * ratioA + qb.x * ratioB);

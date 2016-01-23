@@ -17,4 +17,7 @@ namespace Sand
 	extern std::string WStringToString(std::wstring* wstr);
 
 	extern bool Equal(const double& a, const double& b);
+
+	template <typename... T>
+	extern void ConsoleLog(std::wstring message, T... params);
 }

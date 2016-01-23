@@ -79,12 +79,9 @@ private:
 	D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
 	ID3D12Resource* m_pIndexBuffer;
 
-	ID3D12DescriptorHeap* m_pCBVHeap;
+	ID3D12DescriptorHeap* m_pShaderBufferHeap;
+	unsigned int m_uiShaderBufferDescriptorSize = 0;
 	ID3D12Resource* m_pCBVBuffer[2];
-	unsigned int m_uiCBVDescriptorSize = 0;
-
-	ID3D12DescriptorHeap* m_pSRVHeap;
-	unsigned int m_uiSRVDescriptorSize = 0;
 	ID3D12Resource* m_pSRVBuffer;
 
 	ID3D12DescriptorHeap* m_pSamplerHeap;

@@ -19,5 +19,5 @@ private:
 
 	std::vector<SModel> m_Models;
 
-	long long m_Time = 0LL;
+	long long m_Time;
 };

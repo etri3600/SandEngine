@@ -34,7 +34,7 @@ unsigned int STexture::GetTextureFormat() const
 
 	}
 
-	return 0;
+	return format;
 }
 
 unsigned int STexture::GetTexturePixelSize() const

@@ -105,10 +105,13 @@
     <ClInclude Include="SDX12Helper.h">
       <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
-    <ClInclude Include="SAnimator.h">
+    <ClInclude Include="SConstantBuffer.h">
       <Filter>Asset</Filter>
     </ClInclude>
-    <ClInclude Include="SConstantBuffer.h">
+    <ClInclude Include="SAnimation.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="SBone.h">
       <Filter>Asset</Filter>
     </ClInclude>
   </ItemGroup>
@@ -148,10 +151,10 @@
     <ClCompile Include="SDX12Helper.cpp">
       <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
-    <ClCompile Include="SAnimator.cpp">
+    <ClCompile Include="SModelStruct.cpp">
       <Filter>Asset</Filter>
     </ClCompile>
-    <ClCompile Include="SModelStruct.cpp">
+    <ClCompile Include="SAnimation.cpp">
       <Filter>Asset</Filter>
     </ClCompile>
   </ItemGroup>

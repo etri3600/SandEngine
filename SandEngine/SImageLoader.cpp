@@ -38,7 +38,7 @@ bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 			ILinfo info = {};
 			iluGetImageInfo(&info);
 
-			pTexture->MipTextures.reserve(info.NumMips);
+			pTexture->MipTextures.resize(info.NumMips == 0 ? 1 : info.NumMips);
 			pTexture->eTextureLayout = STexture::TextureLayout::TL_TEX_2D;
 			STexture::TextureFormat eFormat;
 			switch (info.Format)
@@ -57,8 +57,9 @@ bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 			pTexture->eTextureFormat = eFormat;
 			pTexture->MipLevels = info.NumMips;
 
-			for (unsigned int i = 0;i < info.NumMips; ++i)
+			for (unsigned int i = 0;i < pTexture->MipTextures.size(); ++i)
 			{
+				pTexture->MipTextures[i] = new STexture::SMipTexture();
 				pTexture->MipTextures[i]->Width = info.Width;
 				pTexture->MipTextures[i]->Height = info.Height;
 				pTexture->MipTextures[i]->Size = info.SizeOfData;
