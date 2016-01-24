@@ -136,7 +136,11 @@ public:
 	}
 
 	unsigned int TextureFormat(unsigned int nTextureIndex) const {
-		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTextureFormat() : 0;
+		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTextureFormat() : 0U;
+	}
+
+	unsigned int TexelSize(unsigned int nTextureIndex) const {
+		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTexelSize() : 0U;
 	}
 
 	std::string GetClipName() const { return m_clipName; }

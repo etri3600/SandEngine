@@ -550,7 +550,7 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 
 	// Create Shader buffer
 	D3D12_DESCRIPTOR_HEAP_DESC cbheapDesc = {};
-	cbheapDesc.NumDescriptors = c_BufferingCount * static_cast<unsigned int>(models.size()) * 2;
+	cbheapDesc.NumDescriptors = c_BufferingCount * static_cast<unsigned int>(models.size()) * c_NumShaderBuffer;
 	cbheapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	cbheapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	hResult = m_pDevice->GetDevice()->CreateDescriptorHeap(&cbheapDesc, IID_PPV_ARGS(&m_pShaderBufferHeap));
@@ -558,8 +558,8 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 	m_pShaderBufferHeap->SetName(L"Shader Buffer Descriptor Heap");
 	m_uiShaderBufferDescriptorSize = m_pDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	CreateShaderResources(models);
 	CreateConstantBuffer(models);
+	CreateShaderResources(models);
 
 	for (unsigned int i = 0;i < models.size(); ++i)
 	{
@@ -622,7 +622,7 @@ bool SDirectX12::Render()
 		ID3D12DescriptorHeap* ppHeaps[] = { m_pShaderBufferHeap };
 		m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = {};
-		gpuHandle.ptr = m_pShaderBufferHeap->GetGPUDescriptorHandleForHeapStart().ptr + (m_BufferIndex * m_SceneProxy.size()) * m_uiShaderBufferDescriptorSize * 2;
+		gpuHandle.ptr = m_pShaderBufferHeap->GetGPUDescriptorHandleForHeapStart().ptr + (m_BufferIndex * m_SceneProxy.size()) * m_uiShaderBufferDescriptorSize * c_NumShaderBuffer;
 		for (unsigned int i = 0;i < m_SceneProxy.size(); ++i)
 		{
 			m_pCommandList->SetGraphicsRootDescriptorTable(0, gpuHandle);
@@ -781,7 +781,7 @@ VOID SDirectX12::CreateShaderResources(std::vector<SModel>& models)
 
 	D3D12_SUBRESOURCE_DATA textureData = {};
 	textureData.pData = model.TextureSerialize(0);
-	textureData.RowPitch = TextureWidth * model.TextureFormat(0);
+	textureData.RowPitch = TextureWidth * model.TexelSize(0);
 	textureData.SlicePitch = textureData.RowPitch * TextureHeight;
 
 	UpdateSubresource(m_pCommandList, m_pSRVBuffer, texturebuffer, 0, 0, 1, &textureData);
@@ -801,7 +801,17 @@ VOID SDirectX12::CreateShaderResources(std::vector<SModel>& models)
 	srvDesc.Format = textureDesc.Format;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
-	m_pDevice->GetDevice()->CreateShaderResourceView(m_pSRVBuffer, &srvDesc, m_pShaderBufferHeap->GetCPUDescriptorHandleForHeapStart());
+	D3D12_CPU_DESCRIPTOR_HANDLE gpuHandle = m_pShaderBufferHeap->GetCPUDescriptorHandleForHeapStart();
+
+	for (unsigned int i = 0; i < c_BufferingCount; ++i)
+	{
+		gpuHandle.ptr += m_uiCBVOffset;
+		for (unsigned int j = 0;j < models.size(); ++j)
+		{
+			m_pDevice->GetDevice()->CreateShaderResourceView(m_pSRVBuffer, &srvDesc, gpuHandle);
+			gpuHandle.ptr += m_uiShaderBufferDescriptorSize;
+		}
+	}
 }
 
 VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
@@ -839,7 +849,7 @@ VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
 	cbvGPUAddress[0] = m_pCBVBuffer[0]->GetGPUVirtualAddress();
 	cbvGPUAddress[1] = m_pCBVBuffer[1]->GetGPUVirtualAddress();
 	D3D12_CPU_DESCRIPTOR_HANDLE cbvCPUHandle = m_pShaderBufferHeap->GetCPUDescriptorHandleForHeapStart();
-
+	
 	for (unsigned int i = 0; i < c_BufferingCount; ++i)
 	{
 		for (unsigned int j = 0;j < models.size(); ++j)
@@ -859,7 +869,10 @@ VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
 			cbvGPUAddress[1] += desc.SizeInBytes;
 			cbvCPUHandle.ptr += m_uiShaderBufferDescriptorSize;
 		}
+		cbvCPUHandle.ptr += m_uiShaderBufferDescriptorSize;
 	}
+
+	m_uiCBVOffset += m_uiShaderBufferDescriptorSize * 2;
 
 	D3D12_RANGE readRange;
 	readRange.Begin = readRange.End = 0;

@@ -22,10 +22,26 @@ unsigned int STexture::GetTextureFormat() const
 		switch (eTextureFormat)
 		{
 		case TextureFormat::TF_RGB:
-		case TextureFormat::TF_BGR: format = DXGI_FORMAT_R32G32B32_FLOAT;
+		case TextureFormat::TF_BGR: 
+			{
+				switch (eTexelType)
+				{
+				case TexelType::TT_INT: format = DXGI_FORMAT_R32G32B32_UINT; break;
+				case TexelType::TT_FLOAT: format = DXGI_FORMAT_R32G32B32_FLOAT; break;
+				default: format = DXGI_FORMAT_R32G32B32_FLOAT; break;
+				}
+			}
 			break;
 		case TextureFormat::TF_RGBA:
-		case TextureFormat::TF_BGRA: format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		case TextureFormat::TF_BGRA: 
+			{
+				switch (eTexelType)
+				{
+				case TexelType::TT_INT: format = DXGI_FORMAT_R32G32B32A32_UINT; break;
+				case TexelType::TT_FLOAT: format = DXGI_FORMAT_R32G32B32A32_FLOAT; break;
+				default: format = DXGI_FORMAT_R32G32B32A32_FLOAT; break;
+				}
+			}
 			break;
 		}
 	}
@@ -37,16 +53,22 @@ unsigned int STexture::GetTextureFormat() const
 	return format;
 }
 
-unsigned int STexture::GetTexturePixelSize() const
+unsigned int STexture::GetTexelSize() const
 {
 	unsigned int size = 0;
-	switch (eTextureFormat)
+	switch (eTexelType)
 	{
-	case TextureFormat::TF_RGB:
-	case TextureFormat::TF_BGR: size = 4 * 3;
+	case TexelType::TT_BYTE: size = 1;
 		break;
-	case TextureFormat::TF_RGBA:
-	case TextureFormat::TF_BGRA: size = 4 * 4;
+	case TexelType::TT_SHORT: size = 2;
+		break;
+	case TexelType::TT_INT: size = 4;
+		break;
+	case TexelType::TT_FLOAT: size = 4;
+		break;
+	case TexelType::TT_DOUBLE: size = 8;
+		break;
+	case TexelType::TT_HALF: size = 2;
 		break;
 	}
 
