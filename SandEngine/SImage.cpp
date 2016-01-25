@@ -8,7 +8,7 @@ STexture::~STexture()
 {
 	for (auto MipTexture : MipTextures)
 	{
-		delete MipTexture->pTexData;
+		delete[] MipTexture->pTexData;
 		MipTexture->pTexData = nullptr;
 	}
 	MipTextures.clear();
@@ -22,10 +22,12 @@ unsigned int STexture::GetTextureFormat() const
 		switch (eTextureFormat)
 		{
 		case TextureFormat::TF_RGB:
-		case TextureFormat::TF_BGR: format = DXGI_FORMAT_R32G32B32_FLOAT;
+		case TextureFormat::TF_BGR:
+			format = DXGI_FORMAT_R8G8B8A8_UNORM;
 			break;
 		case TextureFormat::TF_RGBA:
-		case TextureFormat::TF_BGRA: format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		case TextureFormat::TF_BGRA: 
+			format = DXGI_FORMAT_R8G8B8A8_UNORM;
 			break;
 		}
 	}
@@ -37,18 +39,7 @@ unsigned int STexture::GetTextureFormat() const
 	return format;
 }
 
-unsigned int STexture::GetTexturePixelSize() const
+unsigned int STexture::GetTexelSize() const
 {
-	unsigned int size = 0;
-	switch (eTextureFormat)
-	{
-	case TextureFormat::TF_RGB:
-	case TextureFormat::TF_BGR: size = 4 * 3;
-		break;
-	case TextureFormat::TF_RGBA:
-	case TextureFormat::TF_BGRA: size = 4 * 4;
-		break;
-	}
-
-	return size;
+	return BytesPerPixel;
 }

@@ -139,6 +139,10 @@ public:
 		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTextureFormat() : 0;
 	}
 
+	unsigned int TexelSize(unsigned int nTextureIndex) const {
+		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTexelSize() : 0;
+	}
+
 	std::string GetClipName() const { return m_clipName; }
 	void SetClipName(const std::string clipName);
 	std::vector<std::string> GetClips() const;

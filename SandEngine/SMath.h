@@ -302,7 +302,7 @@ struct SQuaternion
 	}
 	float x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f;
 
-	SQuaternion operator*(const SQuaternion& rhs)
+	SQuaternion operator*(const SQuaternion& rhs) const
 	{
 		SQuaternion quat;
 		quat.x = w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y;
@@ -312,6 +312,15 @@ struct SQuaternion
 
 		quat.Normalize();
 		return quat;
+	}
+
+	SVector3 operator*(const SVector3& vec3) const
+	{
+		SQuaternion v{vec3.x, vec3.y, vec3.z, 0.0f};
+		SQuaternion invQ = Conjugate();
+		SQuaternion r = *this * v * invQ;
+
+		return SVector3(r.x, r.y, r.z);
 	}
 
 	SMatrix RotationMatrix() const
@@ -359,6 +368,16 @@ struct SQuaternion
 		y = -y;
 		z = -z;
 		return *this;
+	}
+
+	SQuaternion Conjugate() const
+	{
+		SQuaternion quat;
+		quat.x = -x;
+		quat.y = -y;
+		quat.z = -z;
+		quat.w = w;
+		return quat;
 	}
 };
 
@@ -448,15 +467,9 @@ namespace SMath
 		return m;
 	}
 
-	inline SMatrix Rotation(const SQuaternion& quat)
-	{
-		return quat.Normal().RotationMatrix();
-	}
-
 	inline SMatrix Transform(const SVector3& scale, const SVector3& location, const SQuaternion& quat)
 	{
-		SMatrix m(SMatrix::Identity);
-
+		SMatrix m;
 		return m.Scale(scale).Rotate(quat).Translate(location);
 	}
 

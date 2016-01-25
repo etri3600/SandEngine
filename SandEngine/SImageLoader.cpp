@@ -1,6 +1,7 @@
 #include "SImageLoader.h"
 
 #include <cassert>
+#include "SUtils.h"
 
 namespace {
 	const std::wstring DirPath = LR"(..\Model\)";
@@ -23,21 +24,22 @@ bool SImageLoader::LoadImageFromFile(const wchar_t* file, SImage* pImage)
 
 	return true;
 }
-
+#include <Windows.h>
 bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 {
 	if (pTexture)
 	{
-
 		ILuint imageId;
 		ilGenImages(1, &imageId);
 		ilBindImage(imageId);
 
 		if (ilLoadImage((DirPath + file).c_str()))
 		{
+			ILboolean success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+
 			ILinfo info = {};
 			iluGetImageInfo(&info);
-
+			
 			pTexture->MipTextures.resize(info.NumMips == 0 ? 1 : info.NumMips);
 			pTexture->eTextureLayout = STexture::TextureLayout::TL_TEX_2D;
 			STexture::TextureFormat eFormat;
@@ -56,7 +58,26 @@ bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 			}
 			pTexture->eTextureFormat = eFormat;
 			pTexture->MipLevels = info.NumMips;
+			pTexture->FlipY = info.Origin == IL_ORIGIN_UPPER_LEFT;
+			STexture::TexelType eTexelType;
+			switch (info.Type)
+			{
+			case IL_BYTE: 
+			case IL_UNSIGNED_BYTE:
+				eTexelType = STexture::TexelType::TT_BYTE; break;
+			case IL_SHORT: 
+			case IL_UNSIGNED_SHORT:
+				eTexelType = STexture::TexelType::TT_SHORT; break;
+			case IL_INT: 
+			case IL_UNSIGNED_INT:
+				eTexelType = STexture::TexelType::TT_INT; break;
+			case IL_FLOAT: eTexelType = STexture::TexelType::TT_FLOAT; break;
+			case IL_DOUBLE: eTexelType = STexture::TexelType::TT_DOUBLE; break;
+			case IL_HALF: eTexelType = STexture::TexelType::TT_HALF; break;
+			}
 
+			pTexture->BytesPerPixel = info.SizeOfData / (info.Width * info.Height);
+			
 			for (unsigned int i = 0;i < pTexture->MipTextures.size(); ++i)
 			{
 				pTexture->MipTextures[i] = new STexture::SMipTexture();
@@ -67,7 +88,7 @@ bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 				memcpy(pTexture->MipTextures[i]->pTexData, ilGetData(), info.SizeOfData);
 			}
 		}
-
+		ilDeleteImage(imageId);
 		ilBindImage(0);
 	}
 

@@ -35,6 +35,7 @@ private:
 
 	SMatrix MatrixFromAI(const aiMatrix4x4& aiMatrix);
 	SVector3 Vector3FromAI(const aiVector3D& aiVector3);
+	SVector4 Vector4FromAI(const aiColor4D& aiColor4);
 	SQuaternion QuatFromAI(const aiQuaternion& aiQuat);
 	std::vector<SAnimTimelineVector> ATVFromAI(const aiVectorKey* pVectorKey, const unsigned int num);
 	std::vector<SAnimTimelineQuat> ATQFromAI(const aiQuatKey* pQuatKey, const unsigned int num);

@@ -26,6 +26,16 @@ struct STexture : public SImage
 		TF_BGRA,
 	};
 
+	enum class TexelType
+	{
+		TT_BYTE,
+		TT_SHORT,
+		TT_INT,
+		TT_FLOAT,
+		TT_DOUBLE,
+		TT_HALF
+	};
+
 	struct SMipTexture
 	{
 		unsigned char* pTexData = nullptr;
@@ -37,11 +47,14 @@ struct STexture : public SImage
 
 	TextureLayout eTextureLayout = TextureLayout::TL_TEX_2D;
 	TextureFormat eTextureFormat = TextureFormat::TF_RGBA;
+	TexelType eTexelType = TexelType::TT_BYTE;
+	unsigned int BytesPerPixel = 0;
 	unsigned int MipLevels = 0;
 	unsigned int CurrentMipLevel = 0;
+	bool FlipY = false;
 	std::vector<SMipTexture*> MipTextures;
 
 	SMipTexture GetCurrentMipTexture() { return MipTextures.size() > CurrentMipLevel ? *MipTextures[CurrentMipLevel] : SMipTexture(); }
 	unsigned int GetTextureFormat() const;
-	unsigned int GetTexturePixelSize() const;
+	unsigned int GetTexelSize() const;
 };

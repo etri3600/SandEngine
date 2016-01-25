@@ -8,6 +8,7 @@
 #include <locale>
 #include <codecvt>
 
+
 namespace Sand
 {
 	extern void StringToWString(std::string* str, std::wstring* wstr);
@@ -19,5 +20,12 @@ namespace Sand
 	extern bool Equal(const double& a, const double& b);
 
 	template <typename... T>
-	extern void ConsoleLog(std::wstring message, T... params);
+	void ConsoleLog(std::wstring message, T... params)
+	{
+		wchar_t buffer[512];
+		swprintf(buffer, 512, message, params...);
+#if __WINDOWS__
+		OutputDebugString(buffer);
+#endif
+	}
 }

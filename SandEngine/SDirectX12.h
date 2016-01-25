@@ -37,10 +37,11 @@ public:
 	std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob);
 
 protected:
-	void CreateShaderResources(std::vector<SModel>& models);
 	void CreateConstantBuffer(std::vector<SModel>& models);
+	void CreateShaderResources(std::vector<SModel>& models);
 
 	void UpdateConstantBuffer();
+	void UpdateShaderResource();
 
 private:
 	void WaitForGPU();
@@ -82,6 +83,7 @@ private:
 	ID3D12DescriptorHeap* m_pShaderBufferHeap;
 	unsigned int m_uiShaderBufferDescriptorSize = 0;
 	ID3D12Resource* m_pCBVBuffer[2];
+	unsigned int m_uiCBVDescriptorOffset = 0;
 	ID3D12Resource* m_pSRVBuffer;
 
 	ID3D12DescriptorHeap* m_pSamplerHeap;
@@ -91,4 +93,7 @@ private:
 	HANDLE m_hFenceEvent;
 	bool m_bVSync;
 	bool m_bFullScreen;
+
+private:
+	static constexpr unsigned int c_NumShaderBuffer = 3;
 };

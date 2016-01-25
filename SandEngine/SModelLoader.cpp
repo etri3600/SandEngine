@@ -60,7 +60,7 @@ SModel SModelLoader::LoadModelFromFile(const wchar_t* file)
 
 	return std::move(model);
 }
-
+#include <Windows.h>
 void SModelLoader::LoadMeshes(SModel* model, const aiScene* pScene)
 {
 	model->MeshInfoes.resize(pScene->mNumMeshes);
@@ -86,16 +86,12 @@ void SModelLoader::LoadMeshes(SModel* model, const aiScene* pScene)
 			{
 				SModelVertex vertex;
 				vertex.position = Vector3FromAI(pMesh->mVertices[j]);
-				aiVector3D uv = pMesh->HasTextureCoords(j) ? pMesh->mTextureCoords[0][j] : aiVector3D(0.0f, 0.0f, 0.0f);
-				aiVector3D normal = pMesh->HasNormals() ? pMesh->mNormals[j] : aiVector3D(1.f, 1.f, 1.f);
-				aiColor4D color = pMesh->HasVertexColors(j) ? *pMesh->mColors[j] : aiColor4D(0, 1.0f, 0, 1.0f);
+				vertex.normal = pMesh->HasNormals() ? Vector3FromAI(pMesh->mNormals[j]) : SVector3(1.f, 1.f, 1.f);
 				if (pMesh->HasTangentsAndBitangents())
-				{
 					vertex.tangent = Vector3FromAI(pMesh->mTangents[j]);
-				}
-				vertex.color = SVector4(color.g, color.b, color.r, color.a);
-				vertex.normal = SVector3(normal.x, normal.y, normal.z);
-				vertex.uv = SVector2(uv.x, uv.y);
+				SVector3 uv = pMesh->HasTextureCoords(0) ? Vector3FromAI(pMesh->mTextureCoords[0][j]) : SVector3(0.0f, 0.0f, 0.0f);
+				vertex.uv = { uv.x, uv.y };
+				vertex.color = pMesh->HasVertexColors(0) ? Vector4FromAI(pMesh->mColors[0][j]) : SVector4(0, 1.0f, 0, 1.0f);
 				model->Vertices.push_back(vertex);
 			}
 			for (unsigned int j = 0;j < pMesh->mNumFaces; ++j)
@@ -107,7 +103,7 @@ void SModelLoader::LoadMeshes(SModel* model, const aiScene* pScene)
 					model->Indices.push_back(index);
 				}
 			}
-
+			
 			LoadBones(model, pMesh, i);
 		}
 	}
@@ -226,6 +222,11 @@ SMatrix SModelLoader::MatrixFromAI(const aiMatrix4x4& aiMatrix)
 SVector3 SModelLoader::Vector3FromAI(const aiVector3D & aiVector3)
 {
 	return SVector3(aiVector3.x, aiVector3.y, aiVector3.z);
+}
+
+SVector4 SModelLoader::Vector4FromAI(const aiColor4D & aiColor4)
+{
+	return SVector4(aiColor4.r, aiColor4.g, aiColor4.b, aiColor4.a);
 }
 
 SQuaternion SModelLoader::QuatFromAI(const aiQuaternion & aiQuat)

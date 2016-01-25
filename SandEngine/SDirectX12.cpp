@@ -89,7 +89,7 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 
 	D3D12_ROOT_PARAMETER parameter[1];
 	parameter[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	parameter[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	parameter[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	parameter[0].DescriptorTable.NumDescriptorRanges = 3;
 	parameter[0].DescriptorTable.pDescriptorRanges = &range[0];
 
@@ -104,6 +104,8 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	staticSampler.MipLODBias = 0.0f;
 	staticSampler.MaxAnisotropy = 1;
 	staticSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	staticSampler.ShaderRegister = 0;
+	staticSampler.RegisterSpace = 0;
 
 	D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // Only the input assembler stage needs access to the constant buffer.
@@ -115,8 +117,8 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	rootSignatureDesc.Flags = rootSignatureFlags;
 	rootSignatureDesc.NumParameters = 1;
 	rootSignatureDesc.pParameters = parameter;
-	rootSignatureDesc.NumStaticSamplers = 0;
-	rootSignatureDesc.pStaticSamplers = nullptr;
+	rootSignatureDesc.NumStaticSamplers = 1;
+	rootSignatureDesc.pStaticSamplers = &staticSampler;
 	
 	ID3DBlob* pBlob = nullptr;
 	hResult = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pBlob, nullptr);
@@ -145,7 +147,6 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 		{ "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
 		{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
 	};
-
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
 	pipelineStateDesc.InputLayout = { inputLayout, sizeof(inputLayout) / sizeof(inputLayout[0]) };
@@ -407,7 +408,6 @@ void SDirectX12::UpdateBoneTransform(const std::vector<SModel>& models)
 
 bool SDirectX12::Update(const double delta)
 {
-	UpdateConstantBuffer();
 
 	return true;
 }
@@ -550,7 +550,7 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 
 	// Create Shader buffer
 	D3D12_DESCRIPTOR_HEAP_DESC cbheapDesc = {};
-	cbheapDesc.NumDescriptors = c_BufferingCount * static_cast<unsigned int>(models.size()) * 2;
+	cbheapDesc.NumDescriptors = static_cast<unsigned int>(models.size()) * c_NumShaderBuffer;
 	cbheapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	cbheapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	hResult = m_pDevice->GetDevice()->CreateDescriptorHeap(&cbheapDesc, IID_PPV_ARGS(&m_pShaderBufferHeap));
@@ -558,8 +558,8 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 	m_pShaderBufferHeap->SetName(L"Shader Buffer Descriptor Heap");
 	m_uiShaderBufferDescriptorSize = m_pDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	CreateShaderResources(models);
 	CreateConstantBuffer(models);
+	CreateShaderResources(models);
 
 	for (unsigned int i = 0;i < models.size(); ++i)
 	{
@@ -617,12 +617,15 @@ bool SDirectX12::Render()
 	m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView);
 	m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
 
+	UpdateConstantBuffer();
+	UpdateShaderResource();
+
 	m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
 	{
 		ID3D12DescriptorHeap* ppHeaps[] = { m_pShaderBufferHeap };
 		m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = {};
-		gpuHandle.ptr = m_pShaderBufferHeap->GetGPUDescriptorHandleForHeapStart().ptr + (m_BufferIndex * m_SceneProxy.size()) * m_uiShaderBufferDescriptorSize * 2;
+		gpuHandle.ptr = m_pShaderBufferHeap->GetGPUDescriptorHandleForHeapStart().ptr;
 		for (unsigned int i = 0;i < m_SceneProxy.size(); ++i)
 		{
 			m_pCommandList->SetGraphicsRootDescriptorTable(0, gpuHandle);
@@ -728,6 +731,71 @@ std::vector<byte>&& SDirectX12::CompileShader(const wchar_t* fileName, const cha
 	return std::move(shader);
 }
 
+VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
+{
+	D3D12_HEAP_PROPERTIES uploadHeapProperties;
+	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+	uploadHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	uploadHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	uploadHeapProperties.CreationNodeMask = 1;
+	uploadHeapProperties.VisibleNodeMask = 1;
+
+	D3D12_RESOURCE_DESC constantBufferDesc = {};
+	constantBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	constantBufferDesc.Alignment = 0;
+	constantBufferDesc.Height = 1;
+	constantBufferDesc.DepthOrArraySize = 1;
+	constantBufferDesc.MipLevels = 1;
+	constantBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	constantBufferDesc.SampleDesc.Count = 1;
+	constantBufferDesc.SampleDesc.Quality = 0;
+	constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	constantBufferDesc.Width = sizeof(SModelViewProjection) * models.size();
+	HRESULT hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pCBVBuffer[0]));
+	SWindows::OutputErrorMessage(hResult);
+	m_pCBVBuffer[0]->SetName(L"MVP Buffer");
+
+	constantBufferDesc.Width = sizeof(SBoneTransform) * models.size();
+	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pCBVBuffer[1]));
+	SWindows::OutputErrorMessage(hResult);
+	m_pCBVBuffer[1]->SetName(L"Bone Buffer");
+
+	D3D12_GPU_VIRTUAL_ADDRESS cbvGPUAddress[2];
+	cbvGPUAddress[0] = m_pCBVBuffer[0]->GetGPUVirtualAddress();
+	cbvGPUAddress[1] = m_pCBVBuffer[1]->GetGPUVirtualAddress();
+	D3D12_CPU_DESCRIPTOR_HANDLE cbvCPUHandle = m_pShaderBufferHeap->GetCPUDescriptorHandleForHeapStart();
+
+	for (unsigned int j = 0;j < models.size(); ++j)
+	{
+		D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
+		desc.BufferLocation = cbvGPUAddress[0];
+		desc.SizeInBytes = sizeof(SModelViewProjection);
+		m_pDevice->GetDevice()->CreateConstantBufferView(&desc, cbvCPUHandle);
+
+		cbvGPUAddress[0] += desc.SizeInBytes;
+		cbvCPUHandle.ptr += m_uiShaderBufferDescriptorSize;
+
+		desc.BufferLocation = cbvGPUAddress[1];
+		desc.SizeInBytes = sizeof(SBoneTransform);
+		m_pDevice->GetDevice()->CreateConstantBufferView(&desc, cbvCPUHandle);
+
+		cbvGPUAddress[1] += desc.SizeInBytes;
+		cbvCPUHandle.ptr += m_uiShaderBufferDescriptorSize;
+	}
+
+	m_uiCBVDescriptorOffset += m_uiShaderBufferDescriptorSize * 2;
+
+	D3D12_RANGE readRange;
+	readRange.Begin = readRange.End = 0;
+	m_pCBVBuffer[0]->Map(0, &readRange, reinterpret_cast<void**>(&MappedConstantBuffer[0]));
+	memset(MappedConstantBuffer[0], 0, sizeof(SModelViewProjection) * models.size());
+
+	m_pCBVBuffer[1]->Map(0, &readRange, reinterpret_cast<void**>(&MappedConstantBuffer[1]));
+	memset(MappedConstantBuffer[1], 0, sizeof(SBoneTransform) * models.size());
+}
+
 VOID SDirectX12::CreateShaderResources(std::vector<SModel>& models)
 {
 	auto& model = models[0];
@@ -781,7 +849,7 @@ VOID SDirectX12::CreateShaderResources(std::vector<SModel>& models)
 
 	D3D12_SUBRESOURCE_DATA textureData = {};
 	textureData.pData = model.TextureSerialize(0);
-	textureData.RowPitch = TextureWidth * model.TextureFormat(0);
+	textureData.RowPitch = TextureWidth * model.TexelSize(0);
 	textureData.SlicePitch = textureData.RowPitch * TextureHeight;
 
 	UpdateSubresource(m_pCommandList, m_pSRVBuffer, texturebuffer, 0, 0, 1, &textureData);
@@ -798,76 +866,12 @@ VOID SDirectX12::CreateShaderResources(std::vector<SModel>& models)
 	// Describe and create a SRV for the texture.
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.Format = textureDesc.Format;
+	srvDesc.Format = static_cast<DXGI_FORMAT>(model.TextureFormat(0));
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
-	m_pDevice->GetDevice()->CreateShaderResourceView(m_pSRVBuffer, &srvDesc, m_pShaderBufferHeap->GetCPUDescriptorHandleForHeapStart());
-}
-
-VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
-{
-	D3D12_HEAP_PROPERTIES uploadHeapProperties;
-	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
-	uploadHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-	uploadHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-	uploadHeapProperties.CreationNodeMask = 1;
-	uploadHeapProperties.VisibleNodeMask = 1;
-
-	D3D12_RESOURCE_DESC constantBufferDesc = {};
-	constantBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	constantBufferDesc.Alignment = 0;
-	constantBufferDesc.Height = 1;
-	constantBufferDesc.DepthOrArraySize = 1;
-	constantBufferDesc.MipLevels = 1;
-	constantBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-	constantBufferDesc.SampleDesc.Count = 1;
-	constantBufferDesc.SampleDesc.Quality = 0;
-	constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	constantBufferDesc.Width = c_BufferingCount * sizeof(SModelViewProjection) * models.size();
-	HRESULT hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pCBVBuffer[0]));
-	SWindows::OutputErrorMessage(hResult);
-	m_pCBVBuffer[0]->SetName(L"MVP Buffer");
-
-	constantBufferDesc.Width = c_BufferingCount * sizeof(SBoneTransform) * models.size();
-	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pCBVBuffer[1]));
-	SWindows::OutputErrorMessage(hResult);
-	m_pCBVBuffer[1]->SetName(L"Bone Buffer");
-
-	D3D12_GPU_VIRTUAL_ADDRESS cbvGPUAddress[2];
-	cbvGPUAddress[0] = m_pCBVBuffer[0]->GetGPUVirtualAddress();
-	cbvGPUAddress[1] = m_pCBVBuffer[1]->GetGPUVirtualAddress();
-	D3D12_CPU_DESCRIPTOR_HANDLE cbvCPUHandle = m_pShaderBufferHeap->GetCPUDescriptorHandleForHeapStart();
-
-	for (unsigned int i = 0; i < c_BufferingCount; ++i)
-	{
-		for (unsigned int j = 0;j < models.size(); ++j)
-		{
-			D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
-			desc.BufferLocation = cbvGPUAddress[0];
-			desc.SizeInBytes = sizeof(SModelViewProjection);
-			m_pDevice->GetDevice()->CreateConstantBufferView(&desc, cbvCPUHandle);
-
-			cbvGPUAddress[0] += desc.SizeInBytes;
-			cbvCPUHandle.ptr += m_uiShaderBufferDescriptorSize;
-
-			desc.BufferLocation = cbvGPUAddress[1];
-			desc.SizeInBytes = sizeof(SBoneTransform);
-			m_pDevice->GetDevice()->CreateConstantBufferView(&desc, cbvCPUHandle);
-
-			cbvGPUAddress[1] += desc.SizeInBytes;
-			cbvCPUHandle.ptr += m_uiShaderBufferDescriptorSize;
-		}
-	}
-
-	D3D12_RANGE readRange;
-	readRange.Begin = readRange.End = 0;
-	m_pCBVBuffer[0]->Map(0, &readRange, reinterpret_cast<void**>(&MappedConstantBuffer[0]));
-	memset(MappedConstantBuffer[0], 0, c_BufferingCount * sizeof(SModelViewProjection) * models.size());
-
-	m_pCBVBuffer[1]->Map(0, &readRange, reinterpret_cast<void**>(&MappedConstantBuffer[1]));
-	memset(MappedConstantBuffer[1], 0, c_BufferingCount * sizeof(SBoneTransform) * models.size());
+	D3D12_CPU_DESCRIPTOR_HANDLE gpuHandle = m_pShaderBufferHeap->GetCPUDescriptorHandleForHeapStart();
+	gpuHandle.ptr += m_uiCBVDescriptorOffset;
+	m_pDevice->GetDevice()->CreateShaderResourceView(m_pSRVBuffer, &srvDesc, gpuHandle);
 }
 
 void SDirectX12::UpdateConstantBuffer()
@@ -883,7 +887,7 @@ void SDirectX12::UpdateConstantBuffer()
 		{
 			mvp.Model = m_SceneProxy[i].Tranformation;
 			mvp.NormalMatrix = SMath::NormalMatrix(m_SceneProxy[i].Tranformation);
-			auto offset = m_BufferIndex * sizeof(SModelViewProjection) * m_SceneProxy.size() + (i * sizeof(SModelViewProjection));
+			auto offset = i * sizeof(SModelViewProjection);
 			SModelViewProjection* pMVP = reinterpret_cast<SModelViewProjection*>(MappedConstantBuffer[0] + offset);
 
 			memcpy(pMVP, &mvp, sizeof(SModelViewProjection));
@@ -900,11 +904,15 @@ void SDirectX12::UpdateConstantBuffer()
 				bones.transform[j] = m_SceneProxy[i].BoneTransform[j];
 			}
 
-			auto offset = m_BufferIndex * sizeof(SBoneTransform) * m_SceneProxy.size() + (i * sizeof(SBoneTransform));
+			auto offset = i * sizeof(SBoneTransform);
 			SBoneTransform* pBone = reinterpret_cast<SBoneTransform*>(MappedConstantBuffer[1] + offset);
 			memcpy(pBone, &bones, sizeof(SBoneTransform));
 		}
 	}
+}
+
+void SDirectX12::UpdateShaderResource()
+{
 }
 
 void SDirectX12::WaitForGPU()

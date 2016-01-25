@@ -1,5 +1,4 @@
 #include "SUtils.h"
-#include "SPlatformSystem.h"
 
 namespace Sand
 {
@@ -29,18 +28,6 @@ namespace Sand
 	{
 #define EPSILON (1.e-6)
 		return fabs(a - b) < EPSILON;
-	}
-
-
-	template <typename... T>
-	void ConsoleLog(std::wstring message, T... params)
-	{
-		wchar_t buffer[512];
-		std::swprintf(buffer, 512, message, params);
-#if __WINDOWS__
-#include <Windows.h>
-		OutputDebugString(buffer);
-#endif
 	}
 
 }
