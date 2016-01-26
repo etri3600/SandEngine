@@ -11,12 +11,6 @@ struct PixelShaderInput
 Texture2D<half4> diff : register(t0);
 SamplerState samp : register(s0);
 
-struct MaterialIndex
-{
-	uint matIndex;
-};
-ConstantBuffer<MaterialIndex> MaterialConstant : register(b0, space1);
-
 float4 main(PixelShaderInput input) : SV_TARGET
 {
 	return diff.Sample(samp, input.uv);

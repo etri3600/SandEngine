@@ -33,11 +33,12 @@ class SModel
 public:
 	~SModel();
 
-	std::vector<SMeshInfo> MeshInfoes;
 	std::vector<SModelVertex> Vertices;
 	std::vector<unsigned int> Indices;
-	std::vector<STexture*> Textures;
 	SAnimation* Animation;
+
+	std::vector<SMeshInfo> MeshInfoes;
+	std::vector<STexture*> Textures;
 
 	SVector3 Location;
 	SQuaternion Rotation;
@@ -83,7 +84,7 @@ public:
 		return static_cast<void*>(Indices.data());
 	}
 
-	auto GetTextures() const {
+	std::vector<STexture*> GetTextures() const {
 		return Textures;
 	}
 
@@ -98,18 +99,7 @@ public:
 	unsigned int TextureWidth(unsigned int nTextureIndex) const {
 		unsigned int Width = 0;
 		if (Textures.size() > nTextureIndex)
-		{
-			switch (Textures[nTextureIndex]->eTextureLayout)
-			{
-			case STexture::TextureLayout::TL_TEX_1D:
-				Width = Textures[nTextureIndex]->GetCurrentMipTexture().Size;
-				break;
-			case STexture::TextureLayout::TL_TEX_2D:
-			case STexture::TextureLayout::TL_TEX_3D:
-				Width = Textures[nTextureIndex]->GetCurrentMipTexture().Width;
-				break;
-			}
-		}
+			Width = Textures[nTextureIndex]->GetWidth();
 		return Width;
 	}
 
@@ -117,16 +107,7 @@ public:
 		unsigned int Height = 0;
 		if (Textures.size() > nTextureIndex)
 		{
-			switch (Textures[nTextureIndex]->eTextureLayout)
-			{
-			case STexture::TextureLayout::TL_TEX_1D:
-				Height = Textures[nTextureIndex]->GetCurrentMipTexture().Size;
-				break;
-			case STexture::TextureLayout::TL_TEX_2D:
-			case STexture::TextureLayout::TL_TEX_3D:
-				Height = Textures[nTextureIndex]->GetCurrentMipTexture().Height;
-				break;
-			}
+			Height = Textures[nTextureIndex]->GetHeight();
 		}
 		return Height;
 	}

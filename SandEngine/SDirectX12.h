@@ -4,15 +4,16 @@
 #include "SDirectX12Device.h"
 #include "SDX12ShaderResourceManager.h"
 
-struct SDX12SceneProxy
+struct SSceneProxy
 {
 	unsigned int CBVDescriptorSize = 0;
 	unsigned int RTVDescriptorSize = 0;
 	unsigned int BaseVertexLocation = 0;
-	unsigned int IndexCountPerInstance = 0;
 	unsigned int StartIndexLocation = 0;
+	std::vector<SMeshInfo> MeshProxy;
 	SMatrix Tranformation;
 	SMatrix BoneTransform[MAX_BONES];
+	std::vector<STexture*> Textures;
 };
 
 class SDirectX12 : public SIGraphicsInterface
@@ -38,10 +39,9 @@ public:
 
 protected:
 	void CreateConstantBuffer(std::vector<SModel>& models);
-	void CreateShaderResources(std::vector<SModel>& models);
 
-	void UpdateConstantBuffer();
-	void UpdateShaderResource();
+	void UpdateConstantBuffer(unsigned int sceneIndex);
+	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);
 
 private:
 	void WaitForGPU();
@@ -88,7 +88,7 @@ private:
 
 	ID3D12DescriptorHeap* m_pSamplerHeap;
 
-	std::vector<SDX12SceneProxy> m_SceneProxy;
+	std::vector<SSceneProxy> m_SceneProxy;
 
 	HANDLE m_hFenceEvent;
 	bool m_bVSync;

@@ -37,6 +37,14 @@ struct PixelShaderInput
 	float2 uv : TEXCOORD0;
 };
 
+static column_major matrix Identity = 
+{
+	{ 1.0f, 0.0f, 0.0f, 0.0f },
+	{ 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 1.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 1.0f }
+};
+
 PixelShaderInput main(VertexShaderInput input)
 {
 	PixelShaderInput output;
@@ -45,7 +53,7 @@ PixelShaderInput main(VertexShaderInput input)
 	boneTransform += mul(BoneTransformConstantBuffer.transform[input.bone[1]], input.weight[1]);
 	boneTransform += mul(BoneTransformConstantBuffer.transform[input.bone[2]], input.weight[2]);
 	boneTransform += mul(BoneTransformConstantBuffer.transform[input.bone[3]], input.weight[3]);
-
+	
 	float4 posW = mul(boneTransform, float4(input.pos, 1.0f));
 	posW = mul(ViewProjectionConstantBuffer.model, posW);
 	float4 pos = mul(ViewProjectionConstantBuffer.view, posW);

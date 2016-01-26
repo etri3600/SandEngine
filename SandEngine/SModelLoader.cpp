@@ -33,7 +33,7 @@ SModel SModelLoader::LoadModelFromFile(const wchar_t* file)
 	const aiScene* pScene = importer.ReadFile(Sand::WStringToString(&wfullPath),
 		aiProcess_CalcTangentSpace |
 		aiProcess_Triangulate |
-		aiProcess_JoinIdenticalVertices | 
+		//aiProcess_JoinIdenticalVertices | 
 		aiProcess_GenSmoothNormals);
 
 	SModel model;
@@ -60,7 +60,7 @@ SModel SModelLoader::LoadModelFromFile(const wchar_t* file)
 
 	return std::move(model);
 }
-#include <Windows.h>
+
 void SModelLoader::LoadMeshes(SModel* model, const aiScene* pScene)
 {
 	model->MeshInfoes.resize(pScene->mNumMeshes);

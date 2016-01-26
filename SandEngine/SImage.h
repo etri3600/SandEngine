@@ -54,7 +54,35 @@ struct STexture : public SImage
 	bool FlipY = false;
 	std::vector<SMipTexture*> MipTextures;
 
-	SMipTexture GetCurrentMipTexture() { return MipTextures.size() > CurrentMipLevel ? *MipTextures[CurrentMipLevel] : SMipTexture(); }
+	SMipTexture GetCurrentMipTexture() const { return MipTextures.size() > CurrentMipLevel ? *MipTextures[CurrentMipLevel] : SMipTexture(); }
 	unsigned int GetTextureFormat() const;
 	unsigned int GetTexelSize() const;
+	unsigned int GetWidth() const{
+		unsigned int Width = 0;
+		switch (eTextureLayout)
+		{
+		case STexture::TextureLayout::TL_TEX_1D:
+			Width = GetCurrentMipTexture().Size;
+			break;
+		case STexture::TextureLayout::TL_TEX_2D:
+		case STexture::TextureLayout::TL_TEX_3D:
+			Width = GetCurrentMipTexture().Width;
+			break;
+		}
+		return Width;
+	}
+	unsigned int GetHeight() const {
+		unsigned int Height = 0;
+		switch (eTextureLayout)
+		{
+		case STexture::TextureLayout::TL_TEX_1D:
+			Height = 1;
+			break;
+		case STexture::TextureLayout::TL_TEX_2D:
+		case STexture::TextureLayout::TL_TEX_3D:
+			Height = GetCurrentMipTexture().Height;
+			break;
+		}
+		return Height;
+	}
 };

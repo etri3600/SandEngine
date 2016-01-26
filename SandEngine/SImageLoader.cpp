@@ -24,7 +24,7 @@ bool SImageLoader::LoadImageFromFile(const wchar_t* file, SImage* pImage)
 
 	return true;
 }
-#include <Windows.h>
+
 bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 {
 	if (pTexture)
