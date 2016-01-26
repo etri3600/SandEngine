@@ -12,6 +12,7 @@ struct SDX12SceneProxy
 	unsigned int IndexCountPerInstance = 0;
 	unsigned int StartIndexLocation = 0;
 	SMatrix Tranformation;
+	SMatrix BoneTransform[MAX_BONES];
 };
 
 class SDirectX12 : public SIGraphicsInterface
@@ -26,6 +27,8 @@ public:
 	bool CreateSwapChain(const SPlatformSystem* pPlatformSystem, const int nNumerator, const int nDenominator) override;
 	void CreateViewProjection() override;
 
+	void UpdateBoneTransform(const std::vector<SModel>& models) override;
+
 	bool Update(const double delta) override;
 	void Draw(std::vector<SModel>& models) override;
 	bool Render() override;
@@ -34,8 +37,9 @@ public:
 	std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob);
 
 protected:
-	VOID CreateShaderResources(std::vector<SModel>& models);
-	VOID CreateConstantBuffer(std::vector<SModel>& models);
+	void CreateShaderResources(std::vector<SModel>& models);
+	void CreateConstantBuffer(std::vector<SModel>& models);
+
 	void UpdateConstantBuffer();
 
 private:
@@ -75,12 +79,10 @@ private:
 	D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
 	ID3D12Resource* m_pIndexBuffer;
 
-	ID3D12DescriptorHeap* m_pCBVHeap;
-	unsigned int m_uiCBVDescriptorSize = 0;
-	ID3D12Resource* m_pConstantBuffer;
-
-	ID3D12DescriptorHeap* m_pSRVHeap;
-	unsigned int m_uiSRVDescriptorSize = 0;
+	ID3D12DescriptorHeap* m_pShaderBufferHeap;
+	unsigned int m_uiShaderBufferDescriptorSize = 0;
+	ID3D12Resource* m_pCBVBuffer[2];
+	unsigned int m_uiCBVOffset = 0;
 	ID3D12Resource* m_pSRVBuffer;
 
 	ID3D12DescriptorHeap* m_pSamplerHeap;
@@ -90,4 +92,7 @@ private:
 	HANDLE m_hFenceEvent;
 	bool m_bVSync;
 	bool m_bFullScreen;
+
+private:
+	static constexpr unsigned int c_NumShaderBuffer = 3;
 };

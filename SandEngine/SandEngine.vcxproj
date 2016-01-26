@@ -147,6 +147,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="SandEngine.h" />
+    <ClInclude Include="SAnimation.h" />
+    <ClInclude Include="SBone.h" />
     <ClInclude Include="SDirectX12.h" />
     <ClInclude Include="SDirectX12Device.h" />
     <ClInclude Include="SDX12Helper.h" />
@@ -162,7 +164,7 @@
     <ClInclude Include="SMath.h" />
     <ClInclude Include="SModelLoader.h" />
     <ClInclude Include="SModelStruct.h" />
-    <ClInclude Include="SModelViewProjection.h" />
+    <ClInclude Include="SConstantBuffer.h" />
     <ClInclude Include="SPlatformManager.h" />
     <ClInclude Include="SPlatformSystem.h" />
     <ClInclude Include="SSceneManager.h" />
@@ -175,6 +177,7 @@
     <ClInclude Include="SWindows.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SAnimation.cpp" />
     <ClCompile Include="SDirectX12.cpp" />
     <ClCompile Include="SDirectX12Device.cpp" />
     <ClCompile Include="SDX12Helper.cpp" />
@@ -184,6 +187,7 @@
     <ClCompile Include="SImageLoader.cpp" />
     <ClCompile Include="SMath.cpp" />
     <ClCompile Include="SModelLoader.cpp" />
+    <ClCompile Include="SModelStruct.cpp" />
     <ClCompile Include="SSceneManager.cpp" />
     <ClCompile Include="SShaderResourceManager.cpp" />
     <ClCompile Include="SUtils.cpp" />

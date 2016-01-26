@@ -3,7 +3,7 @@
 #include "SPlatformSystem.h"
 #include "SUtils.h"
 #include "SModelLoader.h"
-#include "SModelViewProjection.h"
+#include "SConstantBuffer.h"
 #include "SShaderResourceManager.h"
 
 enum class GraphicsInterfaceEnum
@@ -13,7 +13,6 @@ enum class GraphicsInterfaceEnum
 	//GI_GL_4,
 	//GI_BULKAN
 };
-
 class SIGraphicsInterface
 {
 public:
@@ -28,12 +27,14 @@ public:
 	virtual bool CreateSwapChain(const SPlatformSystem* pPlatformSystem, const int nNumerator, const int nDenominator) = 0;
 	virtual void CreateViewProjection() = 0;
 
+	virtual void UpdateBoneTransform(const std::vector<SModel>& models) = 0;
+
 public:
 	static constexpr unsigned int c_BufferingCount = 3;
 
 protected:
 	SModelLoader* ModelLoader = nullptr;
-	SModelViewProjection* MVP;
+	char* MappedConstantBuffer[2];
 	SMatrix View, Projection;
 
 	unsigned int m_BufferIndex = 0;

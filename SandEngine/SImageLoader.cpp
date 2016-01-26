@@ -38,7 +38,7 @@ bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 			ILinfo info = {};
 			iluGetImageInfo(&info);
 
-			pTexture->MipTextures.reserve(info.NumMips);
+			pTexture->MipTextures.resize(info.NumMips == 0 ? 1 : info.NumMips);
 			pTexture->eTextureLayout = STexture::TextureLayout::TL_TEX_2D;
 			STexture::TextureFormat eFormat;
 			switch (info.Format)
@@ -57,8 +57,30 @@ bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 			pTexture->eTextureFormat = eFormat;
 			pTexture->MipLevels = info.NumMips;
 
-			for (unsigned int i = 0;i < info.NumMips; ++i)
+			STexture::TexelType eType;
+			switch (info.Type)
 			{
+			case IL_BYTE:
+			case IL_UNSIGNED_BYTE: eType = STexture::TexelType::TT_BYTE;
+				break;
+			case IL_SHORT:
+			case IL_UNSIGNED_SHORT: eType = STexture::TexelType::TT_SHORT;
+				break;
+			case IL_INT:
+			case IL_UNSIGNED_INT: eType = STexture::TexelType::TT_BYTE;
+				break;
+			case IL_FLOAT: eType = STexture::TexelType::TT_FLOAT;
+				break;
+			case IL_DOUBLE: eType = STexture::TexelType::TT_DOUBLE;
+				break;
+			case IL_HALF: eType = STexture::TexelType::TT_HALF;
+				break;
+			}
+			pTexture->eTexelType = eType;
+			
+			for (unsigned int i = 0;i < pTexture->MipTextures.size(); ++i)
+			{
+				pTexture->MipTextures[i] = new STexture::SMipTexture();
 				pTexture->MipTextures[i]->Width = info.Width;
 				pTexture->MipTextures[i]->Height = info.Height;
 				pTexture->MipTextures[i]->Size = info.SizeOfData;

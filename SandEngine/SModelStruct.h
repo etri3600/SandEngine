@@ -4,24 +4,52 @@
 #include "SUtils.h"
 #include "SImage.h"
 
+#include <queue>
+
+#define BONES_PER_VERTEX 4U
+
 struct SModelVertex
 {
 	SVector3 position;
 	SVector4 color;
 	SVector3 normal;
+	SVector4 tangent;
 	SVector2 uv;
+	unsigned int boneIDs[BONES_PER_VERTEX]{};
+	float weights[BONES_PER_VERTEX]{};
 };
 
+struct SMeshInfo
+{
+	unsigned int NumIndices = 0;
+	unsigned int BaseVertex = 0;
+	unsigned int BaseIndex = 0;
+	unsigned int MaterialIndex = -1;
+};
+
+class SAnimation;
 class SModel
 {
 public:
+	~SModel();
+
+	std::vector<SMeshInfo> MeshInfoes;
 	std::vector<SModelVertex> Vertices;
 	std::vector<unsigned int> Indices;
 	std::vector<STexture*> Textures;
+	SAnimation* Animation;
 
 	SVector3 Location;
 	SQuaternion Rotation;
 	SVector3 Scale{ 1.0f, 1.0f, 1.0f };
+
+	double m_timePoint;
+	SMatrix m_world;
+	std::string m_clipName;
+	std::queue<std::string> m_clipQueue;
+	bool m_bLoopClips;
+
+	void Update(double delta);
 	
 	static constexpr std::size_t VertexBaseSize() {
 		return sizeof(SModelVertex);
@@ -108,20 +136,26 @@ public:
 	}
 
 	unsigned int TextureFormat(unsigned int nTextureIndex) const {
-		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTextureFormat() : 0;
+		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTextureFormat() : 0U;
 	}
 
-	void Release()
-	{
-		Vertices.empty();
-		Indices.empty();
-		for (auto it = Textures.begin(); it != Textures.end(); ++it)
-		{
-			delete[] *it;
-			(*it) = nullptr;
-		}
-		Textures.empty();
+	unsigned int TexelSize(unsigned int nTextureIndex) const {
+		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTexelSize() : 0U;
 	}
+
+	std::string GetClipName() const { return m_clipName; }
+	void SetClipName(const std::string clipName);
+	std::vector<std::string> GetClips() const;
+	void AddClip(const std::string& clip) { m_clipQueue.push(clip); }
+	void ClearClip() { std::queue<std::string> empty; std::swap(m_clipQueue, empty); }
+
+	bool HasAnimation() const;
+	std::vector<SMatrix> GetFinalTransform() const;
+
+	bool AddBoneData(unsigned int vertexIndex, unsigned int boneIndex, float weight);
+	void SetDefaultBoneWeights();
+
+	void Release();
 };
 
 class STriangle : public SModel
@@ -134,16 +168,19 @@ public:
 		point1.color = { 1.0f, 0.0f, 0.0f };
 		point1.normal = SVector3(0.0f, 0.0f, 1.0f);
 		point1.uv = SVector2(0.0f, 0.0f);
+		point1.weights[0] = 1.0f;
 
 		point2.position = SVector3(-1.0f, 0.0f, 0.0f);
 		point2.color = { 0.0f, 1.0f, 0.0f };
 		point2.normal = SVector3(0.0f, 0.0f, 1.0f);
 		point2.uv = SVector2(0.0f, 1.0f);
+		point2.weights[0] = 1.0f;
 
 		point3.position = SVector3(1.0f, 0.0f, 0.0f);
 		point3.color = { 0.0f, 0.0f, 1.0f };
 		point3.normal = SVector3(0.0f, 0.0f, 1.0f);
 		point3.uv = SVector2(1.0f, 0.0f);
+		point3.weights[0] = 1.0f;
 		
 		Vertices.push_back(point1);
 		Vertices.push_back(point2);
@@ -165,41 +202,49 @@ public:
 		point1.color = {1.0f, 1.0f, 1.0f};
 		point1.normal = { 0.0f, 0.0f, 1.0f };
 		point1.uv = { 0.0f, 0.0f };
+		point1.weights[0] = 1.0f;
 
 		point2.position = { -1.0f, -1.0f, 1.0f };
 		point2.color = { 0.0f, 1.0f, 1.0f };
 		point2.normal = { 0.0f, 0.0f, 1.0f };
 		point2.uv = { 0.0f, 1.0f };
+		point2.weights[0] = 1.0f;
 
 		point3.position = SVector3(1.0f, 1.0f, 1.0f);
 		point3.color = { 1.0f, 0.0f, 1.0f };
 		point3.normal = SVector3(0.0f, 0.0f, 1.0f);
 		point3.uv = SVector2(1.0f, 0.0f);
+		point3.weights[0] = 1.0f;
 
 		point4.position = SVector3(1.0f, -1.0f, 1.0f);
 		point4.color = { 1.0f, 1.0f, 0.0f };
 		point4.normal = SVector3(0.0f, 0.0f, 1.0f);
 		point4.uv = SVector2(0.0f, 0.0f);
+		point4.weights[0] = 1.0f;
 
 		point5.position = SVector3(1.0f, 1.0f, -1.0f);
 		point5.color = { 0.0f, 0.0f, 1.0f };
 		point5.normal = SVector3(0.0f, 0.0f, -1.0f);
 		point5.uv = SVector2(0.0f, 1.0f);
+		point5.weights[0] = 1.0f;
 
 		point6.position = SVector3(1.0f, -1.0f, -1.0f);
 		point6.color = { 1.0f, 0.0f, 0.0f };
 		point6.normal = SVector3(0.0f, 0.0f, -1.0f);
 		point6.uv = SVector2(1.0f, 0.0f);
+		point6.weights[0] = 1.0f;
 
 		point7.position = SVector3(-1.0f, 1.0f, -1.0f);
 		point7.color = { 0.0f, 1.0f, 0.0f };
 		point7.normal = SVector3(0.0f, 0.0f, -1.0f);
 		point7.uv = SVector2(0.0f, 0.0f);
+		point7.weights[0] = 1.0f;
 
 		point8.position = SVector3(-1.0f, -1.0f, -1.0f);
 		point8.color = { 0.0f, 0.0f, 0.0f };
 		point8.normal = SVector3(0.0f, 0.0f, -1.0f);
 		point8.uv = SVector2(0.0f, 1.0f);
+		point8.weights[0] = 1.0f;
 
 		Vertices.push_back(point1);
 		Vertices.push_back(point2);
