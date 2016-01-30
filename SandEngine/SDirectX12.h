@@ -2,7 +2,6 @@
 
 #include "SGraphicsInterface.h"
 #include "SDirectX12Device.h"
-#include "SDX12ShaderResourceManager.h"
 
 struct SSceneProxy
 {
@@ -16,6 +15,8 @@ struct SSceneProxy
 	std::vector<STexture*> Textures;
 };
 
+class SDX12ResourceAllocator;
+class SDX12DescriptorHeapAllocator;
 class SDirectX12 : public SIGraphicsInterface
 {
 public:
@@ -39,8 +40,9 @@ public:
 
 protected:
 	void CreateConstantBuffer(std::vector<SModel>& models);
+	void CreateShaderResources(std::vector<SModel>& models);
 
-	void UpdateConstantBuffer(unsigned int sceneIndex);
+	void UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pMappedConstant);
 	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);
 
 private:
@@ -52,7 +54,8 @@ private:
 
 private:
 	SDirectX12Device* m_pDevice;
-	SDX12ShaderResourceManager* m_pShaderResourceManager;
+	SDX12ResourceAllocator* m_pResourceAllocator[2];
+	SDX12DescriptorHeapAllocator* m_pDescriptorAllocator[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 
 	ID3D12CommandQueue* m_pCommandQueue;
 	ID3D12DescriptorHeap* m_pRenderTargetViewHeap;
@@ -95,5 +98,5 @@ private:
 	bool m_bFullScreen;
 
 private:
-	static constexpr unsigned int c_NumShaderBuffer = 3;
+	static constexpr unsigned int c_NumDescriptorsPerHeap = 64;
 };

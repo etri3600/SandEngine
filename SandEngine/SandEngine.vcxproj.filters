@@ -62,12 +62,6 @@
     <ClInclude Include="SPlatformManager.h">
       <Filter>Platform</Filter>
     </ClInclude>
-    <ClInclude Include="SDX12ShaderResourceManager.h">
-      <Filter>Graphics\DirectX12</Filter>
-    </ClInclude>
-    <ClInclude Include="SShaderResourceManager.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="SLinux.h">
       <Filter>Platform</Filter>
     </ClInclude>
@@ -114,6 +108,12 @@
     <ClInclude Include="SBone.h">
       <Filter>Asset</Filter>
     </ClInclude>
+    <ClInclude Include="SDX12ResourceAllocator.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="SDX12DescriptorHeapAllocator.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDirectX12.cpp">
@@ -123,9 +123,6 @@
       <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="SGraphics.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="SShaderResourceManager.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="SWindows.cpp">
@@ -145,9 +142,6 @@
     <ClCompile Include="SImage.cpp">
       <Filter>Asset</Filter>
     </ClCompile>
-    <ClCompile Include="SDX12ShaderResourceManager.cpp">
-      <Filter>Graphics\DirectX12</Filter>
-    </ClCompile>
     <ClCompile Include="SDX12Helper.cpp">
       <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
@@ -157,6 +151,10 @@
     <ClCompile Include="SAnimation.cpp">
       <Filter>Asset</Filter>
     </ClCompile>
+    <ClCompile Include="SDX12ResourceAllocator.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="SDX12DescriptorHeapAllocator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\SimplePixelShader.hlsl">

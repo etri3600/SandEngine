@@ -151,8 +151,9 @@
     <ClInclude Include="SBone.h" />
     <ClInclude Include="SDirectX12.h" />
     <ClInclude Include="SDirectX12Device.h" />
+    <ClInclude Include="SDX12DescriptorHeapAllocator.h" />
     <ClInclude Include="SDX12Helper.h" />
-    <ClInclude Include="SDX12ShaderResourceManager.h" />
+    <ClInclude Include="SDX12ResourceAllocator.h" />
     <ClInclude Include="SGraphics.h" />
     <ClInclude Include="SGraphicsInterface.h" />
     <ClInclude Include="SHeader.h" />
@@ -169,7 +170,6 @@
     <ClInclude Include="SPlatformSystem.h" />
     <ClInclude Include="SSceneManager.h" />
     <ClInclude Include="SSceneNode.h" />
-    <ClInclude Include="SShaderResourceManager.h" />
     <ClInclude Include="SSingletone.h" />
     <ClInclude Include="SImageLoader.h" />
     <ClInclude Include="STime.h" />
@@ -180,8 +180,9 @@
     <ClCompile Include="SAnimation.cpp" />
     <ClCompile Include="SDirectX12.cpp" />
     <ClCompile Include="SDirectX12Device.cpp" />
+    <ClCompile Include="SDX12DescriptorHeapAllocator.cpp" />
     <ClCompile Include="SDX12Helper.cpp" />
-    <ClCompile Include="SDX12ShaderResourceManager.cpp" />
+    <ClCompile Include="SDX12ResourceAllocator.cpp" />
     <ClCompile Include="SGraphics.cpp" />
     <ClCompile Include="SImage.cpp" />
     <ClCompile Include="SImageLoader.cpp" />
@@ -189,7 +190,6 @@
     <ClCompile Include="SModelLoader.cpp" />
     <ClCompile Include="SModelStruct.cpp" />
     <ClCompile Include="SSceneManager.cpp" />
-    <ClCompile Include="SShaderResourceManager.cpp" />
     <ClCompile Include="SUtils.cpp" />
     <ClCompile Include="SWindows.cpp" />
   </ItemGroup>
