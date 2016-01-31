@@ -629,8 +629,8 @@ bool SDirectX12::Render()
 		{
 			m_pCommandList->SetGraphicsRootConstantBufferView(0, mvpGPUAddress);
 			m_pCommandList->SetGraphicsRootConstantBufferView(1, boneGPUAddress);
-			mvpGPUAddress += m_uiShaderBufferDescriptorSize * 2;
-			boneGPUAddress += m_uiShaderBufferDescriptorSize * 2;
+			mvpGPUAddress += sizeof(SModelViewProjection);
+			boneGPUAddress += sizeof(SBoneTransform);
 			UpdateConstantBuffer(i, nullptr);
 			for (unsigned int j = 0;j < m_SceneProxy[i].MeshProxy.size(); ++j)
 			{
@@ -815,6 +815,9 @@ void SDirectX12::CreateShaderResources(std::vector<SModel>& models)
 		{
 			auto& texture = models[i].Textures[j];
 
+			if (texture->MipTextures.size() == 0)
+				continue;
+
 			unsigned int TextureWidth = static_cast<unsigned int>(texture->GetWidth()), TextureHeight = static_cast<unsigned int>(texture->GetHeight());
 
 			// Create Texture
@@ -899,7 +902,7 @@ void SDirectX12::UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pM
 
 		mvp.Model = m_SceneProxy[sceneIndex].Tranformation;
 		mvp.NormalMatrix = SMath::NormalMatrix(m_SceneProxy[sceneIndex].Tranformation);
-		SModelViewProjection* pMVP = reinterpret_cast<SModelViewProjection*>(MappedConstantBuffer[0]);
+		SModelViewProjection* pMVP = reinterpret_cast<SModelViewProjection*>(MappedConstantBuffer[0] + sizeof(SModelViewProjection) * sceneIndex);
 
 		memcpy(pMVP, &mvp, sizeof(SModelViewProjection));
 	}
@@ -911,7 +914,7 @@ void SDirectX12::UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pM
 		{
 			bones.transform[j] = m_SceneProxy[sceneIndex].BoneTransform[j];
 		}
-		SBoneTransform* pBone = reinterpret_cast<SBoneTransform*>(MappedConstantBuffer[1]);
+		SBoneTransform* pBone = reinterpret_cast<SBoneTransform*>(MappedConstantBuffer[1] + sizeof(SBoneTransform) * sceneIndex);
 		memcpy(pBone, &bones, sizeof(SBoneTransform));
 	}
 }

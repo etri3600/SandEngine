@@ -19,14 +19,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			auto&& model = ModelLoader->LoadModelFromFile(LR"(boblampclean\boblampclean.md5mesh)");
 			model.Scale = {0.3f, 0.3f, 0.3f};
-			model.Location = { 0.0f, 0.0f, -10.0f };
-			model.Rotation = { std::sinf(-45.0f), 0.0f, 0.0f, std::cosf(-45.0f) };
+			model.Location = { 0.0f, -10.0f, -10.0f };
 			SceneManager->Queue(model);
 			
-			SCube cube1;
-			cube1.Rotation = { 1.0f, 1.0f, 0.0f, std::cosf(15.0f)};
-			cube1.Location = { -0.3f, 0.0f, 0.0f };
-			//SceneManager->Queue(cube1);
+			auto&& model2 = ModelLoader->LoadModelFromFile(LR"(Jet_Animation.FBX)");
+			model2.Location = { -2.0f, 0.0f, 0.0f };
+			//SceneManager->Queue(model2);
 
 			SceneManager->Draw();
 			

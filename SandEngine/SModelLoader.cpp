@@ -117,9 +117,10 @@ void SModelLoader::LoadBones(SModel* model, aiMesh* pMesh, unsigned int meshInde
 		std::string BoneName(pMesh->mBones[i]->mName.data);
 		if (model->Animation->m_BoneNameMap.find(BoneName) == model->Animation->m_BoneNameMap.end()) {
 			SBone* bone = new SBone();
+			BoneIndex = model->Animation->m_NumBones++;
 			model->Animation->m_Bones.push_back(bone);
 			bone->boneOffset = MatrixFromAI(pMesh->mBones[i]->mOffsetMatrix);
-			model->Animation->m_BoneNameMap[BoneName] = BoneIndex++;
+			model->Animation->m_BoneNameMap[BoneName] = BoneIndex;
 		}
 		else {
 			BoneIndex = model->Animation->m_BoneNameMap[BoneName];

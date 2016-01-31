@@ -20,10 +20,10 @@ namespace Sand
 	extern bool Equal(const double& a, const double& b);
 
 	template <typename... T>
-	void ConsoleLog(std::wstring message, T... params)
+	void ConsoleLog(std::wstring message, T&&... params)
 	{
 		wchar_t buffer[512];
-		swprintf(buffer, 512, message, params...);
+		swprintf(buffer, 512, message, std::forward<T>(params)...);
 #if __WINDOWS__
 		OutputDebugString(buffer);
 #endif

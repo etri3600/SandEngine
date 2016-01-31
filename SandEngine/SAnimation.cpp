@@ -24,7 +24,7 @@ void SAnimation::Update(double delta)
 	double TicksPerSecond = (animInfo.tickPerSeconds != 0 ? animInfo.tickPerSeconds : 30.0);
 	double TimeInTicks = m_ElapsedTime * TicksPerSecond;
 	double AnimationTime = fmod(TimeInTicks, animInfo.duration);
-
+	
 	ReadNodeHeirarchy(AnimationTime, m_Skeleton, Identity);
 
 	Transforms.resize(m_Bones.size());
@@ -55,7 +55,7 @@ void SAnimation::ReadNodeHeirarchy(double AnimationTime, const SBoneNode* pNode,
 		SVector3 translate;
 		CalcInterpolatedPosition(translate, AnimationTime, channel);
 		SMatrix translateMatrix;
-		translateMatrix.Translate(scale);
+		translateMatrix.Translate(translate);
 
 		NodeTransformation = translateMatrix * rotateMatrix * scaleMatrix;
 	}

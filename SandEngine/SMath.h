@@ -328,7 +328,7 @@ struct SQuaternion
 		SMatrix mat;
 		mat.m[0][0] = 1.0f - 2.0f * (y * y + z * z);	mat.m[1][0] = 2.0f * (x * y - z * w);		mat.m[2][0] = 2.0f * (x * z + y * w);		mat.m[3][0] = 0.0f;
 		mat.m[0][1] = 2.0f * (x * y + z * w);			mat.m[1][1] = 1.0f - 2.0f * (x * x + z * z);mat.m[2][1] = 2.0f * (y * z - x * w);		mat.m[3][1] = 0.0f;
-		mat.m[0][2] = 2.0f * (x * z - y * w);			mat.m[1][2] = 2.0f * (y * z * x * w);		mat.m[2][2] = 1.0f - 2.0f * (x * x + y * y);mat.m[3][2] = 0.0f;
+		mat.m[0][2] = 2.0f * (x * z - y * w);			mat.m[1][2] = 2.0f * (y * z + x * w);		mat.m[2][2] = 1.0f - 2.0f * (x * x + y * y);mat.m[3][2] = 0.0f;
 		mat.m[0][3] = 0.0f;				 				mat.m[1][3] = 0.0f;							mat.m[2][3] = 0.0f;							mat.m[3][3] = 1.0f;
 		return mat;
 	}

@@ -80,6 +80,7 @@ protected:
 
 	std::vector<SBone*> m_Bones;
 	std::map<std::string, unsigned int> m_BoneNameMap;
+	unsigned int m_NumBones = 0;
 
 	std::map<std::string, unsigned int> m_AnimNameMap;
 	std::vector<SAnimInfo> m_Animations;
