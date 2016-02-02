@@ -192,7 +192,7 @@ SBoneNode* SModelLoader::CreateBoneTree(SAnimation* animation, SBoneNode* pBoneN
 		boneNode->name = node->mName.data;
 		boneNode->parent = pBoneNode;
 		boneNode->localTransformation = MatrixFromAI(node->mTransformation);
-		animation->CalculateBoneNodeToWorldTransform(boneNode);
+		//animation->CalculateBoneNodeToWorldTransform(boneNode);
 		animation->m_BoneNodeNameMap[boneNode->name] = boneNode;
 
 		for (unsigned int i = 0;i < node->mNumChildren; ++i)

@@ -14,6 +14,10 @@ bool SAnimation::SetAnimation(const std::string clipName)
 	return false;
 }
 
+namespace {
+	bool s_log = true;
+}
+
 void SAnimation::Update(double delta)
 {
 	m_ElapsedTime += delta;
@@ -24,7 +28,7 @@ void SAnimation::Update(double delta)
 	double TicksPerSecond = (animInfo.tickPerSeconds != 0 ? animInfo.tickPerSeconds : 30.0);
 	double TimeInTicks = m_ElapsedTime * TicksPerSecond;
 	double AnimationTime = fmod(TimeInTicks, animInfo.duration);
-	
+	//AnimationTime = 40.0;
 	ReadNodeHeirarchy(AnimationTime, m_Skeleton, Identity);
 
 	Transforms.resize(m_Bones.size());
@@ -32,6 +36,8 @@ void SAnimation::Update(double delta)
 	for (unsigned int i = 0; i < m_Bones.size(); ++i) {
 		Transforms[i] = m_Bones[i]->globalTransform;
 	}
+
+	s_log = false;
 }
 
 void SAnimation::ReadNodeHeirarchy(double AnimationTime, const SBoneNode* pNode, const SMatrix & ParentTransform)
@@ -65,7 +71,20 @@ void SAnimation::ReadNodeHeirarchy(double AnimationTime, const SBoneNode* pNode,
 	if (m_BoneNameMap.find(pNode->name) != m_BoneNameMap.end())
 	{
 		unsigned int BoneIndex = m_BoneNameMap[pNode->name];
-		m_Bones[BoneIndex]->globalTransform = GlobalInverseTransformation * GlobalTransformation * m_Bones[BoneIndex]->boneOffset;
+		m_Bones[BoneIndex]->globalTransform = GlobalTransformation * m_Bones[BoneIndex]->boneOffset;
+		if (s_log)
+		{
+			SMatrix ParentTransform = m_Bones[BoneIndex]->globalTransform;
+			wchar_t buffer[256] = {}, temp[256];
+			//swprintf(buffer, 256, L"%S : %f, %f, %f, %f\n", pNode->name.data(), pNode->localTransformation.m[0][0], pNode->localTransformation.m[1][1], pNode->localTransformation.m[2][2], pNode->localTransformation.m[3][3]);
+			swprintf(temp, 256, L"%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n"
+				, ParentTransform.m[0][0], ParentTransform.m[1][0], ParentTransform.m[2][0], ParentTransform.m[3][0]
+				, ParentTransform.m[0][1], ParentTransform.m[1][1], ParentTransform.m[2][1], ParentTransform.m[3][1]
+				, ParentTransform.m[0][2], ParentTransform.m[1][2], ParentTransform.m[2][2], ParentTransform.m[3][2]
+				, ParentTransform.m[0][3], ParentTransform.m[1][3], ParentTransform.m[2][3], ParentTransform.m[3][3]);
+			wcscat_s(buffer, 256, temp);
+			OutputDebugString(buffer);
+		}
 	}
 
 	for (unsigned int i = 0; i < pNode->children.size(); ++i) {
