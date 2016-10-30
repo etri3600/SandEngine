@@ -36,7 +36,7 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 		return false;
 
 	m_pDevice = new SDirectX12Device();
-	m_pDevice->Initialize(0, screenWidth, screenHeight, fullScreen, vSync);
+	m_pDevice->Initialize(screenWidth, screenHeight, fullScreen, vSync);
 
 
 	// Create Command Queue

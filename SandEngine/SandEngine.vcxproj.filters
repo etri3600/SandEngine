@@ -33,6 +33,9 @@
     <Filter Include="Asset">
       <UniqueIdentifier>{cdbcc363-4744-4706-a26b-bdca859d4ab0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics\Vulkan">
+      <UniqueIdentifier>{fa389fe0-2392-425c-a085-5ca66d2e0972}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SHeader.h">
@@ -114,6 +117,12 @@
     <ClInclude Include="SDX12DescriptorHeapAllocator.h">
       <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
+    <ClInclude Include="SVulkanDevice.h">
+      <Filter>Graphics\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="SVulkan.h">
+      <Filter>Graphics\Vulkan</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDirectX12.cpp">
@@ -155,6 +164,12 @@
       <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="SDX12DescriptorHeapAllocator.cpp" />
+    <ClCompile Include="SVulkanDevice.cpp">
+      <Filter>Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="SVulkan.cpp">
+      <Filter>Graphics\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\SimplePixelShader.hlsl">

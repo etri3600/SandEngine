@@ -211,3 +211,4 @@ _Pvt_Extensions/
 ModelManifest.xml
 *.opendb
 *.ipdb
+/SandEngine.VC.db

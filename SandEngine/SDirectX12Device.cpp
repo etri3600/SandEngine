@@ -2,7 +2,7 @@
 
 #include "SUtils.h"
 
-bool SDirectX12Device::Initialize(const HWND pPlayformSystem, unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync)
+bool SDirectX12Device::Initialize(unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync)
 {
 #if defined(_DEBUG)
 	if (SUCCEEDED(D3D12GetDebugInterface(__uuidof(ID3D12Debug), reinterpret_cast<void**>(&m_pDebugController))))

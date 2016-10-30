@@ -1,7 +1,7 @@
 #pragma once
 
 #include <d3d12.h>
-#include <dxgi1_4.h>
+#include <dxgi1_5.h>
 #include <d3dcompiler.h>
 
 #define RELEASE_DX(ptr) {if(ptr) ptr->Release(); ptr = nullptr;}
@@ -9,7 +9,7 @@
 class SDirectX12Device
 {
 public:
-	bool Initialize(const HWND pPlayformSystem, unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync);
+	bool Initialize(unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync);
 	void Finalize();
 
 	ID3D12Device* GetDevice() const { return m_pDevice; }
