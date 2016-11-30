@@ -14,11 +14,7 @@ bool SVulkan::Initialize(const SPlatformSystem* pPlayformSystem, unsigned int sc
 	m_pDevice = new SVulkanDevice();
 	m_pDevice->Initialize(screenWidth, screenHeight, fullScreen, vSync);
 
-	CreateSurface(pPlayformSystem);
-
-
-
-	return false;
+	return CreateSurface(pPlayformSystem);
 }
 
 vk::SurfaceKHR SVulkan::CreateSurface(const SPlatformSystem* pPlayformSystem)
@@ -37,4 +33,35 @@ void SVulkan::Finalize()
 {
 	m_pDevice->GetDevice().destroySurfaceKHR(m_surface);
 	m_pDevice->Finalize();
+}
+
+bool SVulkan::Update(const double delta)
+{
+	return false;
+}
+
+void SVulkan::Draw(std::vector<SModel>& models)
+{
+}
+
+bool SVulkan::Render()
+{
+	return false;
+}
+
+void SVulkan::Present()
+{
+}
+
+bool SVulkan::CreateSwapChain(const SPlatformSystem * pPlatformSystem, const int nNumerator, const int nDenominator)
+{
+	return false;
+}
+
+void SVulkan::CreateViewProjection()
+{
+}
+
+void SVulkan::UpdateBoneTransform(const std::vector<SModel>& models)
+{
 }

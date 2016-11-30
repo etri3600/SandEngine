@@ -1,21 +1,22 @@
 #include "SDirectX12Device.h"
-
 #include "SUtils.h"
 
 bool SDirectX12Device::Initialize(unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync)
 {
+	HRESULT result;
 #if defined(_DEBUG)
-	if (SUCCEEDED(D3D12GetDebugInterface(__uuidof(ID3D12Debug), reinterpret_cast<void**>(&m_pDebugController))))
-	{
-		m_pDebugController->EnableDebugLayer();
-	}
+	//result = D3D12GetDebugInterface(__uuidof(ID3D12Debug), reinterpret_cast<void**>(&m_pDebugController));
+	//if (SUCCEEDED(result))
+	//{
+	//	m_pDebugController->EnableDebugLayer();
+	//}
 #endif
 
 	// Create DXGI
-	IDXGIFactory* factory = nullptr;
+	IDXGIFactory4* factory = nullptr;
 	IDXGIAdapter* adapter = nullptr;
 	IDXGIOutput* adapterOutput = nullptr;
-	CreateDXGIFactory(IID_PPV_ARGS(&factory));
+	result = CreateDXGIFactory1(IID_PPV_ARGS(&factory));
 	factory->QueryInterface(IID_PPV_ARGS(&m_pDXGIFactory));
 
 	// Create Device

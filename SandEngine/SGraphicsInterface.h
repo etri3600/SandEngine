@@ -10,7 +10,7 @@ enum class GraphicsInterfaceEnum
 	//GI_DX_11,
 	GI_DX_12,
 	//GI_GL_4,
-	//GI_BULKAN
+	GI_VULKAN
 };
 class SIGraphicsInterface
 {

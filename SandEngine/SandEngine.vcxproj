@@ -96,7 +96,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.0.30.0\Source\lib;$(ProjectDir)Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Source\lib\;$(ProjectDir)Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp.lib;DevIL.lib;ILU.lib;ILUT.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
@@ -136,7 +136,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.0.30.0\Source\lib;$(ProjectDir)Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Source\lib\;$(ProjectDir)Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp.lib;DevIL.lib;ILU.lib;ILUT.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
