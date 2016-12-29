@@ -9,24 +9,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	auto framework = SPlatformManager::CreateFramework();
 	if (framework && framework->Init())
 	{
-		SIGraphicsInterface* pGraphics = SGraphics::Initialize(GraphicsInterfaceEnum::GI_DX_12);
+		auto pGraphics = SGraphics::Initialize(GraphicsInterfaceEnum::GI_DX_12);
 		if (pGraphics && pGraphics->Initialize(framework, 1920, 1080, false, true))
 		{
 			SModelLoader* ModelLoader = new SModelLoader();
 			ModelLoader->Initialize();
 			SSceneManager* SceneManager = new SSceneManager();
-			SceneManager->Init(pGraphics);
+			SScene* scene = SceneManager->CreateScene(L"gogo");
+			SceneManager->LoadScene(scene);
+
+			SNode* node = scene->GetRootNode();
 
 			auto&& model = ModelLoader->LoadModelFromFile(LR"(boblampclean\boblampclean.md5mesh)");
 			model.Scale = {0.3f, 0.3f, 0.3f};
 			model.Location = { 0.0f, -10.0f, -10.0f };
-			SceneManager->Queue(model);
+			node->Queue(model);
 			
 			auto&& model2 = ModelLoader->LoadModelFromFile(LR"(Jet_Animation.FBX)");
 			model2.Location = { -2.0f, 0.0f, 0.0f };
-			//SceneManager->Queue(model2);
-
-			SceneManager->Draw();
+			//node->Queue(model2);
 			
 			do
 			{
@@ -34,8 +35,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					break;
 				SceneManager->Tick();
 			} while (true);
-
-			SceneManager->Reset();
 		}
 	}
 

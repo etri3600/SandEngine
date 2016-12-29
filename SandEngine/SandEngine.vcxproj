@@ -169,8 +169,9 @@
     <ClInclude Include="SConstantBuffer.h" />
     <ClInclude Include="SPlatformManager.h" />
     <ClInclude Include="SPlatformSystem.h" />
+    <ClInclude Include="SScene.h" />
     <ClInclude Include="SSceneManager.h" />
-    <ClInclude Include="SSceneNode.h" />
+    <ClInclude Include="SNode.h" />
     <ClInclude Include="SSingletone.h" />
     <ClInclude Include="SImageLoader.h" />
     <ClInclude Include="STime.h" />
@@ -192,6 +193,8 @@
     <ClCompile Include="SMath.cpp" />
     <ClCompile Include="SModelLoader.cpp" />
     <ClCompile Include="SModelStruct.cpp" />
+    <ClCompile Include="SNode.cpp" />
+    <ClCompile Include="SScene.cpp" />
     <ClCompile Include="SSceneManager.cpp" />
     <ClCompile Include="SUtils.cpp" />
     <ClCompile Include="SVulkan.cpp" />

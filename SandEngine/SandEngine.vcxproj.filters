@@ -36,6 +36,9 @@
     <Filter Include="Graphics\Vulkan">
       <UniqueIdentifier>{fa389fe0-2392-425c-a085-5ca66d2e0972}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NodeTree">
+      <UniqueIdentifier>{7a1ace21-59f2-4b84-9c04-1e6982503dcd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SHeader.h">
@@ -72,9 +75,6 @@
     <ClInclude Include="STime.h" />
     <ClInclude Include="SSingletone.h" />
     <ClInclude Include="SMath.h" />
-    <ClInclude Include="SSceneNode.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="SSceneManager.h">
       <Filter>Scene</Filter>
     </ClInclude>
@@ -123,6 +123,12 @@
     <ClInclude Include="SVulkan.h">
       <Filter>Graphics\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="SScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SNode.h">
+      <Filter>NodeTree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDirectX12.cpp">
@@ -169,6 +175,12 @@
     </ClCompile>
     <ClCompile Include="SVulkan.cpp">
       <Filter>Graphics\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="SScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SNode.cpp">
+      <Filter>NodeTree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
