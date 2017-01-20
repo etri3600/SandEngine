@@ -9,7 +9,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	auto framework = SPlatformManager::CreateFramework();
 	if (framework && framework->Init())
 	{
-		SIGraphicsInterface* pGraphics = SGraphics::Initialize(GraphicsInterfaceEnum::GI_VULKAN);
+		SIGraphicsInterface* pGraphics = SGraphics::Initialize(GraphicsInterfaceEnum::GI_DX_12);
 		if (pGraphics && pGraphics->Initialize(framework, 1920, 1080, false, true))
 		{
 			SModelLoader* ModelLoader = new SModelLoader();
@@ -23,8 +23,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			SceneManager->Queue(model);
 			
 			auto&& model2 = ModelLoader->LoadModelFromFile(LR"(Jet_Animation.FBX)");
-			model2.Location = { -2.0f, 0.0f, 0.0f };
-			//SceneManager->Queue(model2);
+			model2.Location = { -0.0f, 0.0f, 0.0f };
+			SceneManager->Queue(model2);
 
 			SceneManager->Draw();
 			

@@ -1,27 +1,28 @@
 #include "SDirectX12Device.h"
 #include "SUtils.h"
+#include <d3d12sdklayers.h>
 
 bool SDirectX12Device::Initialize(unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync)
 {
-	HRESULT result;
+	HRESULT hResult;
 #if defined(_DEBUG)
-	//result = D3D12GetDebugInterface(__uuidof(ID3D12Debug), reinterpret_cast<void**>(&m_pDebugController));
-	//if (SUCCEEDED(result))
-	//{
-	//	m_pDebugController->EnableDebugLayer();
-	//}
+	hResult = D3D12GetDebugInterface(__uuidof(ID3D12Debug), reinterpret_cast<void**>(&m_pDebugController));
+	if (SUCCEEDED(hResult))
+	{
+		m_pDebugController->EnableDebugLayer();
+	}
 #endif
-
+	
 	// Create DXGI
 	IDXGIFactory4* factory = nullptr;
 	IDXGIAdapter* adapter = nullptr;
 	IDXGIOutput* adapterOutput = nullptr;
-	result = CreateDXGIFactory1(IID_PPV_ARGS(&factory));
+	hResult = CreateDXGIFactory1(IID_PPV_ARGS(&factory));
 	factory->QueryInterface(IID_PPV_ARGS(&m_pDXGIFactory));
 
 	// Create Device
 	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
-	HRESULT hResult = D3D12CreateDevice(nullptr, featureLevel, __uuidof(ID3D12Device), reinterpret_cast<void**>(&m_pDevice));
+	hResult = D3D12CreateDevice(nullptr, featureLevel, __uuidof(ID3D12Device), reinterpret_cast<void**>(&m_pDevice));
 	if (FAILED(hResult))
 	{
 		m_pDXGIFactory->EnumWarpAdapter(IID_PPV_ARGS(&adapter));
