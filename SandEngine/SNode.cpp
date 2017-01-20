@@ -1,6 +1,8 @@
 #include "SNode.h"
 #include "STime.h"
 
+extern SIGraphicsInterface* gGraphics;
+
 void SNode::Tick()
 {
 	if (m_bDirty)
@@ -14,13 +16,10 @@ void SNode::Tick()
 	m_Time = CurrentTime;
 	double delta = static_cast<double>(milliseconds) / 1000.0;
 	UpdateObjects(delta);
-	if (m_pGraphicsInterface)
-	{
-		m_pGraphicsInterface->UpdateBoneTransform(m_Models);
-		m_pGraphicsInterface->Update(delta);
-		m_pGraphicsInterface->Render();
-		m_pGraphicsInterface->Present();
-	}
+	gGraphics->UpdateBoneTransform(m_Models);
+	gGraphics->Update(delta);
+	gGraphics->Render();
+	gGraphics->Present();
 }
 
 void SNode::Queue(const SModel & model)
@@ -30,10 +29,7 @@ void SNode::Queue(const SModel & model)
 
 void SNode::Draw()
 {
-	if (m_pGraphicsInterface)
-	{
-		m_pGraphicsInterface->Draw(m_Models);
-	}
+	gGraphics->Draw(m_Models);
 }
 
 void SNode::Reset()

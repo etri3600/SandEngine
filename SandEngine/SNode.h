@@ -23,7 +23,6 @@ public:
 
 private:
 	long long m_Time;
-	SIGraphicsInterface* m_pGraphicsInterface = nullptr;
 	std::vector<SModel> m_Models;
 	unsigned int m_childIndex = 0;
 	bool m_bDirty = true;

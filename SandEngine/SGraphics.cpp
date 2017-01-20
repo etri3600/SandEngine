@@ -16,7 +16,7 @@ SIGraphicsInterface* SGraphics::Initialize(const GraphicsInterfaceEnum giInterfa
 		gGraphics = new SDirectX12;
 		break;
 	case GraphicsInterfaceEnum::GI_VULKAN:
-		return new SVulkan;
+		gGraphics = new SVulkan;
 		break;
 	}
 
