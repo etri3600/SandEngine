@@ -1,23 +1,19 @@
 #pragma once
 
-#include "SGraphicsInterface.h"
-#include "STime.h"
+#include "SScene.h"
+#include <vector>
 
 class SSceneManager
 {
 public:
-	void Init(SIGraphicsInterface* pGraphicsInterface);
+	SScene* CreateScene(wchar_t* name);
+
+	void LoadScene(SScene* scene);
+	void UnloadScene(SScene* scene);
+
 	void Tick();
-	void Queue(const SModel& model);
-	void Draw();
-	void Reset();
 
 private:
-	void UpdateObjects(double delta);
-
-	SIGraphicsInterface* m_pGraphicsInterface = nullptr;
-
-	std::vector<SModel> m_Models;
-
-	long long m_Time;
+	SScene* m_pCurScene;
+	std::vector<SScene*> m_Scenes;
 };
