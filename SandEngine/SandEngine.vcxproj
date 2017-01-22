@@ -91,6 +91,7 @@
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(ProjectDir)Include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>false</TreatWarningAsError>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

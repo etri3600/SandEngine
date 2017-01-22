@@ -9,10 +9,14 @@ class SNode
 public:
 	void Tick();
 	void Queue(const SModel& model);
+	SNode* GetParent();
+	void SetParent(SNode* pNode);
+	SNode* CreateChild();
+	void AddChild(SNode* pNode);
+	void RemoveChild(SNode* pNode);
+	std::vector<SNode*> GetChildren();
 	void Draw();
 	void Reset();
-
-	SNode* NextNode();
 
 private:
 	void UpdateObjects(double delta);
@@ -24,6 +28,5 @@ public:
 private:
 	long long m_Time;
 	std::vector<SModel> m_Models;
-	unsigned int m_childIndex = 0;
 	bool m_bDirty = true;
 };

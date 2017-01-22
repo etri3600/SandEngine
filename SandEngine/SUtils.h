@@ -23,7 +23,7 @@ namespace Sand
 	void ConsoleLog(std::wstring message, T&&... params)
 	{
 		wchar_t buffer[512];
-		swprintf(buffer, 512, message, std::forward<T>(params)...);
+		swprintf(buffer, 512, message.c_str(), std::forward<T>(params)...);
 #if __WINDOWS__
 		OutputDebugString(buffer);
 #endif

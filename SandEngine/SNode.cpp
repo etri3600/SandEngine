@@ -20,11 +20,56 @@ void SNode::Tick()
 	gGraphics->Update(delta);
 	gGraphics->Render();
 	gGraphics->Present();
+
+	for (auto it = m_Children.begin(); it != m_Children.end(); ++it)
+	{
+		(*it)->Tick();
+	}
 }
 
 void SNode::Queue(const SModel & model)
 {
 	m_Models.push_back(model);
+}
+
+SNode* SNode::GetParent()
+{
+	return m_pParent;
+}
+
+void SNode::SetParent(SNode * pNode)
+{
+	if (m_pParent)
+	{
+		m_pParent->RemoveChild(this);
+	}
+
+	m_pParent = pNode;
+}
+
+SNode* SNode::CreateChild()
+{
+	auto child = new SNode();
+	child->SetParent(this);
+	m_Children.push_back(child);
+	return child;
+}
+
+void SNode::AddChild(SNode* pNode)
+{
+	m_Children.push_back(pNode);
+}
+
+void SNode::RemoveChild(SNode* pNode)
+{
+	auto cit = std::find(m_Children.cbegin(), m_Children.cend(), pNode);
+	if(cit != m_Children.cend())
+		m_Children.erase(cit);
+}
+
+std::vector<SNode*> SNode::GetChildren()
+{
+	return m_Children;
 }
 
 void SNode::Draw()
@@ -35,19 +80,6 @@ void SNode::Draw()
 void SNode::Reset()
 {
 	m_Models.clear();
-}
-
-SNode* SNode::NextNode()
-{
-	SNode* pNode = nullptr;
-	if (m_Children.size() > m_childIndex)
-	{
-		pNode = m_Children[m_childIndex];
-		++m_childIndex;
-	}
-	else
-		m_childIndex = 0;
-	return pNode;
 }
 
 void SNode::UpdateObjects(double delta)

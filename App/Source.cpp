@@ -27,6 +27,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			
 			auto&& model2 = ModelLoader->LoadModelFromFile(LR"(Jet_Animation.FBX)");
 			model2.Location = { -2.0f, 0.0f, 0.0f };
+
+			node->CreateChild()->Queue(model2);
 			//node->Queue(model2);
 			
 			do
