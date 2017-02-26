@@ -25,6 +25,8 @@ struct SMeshInfo
 	unsigned int BaseVertex = 0;
 	unsigned int BaseIndex = 0;
 	unsigned int MaterialIndex = -1;
+	std::vector<SModelVertex> Vertices;
+	std::vector<unsigned int> Indices;
 };
 
 class SAnimation;

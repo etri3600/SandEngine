@@ -3,16 +3,25 @@
 #include "SGraphicsInterface.h"
 #include "SDirectX12Device.h"
 
-struct SSceneProxy
+struct SObjectProxy
 {
 	unsigned int CBVDescriptorSize = 0;
 	unsigned int RTVDescriptorSize = 0;
 	unsigned int BaseVertexLocation = 0;
+	unsigned int VertexSize = 0;
 	unsigned int StartIndexLocation = 0;
+	unsigned int IndexSize = 0;
 	std::vector<SMeshInfo> MeshProxy;
 	SMatrix Tranformation;
 	SMatrix BoneTransform[MAX_BONES];
 	std::vector<STexture*> Textures;
+};
+
+struct SSceneProxy
+{
+	unsigned int VertexSize = 0;
+	unsigned int IndexSize = 0;
+	std::vector<SObjectProxy> ObjectProxies;
 };
 
 class SDX12ResourceAllocator;
@@ -31,7 +40,8 @@ public:
 
 	void UpdateBoneTransform(const std::vector<SModel>& models) override;
 
-	bool Update(const double delta) override;
+	void Reset() override;
+	bool Update(const double delta, std::vector<SModel>& models) override;
 	void Draw(std::vector<SModel>& models) override;
 	bool Render() override;
 	void Present() override;
@@ -39,7 +49,7 @@ public:
 	std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob);
 
 protected:
-	void CreateConstantBuffer(std::vector<SModel>& models);
+	void CreateConstantBuffer(unsigned int modelCount);
 	void CreateShaderResources(std::vector<SModel>& models);
 
 	void UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pMappedConstant);
@@ -91,7 +101,7 @@ private:
 
 	ID3D12DescriptorHeap* m_pSamplerHeap;
 
-	std::vector<SSceneProxy> m_SceneProxy;
+	SSceneProxy m_SceneProxy;
 
 	HANDLE m_hFenceEvent;
 	bool m_bVSync;

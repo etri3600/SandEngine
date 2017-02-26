@@ -18,7 +18,8 @@ public:
 	virtual bool Initialize(const SPlatformSystem* pPlatformSystem, unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync) = 0;
 	virtual void Finalize() = 0;
 
-	virtual bool Update(const double delta) = 0;
+	virtual void Reset() = 0;
+	virtual bool Update(const double delta, std::vector<SModel>& models) = 0;
 	virtual void Draw(std::vector<SModel>& models) = 0;
 	virtual bool Render() = 0;
 	virtual void Present() = 0;

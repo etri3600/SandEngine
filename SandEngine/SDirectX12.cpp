@@ -406,30 +406,47 @@ void SDirectX12::UpdateBoneTransform(const std::vector<SModel>& models)
 			const auto& boneTransforms = models[i].GetFinalTransform();
 			for (unsigned int j = 0;j < std::fmin(MAX_BONES, boneTransforms.size()); ++j)
 			{
-				m_SceneProxy[i].BoneTransform[j] = boneTransforms[j];
+				m_SceneProxy.ObjectProxies[i].BoneTransform[j] = boneTransforms[j];
 			}
 		}
 	}
 }
 
-bool SDirectX12::Update(const double delta)
+void SDirectX12::Reset()
 {
+	m_SceneProxy.VertexSize = 0;
+	m_SceneProxy.IndexSize = 0;
+	m_SceneProxy.ObjectProxies.clear();
+}
 
+bool SDirectX12::Update(const double delta, std::vector<SModel>& models)
+{
+	m_SceneProxy.ObjectProxies.resize(m_SceneProxy.ObjectProxies.size() + models.size());
+	for (auto objectProxy : m_SceneProxy.ObjectProxies)
+	{
+		for (auto boneTransform : objectProxy.BoneTransform)
+		{
+			memcpy(objectProxy.BoneTransform, &SMatrix::Identity, sizeof(SMatrix));
+		}
+	}
+
+	for (unsigned int i = 0; i < models.size(); ++i)
+	{
+		m_SceneProxy.ObjectProxies[i].MeshProxy = models[i].MeshInfoes;
+		m_SceneProxy.ObjectProxies[i].BaseVertexLocation = m_SceneProxy.VertexSize / sizeof(SModelVertex);
+		m_SceneProxy.ObjectProxies[i].VertexSize = static_cast<unsigned int>(models[i].VertexSize());
+		m_SceneProxy.ObjectProxies[i].StartIndexLocation = m_SceneProxy.IndexSize / sizeof(unsigned int);
+		m_SceneProxy.ObjectProxies[i].IndexSize = static_cast<unsigned int>(models[i].IndexSize());
+		m_SceneProxy.ObjectProxies[i].Textures = models[i].GetTextures();
+		m_SceneProxy.VertexSize += m_SceneProxy.ObjectProxies[i].VertexSize;
+		m_SceneProxy.IndexSize += m_SceneProxy.ObjectProxies[i].IndexSize;
+	}
 	return true;
 }
 
 void SDirectX12::Draw(std::vector<SModel>& models)
 {
 	HRESULT hResult;
-	m_SceneProxy.resize(models.size());
-	for(auto sceneProxy : m_SceneProxy)
-	{
-		for (auto boneTransform : sceneProxy.BoneTransform)
-		{
-			memcpy(sceneProxy.BoneTransform, &SMatrix::Identity, sizeof(SMatrix));
-		}
-	}
-
 	// Setting Default, Upload Heap
 	D3D12_HEAP_PROPERTIES defaultHeapProperties;
 	defaultHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -441,25 +458,13 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 	D3D12_HEAP_PROPERTIES uploadHeapProperties = defaultHeapProperties;
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 
-	unsigned int vertexBufferSize = 0;
-	unsigned int indexBufferSize = 0;
-	for (unsigned int i = 0;i < models.size(); ++i)
-	{
-		m_SceneProxy[i].MeshProxy = models[i].MeshInfoes;
-		m_SceneProxy[i].BaseVertexLocation = vertexBufferSize / sizeof(SModelVertex);
-		m_SceneProxy[i].StartIndexLocation = indexBufferSize / sizeof(unsigned int);
-		m_SceneProxy[i].Textures = models[i].GetTextures();
-		vertexBufferSize += static_cast<unsigned int>(models[i].VertexSize());
-		indexBufferSize += static_cast<unsigned int>(models[i].IndexSize());
-	}
-
 	// Vertex Buffer
 	ID3D12Resource* vertexBufferUpload = nullptr;
 
 	D3D12_RESOURCE_DESC vertexBufferDesc;
 	vertexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 	vertexBufferDesc.Alignment = 0;
-	vertexBufferDesc.Width = vertexBufferSize;
+	vertexBufferDesc.Width = m_SceneProxy.VertexSize;
 	vertexBufferDesc.Height = 1;
 	vertexBufferDesc.DepthOrArraySize = 1;
 	vertexBufferDesc.MipLevels = 1;
@@ -482,10 +487,13 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 
 	std::vector<SModelVertex> vertices;
 	std::vector<unsigned int> indices;
-	for (unsigned int i = 0;i < models.size(); ++i)
+	for (unsigned int i = 0; i < m_SceneProxy.ObjectProxies.size(); ++i)
 	{
-		vertices.insert(std::end(vertices), std::begin(models[i].Vertices), std::end(models[i].Vertices));
-		indices.insert(std::end(indices), std::begin(models[i].Indices), std::end(models[i].Indices));
+		for (unsigned int j = 0; j < m_SceneProxy.ObjectProxies[i].MeshProxy.size(); ++j)
+		{
+			vertices.insert(std::end(vertices), std::begin(m_SceneProxy.ObjectProxies[i].MeshProxy[j].Vertices), std::end(m_SceneProxy.ObjectProxies[i].MeshProxy[j].Vertices));
+			indices.insert(std::end(indices), std::begin(m_SceneProxy.ObjectProxies[i].MeshProxy[j].Indices), std::end(m_SceneProxy.ObjectProxies[i].MeshProxy[j].Indices));
+		}
 	}
 
 	D3D12_SUBRESOURCE_DATA vertexData = {};
@@ -510,7 +518,7 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 	D3D12_RESOURCE_DESC indexBufferDesc;
 	indexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
 	indexBufferDesc.Alignment = 0;
-	indexBufferDesc.Width = indexBufferSize;
+	indexBufferDesc.Width = m_SceneProxy.IndexSize;
 	indexBufferDesc.Height = 1;
 	indexBufferDesc.DepthOrArraySize = 1;
 	indexBufferDesc.MipLevels = 1;
@@ -557,18 +565,15 @@ void SDirectX12::Draw(std::vector<SModel>& models)
 	m_pShaderBufferHeap->SetName(L"Shader Buffer Descriptor Heap");
 	m_uiShaderBufferDescriptorSize = m_pDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	CreateConstantBuffer(models);
+	CreateConstantBuffer(m_SceneProxy.ObjectProxies.size());
 	CreateShaderResources(models);
 
-	for (unsigned int i = 0;i < models.size(); ++i)
-	{
-		m_VertexBufferView.SizeInBytes += static_cast<unsigned int>(models[i].VertexSize());
-		m_IndexBufferView.SizeInBytes += static_cast<unsigned int>(models[i].IndexSize());
-	}
+	m_VertexBufferView.SizeInBytes = m_SceneProxy.VertexSize;
+	m_IndexBufferView.SizeInBytes = m_SceneProxy.IndexSize;
 
 	for (unsigned int i = 0;i < models.size(); ++i)
 	{
-		m_SceneProxy[i].Tranformation = SMath::Transform(models[i].Scale, models[i].Location, models[i].Rotation);
+		m_SceneProxy.ObjectProxies[i].Tranformation = SMath::Transform(models[i].Scale, models[i].Location, models[i].Rotation);
 	}
 
 	// Execute Command
@@ -625,17 +630,17 @@ bool SDirectX12::Render()
 		auto boneGPUAddress = m_pCBVBuffer[1]->GetGPUVirtualAddress();
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = m_pShaderBufferHeap->GetGPUDescriptorHandleForHeapStart();
 		gpuHandle.ptr += m_uiCBVDescriptorOffset;
-		for (unsigned int i = 0;i < m_SceneProxy.size(); ++i)
+		for (unsigned int i = 0;i < m_SceneProxy.ObjectProxies.size(); ++i)
 		{
 			m_pCommandList->SetGraphicsRootConstantBufferView(0, mvpGPUAddress);
 			m_pCommandList->SetGraphicsRootConstantBufferView(1, boneGPUAddress);
 			mvpGPUAddress += sizeof(SModelViewProjection);
 			boneGPUAddress += sizeof(SBoneTransform);
 			UpdateConstantBuffer(i, nullptr);
-			for (unsigned int j = 0;j < m_SceneProxy[i].MeshProxy.size(); ++j)
+			for (unsigned int j = 0;j < m_SceneProxy.ObjectProxies[i].MeshProxy.size(); ++j)
 			{
 				m_pCommandList->SetGraphicsRootDescriptorTable(2, gpuHandle);
-				m_pCommandList->DrawIndexedInstanced(m_SceneProxy[i].MeshProxy[j].NumIndices, 1, m_SceneProxy[i].StartIndexLocation + m_SceneProxy[i].MeshProxy[j].BaseIndex, m_SceneProxy[i].BaseVertexLocation + m_SceneProxy[i].MeshProxy[j].BaseVertex, 0);
+				m_pCommandList->DrawIndexedInstanced(m_SceneProxy.ObjectProxies[i].MeshProxy[j].NumIndices, 1, m_SceneProxy.ObjectProxies[i].StartIndexLocation + m_SceneProxy.ObjectProxies[i].MeshProxy[j].BaseIndex, m_SceneProxy.ObjectProxies[i].BaseVertexLocation + m_SceneProxy.ObjectProxies[i].MeshProxy[j].BaseVertex, 0);
 				gpuHandle.ptr += m_uiShaderBufferDescriptorSize;
 			}
 		}
@@ -740,7 +745,7 @@ std::vector<byte>&& SDirectX12::CompileShader(const wchar_t* fileName, const cha
 	return std::move(shader);
 }
 
-VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
+VOID SDirectX12::CreateConstantBuffer(unsigned int size)
 {
 	D3D12_HEAP_PROPERTIES uploadHeapProperties;
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -761,12 +766,12 @@ VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
 	constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	constantBufferDesc.Width = sizeof(SModelViewProjection) * models.size();
+	constantBufferDesc.Width = sizeof(SModelViewProjection) * size;
 	HRESULT hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pCBVBuffer[0]));
 	SWindows::OutputErrorMessage(hResult);
 	m_pCBVBuffer[0]->SetName(L"MVP Buffer");
 
-	constantBufferDesc.Width = sizeof(SBoneTransform) * models.size();
+	constantBufferDesc.Width = sizeof(SBoneTransform) * size;
 	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pCBVBuffer[1]));
 	SWindows::OutputErrorMessage(hResult);
 	m_pCBVBuffer[1]->SetName(L"Bone Buffer");
@@ -778,7 +783,7 @@ VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
 
-	for (unsigned int i = 0;i < models.size(); ++i)
+	for (unsigned int i = 0;i < size; ++i)
 	{
 		desc.BufferLocation = cbvGPUAddress[0];
 		desc.SizeInBytes = sizeof(SModelViewProjection);
@@ -800,10 +805,10 @@ VOID SDirectX12::CreateConstantBuffer(std::vector<SModel>& models)
 	D3D12_RANGE readRange;
 	readRange.Begin = readRange.End = 0;
 	m_pCBVBuffer[0]->Map(0, &readRange, reinterpret_cast<void**>(&MappedConstantBuffer[0]));
-	memset(MappedConstantBuffer[0], 0, sizeof(SModelViewProjection) * models.size());
+	memset(MappedConstantBuffer[0], 0, sizeof(SModelViewProjection) * size);
 
 	m_pCBVBuffer[1]->Map(0, &readRange, reinterpret_cast<void**>(&MappedConstantBuffer[1]));
-	memset(MappedConstantBuffer[1], 0, sizeof(SBoneTransform) * models.size());
+	memset(MappedConstantBuffer[1], 0, sizeof(SBoneTransform) * size);
 }
 
 void SDirectX12::CreateShaderResources(std::vector<SModel>& models)
@@ -900,8 +905,8 @@ void SDirectX12::UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pM
 		mvp.View = View;
 		mvp.Projection = Projection;
 
-		mvp.Model = m_SceneProxy[sceneIndex].Tranformation;
-		mvp.NormalMatrix = SMath::NormalMatrix(m_SceneProxy[sceneIndex].Tranformation);
+		mvp.Model = m_SceneProxy.ObjectProxies[sceneIndex].Tranformation;
+		mvp.NormalMatrix = SMath::NormalMatrix(m_SceneProxy.ObjectProxies[sceneIndex].Tranformation);
 		SModelViewProjection* pMVP = reinterpret_cast<SModelViewProjection*>(MappedConstantBuffer[0] + sizeof(SModelViewProjection) * sceneIndex);
 
 		memcpy(pMVP, &mvp, sizeof(SModelViewProjection));
@@ -912,7 +917,7 @@ void SDirectX12::UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pM
 		SBoneTransform bones;
 		for (unsigned int j = 0;j < MAX_BONES; ++j)
 		{
-			bones.transform[j] = m_SceneProxy[sceneIndex].BoneTransform[j];
+			bones.transform[j] = m_SceneProxy.ObjectProxies[sceneIndex].BoneTransform[j];
 		}
 		SBoneTransform* pBone = reinterpret_cast<SBoneTransform*>(MappedConstantBuffer[1] + sizeof(SBoneTransform) * sceneIndex);
 		memcpy(pBone, &bones, sizeof(SBoneTransform));
@@ -921,11 +926,11 @@ void SDirectX12::UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pM
 
 void SDirectX12::BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex)
 {
-	auto& textures = m_SceneProxy[sceneIndex].Textures;
+	auto& textures = m_SceneProxy.ObjectProxies[sceneIndex].Textures;
 	if (textures.size() == 0)
 		return;
 
-	auto& texture = textures[m_SceneProxy[sceneIndex].MeshProxy[meshIndex].MaterialIndex];
+	auto& texture = textures[m_SceneProxy.ObjectProxies[sceneIndex].MeshProxy[meshIndex].MaterialIndex];
 
 	unsigned int TextureSize = static_cast<unsigned int>(textures.size());
 	unsigned int TextureWidth = static_cast<unsigned int>(texture->GetWidth()), TextureHeight = static_cast<unsigned int>(texture->GetHeight());

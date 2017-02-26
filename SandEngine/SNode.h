@@ -15,6 +15,7 @@ public:
 	void AddChild(SNode* pNode);
 	void RemoveChild(SNode* pNode);
 	std::vector<SNode*> GetChildren();
+	void RefreshGraphics(double delta);
 	void Draw();
 	void Reset();
 

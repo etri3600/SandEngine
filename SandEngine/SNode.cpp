@@ -5,21 +5,19 @@ extern SIGraphicsInterface* gGraphics;
 
 void SNode::Tick()
 {
-	if (m_bDirty)
-	{
-		Draw();
-		m_bDirty = false;
-	}
-
 	auto CurrentTime = STime::GetTime();
 	auto milliseconds = m_Time > 0 ? CurrentTime - m_Time : 0LL;
 	m_Time = CurrentTime;
 	double delta = static_cast<double>(milliseconds) / 1000.0;
+
+	if (m_bDirty)
+	{
+		RefreshGraphics(delta);
+		m_bDirty = false;
+	}
+
 	UpdateObjects(delta);
 	gGraphics->UpdateBoneTransform(m_Models);
-	gGraphics->Update(delta);
-	gGraphics->Render();
-	gGraphics->Present();
 
 	for (auto it = m_Children.begin(); it != m_Children.end(); ++it)
 	{
@@ -72,9 +70,16 @@ std::vector<SNode*> SNode::GetChildren()
 	return m_Children;
 }
 
+void SNode::RefreshGraphics(double delta)
+{
+	gGraphics->Update(delta, m_Models);
+}
+
 void SNode::Draw()
 {
 	gGraphics->Draw(m_Models);
+	gGraphics->Render();
+	gGraphics->Present();
 }
 
 void SNode::Reset()

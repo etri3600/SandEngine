@@ -35,7 +35,11 @@ void SVulkan::Finalize()
 	m_pDevice->Finalize();
 }
 
-bool SVulkan::Update(const double delta)
+void SVulkan::Reset()
+{
+}
+
+bool SVulkan::Update(const double delta, std::vector<SModel>& models)
 {
 	return false;
 }

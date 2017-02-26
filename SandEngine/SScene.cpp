@@ -7,4 +7,5 @@ void SScene::Tick()
 {
 	SNode* pNode = m_pRootNode;
 	pNode->Tick();
+	pNode->Draw();
 }

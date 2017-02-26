@@ -12,7 +12,8 @@ public:
 	bool Initialize(const SPlatformSystem* pPlayformSystem, unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync) override;
 	void Finalize() override;
 
-	virtual bool Update(const double delta) override;
+	virtual void Reset() override;
+	virtual bool Update(const double delta, std::vector<SModel>& models) override;
 	virtual void Draw(std::vector<SModel>& models) override;
 	virtual bool Render() override;
 	virtual void Present() override;
@@ -25,4 +26,5 @@ public:
 private:
 	SVulkanDevice* m_pDevice;
 	vk::SurfaceKHR m_surface;
+
 };
