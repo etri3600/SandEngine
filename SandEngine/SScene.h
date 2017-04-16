@@ -15,4 +15,5 @@ private:
 	long long m_Time;
 	SNode* m_pRootNode;
 	wchar_t* m_sceneName;
+	bool m_Dirty = true;
 };

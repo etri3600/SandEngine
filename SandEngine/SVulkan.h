@@ -14,7 +14,7 @@ public:
 
 	virtual void Reset() override;
 	virtual bool Update(const double delta, std::vector<SModel>& models) override;
-	virtual void Draw(std::vector<SModel>& models) override;
+	virtual void Draw() override;
 	virtual bool Render() override;
 	virtual void Present() override;
 	virtual bool CreateSwapChain(const SPlatformSystem * pPlatformSystem, const int nNumerator, const int nDenominator) override;

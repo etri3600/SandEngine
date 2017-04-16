@@ -12,7 +12,7 @@ void SNode::Tick()
 
 	if (m_bDirty)
 	{
-		RefreshGraphics(delta);
+		Draw(delta);
 		m_bDirty = false;
 	}
 
@@ -70,16 +70,9 @@ std::vector<SNode*> SNode::GetChildren()
 	return m_Children;
 }
 
-void SNode::RefreshGraphics(double delta)
+void SNode::Draw(double delta)
 {
 	gGraphics->Update(delta, m_Models);
-}
-
-void SNode::Draw()
-{
-	gGraphics->Draw(m_Models);
-	gGraphics->Render();
-	gGraphics->Present();
 }
 
 void SNode::Reset()

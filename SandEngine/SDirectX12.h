@@ -12,6 +12,8 @@ struct SObjectProxy
 	unsigned int StartIndexLocation = 0;
 	unsigned int IndexSize = 0;
 	std::vector<SMeshInfo> MeshProxy;
+	std::vector<SModelVertex> Vertices;
+	std::vector<unsigned int> Indices;
 	SMatrix Tranformation;
 	SMatrix BoneTransform[MAX_BONES];
 	std::vector<STexture*> Textures;
@@ -42,15 +44,15 @@ public:
 
 	void Reset() override;
 	bool Update(const double delta, std::vector<SModel>& models) override;
-	void Draw(std::vector<SModel>& models) override;
+	void Draw() override;
 	bool Render() override;
 	void Present() override;
 
 	std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob);
 
 protected:
-	void CreateConstantBuffer(unsigned int modelCount);
-	void CreateShaderResources(std::vector<SModel>& models);
+	void CreateConstantBuffer(SSceneProxy sceneProxy);
+	void CreateShaderResources(SSceneProxy sceneProxy);
 
 	void UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pMappedConstant);
 	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);

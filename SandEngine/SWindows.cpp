@@ -101,15 +101,15 @@ LRESULT __stdcall WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CLOSE:
 		DestroyWindow(hWnd);
-		break;
+		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
-		break;
-	case WM_COMMAND:
-		break;
+		return 0;
 	case WM_KEYDOWN:
 		break;
 	case WM_KEYUP:
+		break;
+	case WM_COMMAND:
 		break;
 	default:
 		return DefWindowProc(hWnd, msg, wParam, lParam);

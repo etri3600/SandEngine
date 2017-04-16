@@ -72,8 +72,6 @@ void SModelLoader::LoadMeshes(SModel* model, const aiScene* pScene)
 		model->MeshInfoes[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
 		model->MeshInfoes[i].BaseVertex = NumVertices;
 		model->MeshInfoes[i].BaseIndex = NumIndices;
-		model->MeshInfoes[i].Vertices = model->Vertices;
-		model->MeshInfoes[i].Indices = model->Indices;
 
 		NumVertices += pScene->mMeshes[i]->mNumVertices;
 		NumIndices += model->MeshInfoes[i].NumIndices;

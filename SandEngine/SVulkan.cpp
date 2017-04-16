@@ -44,7 +44,7 @@ bool SVulkan::Update(const double delta, std::vector<SModel>& models)
 	return false;
 }
 
-void SVulkan::Draw(std::vector<SModel>& models)
+void SVulkan::Draw()
 {
 }
 

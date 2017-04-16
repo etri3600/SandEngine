@@ -20,7 +20,7 @@ public:
 
 	virtual void Reset() = 0;
 	virtual bool Update(const double delta, std::vector<SModel>& models) = 0;
-	virtual void Draw(std::vector<SModel>& models) = 0;
+	virtual void Draw() = 0;
 	virtual bool Render() = 0;
 	virtual void Present() = 0;
 
