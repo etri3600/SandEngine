@@ -235,6 +235,8 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 
 void SDirectX12::Finalize()
 {
+	WaitForIdle();
+
 	if (m_pVertexBuffer)
 		m_pVertexBuffer->Release();
 	
@@ -305,8 +307,6 @@ bool SDirectX12::CreateSwapChain(const SPlatformSystem* pPlatformSystem, const i
 	const SWindows* pWindowsSystem = static_cast<const SWindows*>(pPlatformSystem);
 	if (pWindowsSystem == nullptr)
 		return false;
-
-	WaitForGPU();
 
 	for (int i = 0;i < c_BufferingCount; ++i)
 	{
@@ -581,8 +581,6 @@ void SDirectX12::Draw()
 
 	m_IndexBufferView.BufferLocation = m_pIndexBuffer->GetGPUVirtualAddress();
 	m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT;
-
-	WaitForGPU();
 }
 
 bool SDirectX12::Render()
@@ -662,16 +660,14 @@ void SDirectX12::Present()
 {
 	m_pSwapChain->Present(1, 0);
 
-	const unsigned __int64 currentFenceValue = m_nFenceValue[m_BufferIndex];
+	const auto currentFenceValue = m_nFenceValue[m_BufferIndex];
 	HRESULT hResult = m_pCommandQueue->Signal(m_pFence, currentFenceValue);
 	SWindows::OutputErrorMessage(hResult);
 
 	m_BufferIndex = (m_BufferIndex + 1) % c_BufferingCount;
 	if (m_pFence->GetCompletedValue() < m_nFenceValue[m_BufferIndex])
 	{
-		hResult = m_pFence->SetEventOnCompletion(m_nFenceValue[m_BufferIndex], m_hFenceEvent);
-		SWindows::OutputErrorMessage(hResult);
-		WaitForSingleObjectEx(m_hFenceEvent, INFINITE, FALSE);
+		WaitForGPU(m_nFenceValue[m_BufferIndex]);
 	}
 
 	m_nFenceValue[m_BufferIndex] = currentFenceValue + 1;
@@ -996,16 +992,15 @@ void SDirectX12::BindShaderResource(unsigned int sceneIndex, unsigned int meshIn
 	m_pDevice->GetDevice()->CreateShaderResourceView(m_pSRVBuffer, &srvDesc, gpuHandle);
 }
 
-void SDirectX12::WaitForGPU()
+void SDirectX12::WaitForGPU(unsigned long long fenceValue)
 {
-	m_pCommandQueue->Signal(m_pFence, m_nFenceValue[m_BufferIndex]);
-	m_pFence->SetEventOnCompletion(m_nFenceValue[m_BufferIndex], m_hFenceEvent);
+	m_pFence->SetEventOnCompletion(fenceValue, m_hFenceEvent);
 	WaitForSingleObjectEx(m_hFenceEvent, INFINITE, FALSE);
-	++m_nFenceValue[m_BufferIndex];
 }
 
 void SDirectX12::WaitForIdle()
 {
+	WaitForGPU(m_nFenceValue[m_BufferIndex] - 1);
 }
 
 void SDirectX12::InitBundle()

@@ -58,7 +58,7 @@ protected:
 	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);
 
 private:
-	void WaitForGPU();
+	void WaitForGPU(unsigned long long fenceValue);
 	void WaitForIdle();
 	void InitBundle();
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <d3d12.h>
-#include <dxgi1_5.h>
+#include <dxgi1_6.h>
 #include <d3dcompiler.h>
 
 #define RELEASE_DX(ptr) {if(ptr) ptr->Release(); ptr = nullptr;}
