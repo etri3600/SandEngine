@@ -55,21 +55,34 @@ std::vector<SMatrix> SModel::GetFinalTransform() const
 
 bool SModel::AddBoneData(unsigned int vertexIndex, unsigned int boneIndex, float weight)
 {
+	float minWeight = 1.0f;
+	int minWeightIndex = -1;
 	for (unsigned int i = 0; i < BONES_PER_VERTEX; i++) {
-		if (Vertices[vertexIndex].weights[i] == 0.0f) {
-			Vertices[vertexIndex].boneIDs[i] = boneIndex;
-			Vertices[vertexIndex].weights[i] = weight;
-			return true;
+		if (minWeight > Vertices[vertexIndex].weights[i])
+		{
+			minWeight = Vertices[vertexIndex].weights[i];
+			minWeightIndex = i;
 		}
 	}
-	return false;
+
+	if (minWeightIndex >= 0 && minWeight < weight)
+	{
+		Vertices[vertexIndex].boneIDs[minWeightIndex] = boneIndex;
+		Vertices[vertexIndex].weights[minWeightIndex] = weight;
+	}
+
+
+	return minWeightIndex != -1;
 }
 
 void SModel::SetDefaultBoneWeights()
 {
 	for (auto& vertex : Vertices)
 	{
-		vertex.weights[0] = 1.0f;
+		for (auto& weight : vertex.weights)
+		{
+			weight = 1.0f / BONES_PER_VERTEX;
+		}
 	}
 }
 

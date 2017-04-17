@@ -423,13 +423,6 @@ bool SDirectX12::Update(const double delta, std::vector<SModel>& models)
 {
 	unsigned int oldSize = m_SceneProxy.ObjectProxies.size();
 	m_SceneProxy.ObjectProxies.resize(oldSize + models.size());
-	for (auto objectProxy : m_SceneProxy.ObjectProxies)
-	{
-		for (auto boneTransform : objectProxy.BoneTransform)
-		{
-			memcpy(objectProxy.BoneTransform, &SMatrix::Identity, sizeof(SMatrix));
-		}
-	}
 
 	for (unsigned int i = oldSize; i < oldSize + models.size(); ++i)
 	{
@@ -445,6 +438,11 @@ bool SDirectX12::Update(const double delta, std::vector<SModel>& models)
 		m_SceneProxy.ObjectProxies[i].Textures = model.GetTextures();
 		m_SceneProxy.VertexSize += m_SceneProxy.ObjectProxies[i].VertexSize;
 		m_SceneProxy.IndexSize += m_SceneProxy.ObjectProxies[i].IndexSize;
+
+		for (auto boneTransform : m_SceneProxy.ObjectProxies[i].BoneTransform)
+		{
+			memcpy(m_SceneProxy.ObjectProxies[i].BoneTransform, &SMatrix::Identity, sizeof(SMatrix));
+		}
 	}
 	return true;
 }

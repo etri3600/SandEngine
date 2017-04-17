@@ -110,7 +110,6 @@ void SModelLoader::LoadMeshes(SModel* model, const aiScene* pScene)
 }
 void SModelLoader::LoadBones(SModel* model, aiMesh* pMesh, unsigned int meshIndex)
 {
-	float totalWeight = 0.0f;
 	for (unsigned int i = 0;i < pMesh->mNumBones; ++i)
 	{
 		unsigned int BoneIndex = 0;
@@ -125,15 +124,13 @@ void SModelLoader::LoadBones(SModel* model, aiMesh* pMesh, unsigned int meshInde
 		else {
 			BoneIndex = model->Animation->m_BoneNameMap[BoneName];
 		}
-
 		for (unsigned int j = 0; j < pMesh->mBones[i]->mNumWeights; ++j) {
 			unsigned int VertexID = model->MeshInfoes[meshIndex].BaseVertex + pMesh->mBones[i]->mWeights[j].mVertexId;
 			float Weight = pMesh->mBones[i]->mWeights[j].mWeight;
-			if(model->AddBoneData(VertexID, BoneIndex, Weight))
-				totalWeight += Weight;
+			model->AddBoneData(VertexID, BoneIndex, Weight);
 		}
 	}
-	if (totalWeight == 0.0f)
+	if(pMesh->mNumBones == 0)
 	{
 		model->SetDefaultBoneWeights();
 	}
