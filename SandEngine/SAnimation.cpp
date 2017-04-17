@@ -42,11 +42,12 @@ void SAnimation::Update(double delta)
 
 void SAnimation::ReadNodeHeirarchy(double AnimationTime, const SBoneNode* pNode, const SMatrix & ParentTransform)
 {
-	auto animInfo = GetCurrentAnimInfo();
-	auto channel = FindNodeChannel(&animInfo, pNode->name);
+	auto& animInfo = GetCurrentAnimInfo();
+	SAnimChannel channel;
+	bool find = FindNodeChannel(&animInfo, pNode->name, channel);
 	SMatrix NodeTransformation(pNode->localTransformation);
 
-	if (channel.boneName.size() > 0)
+	if (find && channel.boneName.size() > 0)
 	{
 		SVector3 scale;
 		CalcInterpolatedScaling(scale, AnimationTime, channel);
@@ -92,15 +93,18 @@ void SAnimation::ReadNodeHeirarchy(double AnimationTime, const SBoneNode* pNode,
 	}
 }
 
-SAnimChannel SAnimation::FindNodeChannel(const SAnimInfo* pAnimInfo, const std::string& boneName)
+bool SAnimation::FindNodeChannel(const SAnimInfo* pAnimInfo, const std::string& boneName, SAnimChannel& animChannel)
 {
 	for (unsigned int i = 0; i < pAnimInfo->channels.size(); ++i) {
-		const SAnimChannel channel = pAnimInfo->channels[i];
+		const SAnimChannel& channel = pAnimInfo->channels[i];
 		if (channel.boneName == boneName)
-			return channel;
+		{
+			animChannel = channel;
+			return true;
+		}
 	}
 
-	return SAnimChannel();
+	return false;
 }
 
 void SAnimation::CalcInterpolatedScaling(SVector3 & Out, double AnimationTime, const SAnimChannel& channel)

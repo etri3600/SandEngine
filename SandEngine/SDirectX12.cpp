@@ -667,7 +667,6 @@ void SDirectX12::Present()
 	SWindows::OutputErrorMessage(hResult);
 
 	m_BufferIndex = (m_BufferIndex + 1) % c_BufferingCount;
-
 	if (m_pFence->GetCompletedValue() < m_nFenceValue[m_BufferIndex])
 	{
 		hResult = m_pFence->SetEventOnCompletion(m_nFenceValue[m_BufferIndex], m_hFenceEvent);
@@ -1003,6 +1002,10 @@ void SDirectX12::WaitForGPU()
 	m_pFence->SetEventOnCompletion(m_nFenceValue[m_BufferIndex], m_hFenceEvent);
 	WaitForSingleObjectEx(m_hFenceEvent, INFINITE, FALSE);
 	++m_nFenceValue[m_BufferIndex];
+}
+
+void SDirectX12::WaitForIdle()
+{
 }
 
 void SDirectX12::InitBundle()

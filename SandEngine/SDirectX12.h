@@ -59,6 +59,7 @@ protected:
 
 private:
 	void WaitForGPU();
+	void WaitForIdle();
 	void InitBundle();
 
 	ID3D12CommandAllocator* GetCommandAllocator() const { return m_pCommandAllocator[m_BufferIndex]; }

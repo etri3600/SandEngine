@@ -21,7 +21,7 @@ struct SAnimTimelineQuat
 
 struct SAnimChannel
 {
-	std::string boneName;
+	std::string boneName = "";
 	std::vector<SAnimTimelineVector> positions;
 	std::vector<SAnimTimelineQuat> rotations;
 	std::vector<SAnimTimelineVector> scales;
@@ -59,14 +59,14 @@ public:
 	std::vector<SMatrix> GetTransform() const { return Transforms; }
 	bool SetAnimation(const std::string clipName);
 	void SetAnimationIndex(const unsigned int index) { if(m_Animations.size() > index) m_CurrentAnimIndex = index; }
-	SAnimInfo GetCurrentAnimInfo() const { return m_Animations[m_CurrentAnimIndex]; }
+	SAnimInfo& GetCurrentAnimInfo() { return m_Animations[m_CurrentAnimIndex]; }
 
 	void Update(double delta);
 	void CalculateBoneNodeToWorldTransform(SBoneNode* child);
 
 private:
 	void ReadNodeHeirarchy(double AnimationTime, const SBoneNode* pNode, const SMatrix& ParentTransform);
-	SAnimChannel FindNodeChannel(const SAnimInfo* pAnimInfo, const std::string& boneName);
+	bool FindNodeChannel(const SAnimInfo* pAnimInfo, const std::string& boneName, SAnimChannel& channel);
 
 	void CalcInterpolatedScaling(SVector3& Out, double AnimationTime, const SAnimChannel& channel);
 	void CalcInterpolatedRotation(SQuaternion& Out, double AnimationTime, const SAnimChannel& channel);
