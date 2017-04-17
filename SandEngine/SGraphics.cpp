@@ -25,4 +25,8 @@ SIGraphicsInterface* SGraphics::Initialize(const GraphicsInterfaceEnum giInterfa
 
 void SGraphics::Fianalize()
 {
+	if (gGraphics)
+	{
+		delete gGraphics;
+	}
 }

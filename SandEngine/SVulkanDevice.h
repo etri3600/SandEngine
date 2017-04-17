@@ -12,6 +12,8 @@
 class SVulkanDevice
 {
 public:
+	~SVulkanDevice();
+
 	bool Initialize(unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync);
 	void Finalize();
 

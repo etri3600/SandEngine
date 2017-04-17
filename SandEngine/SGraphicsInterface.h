@@ -15,6 +15,8 @@ enum class GraphicsInterfaceEnum
 class SIGraphicsInterface
 {
 public:
+	virtual ~SIGraphicsInterface() {}
+
 	virtual bool Initialize(const SPlatformSystem* pPlatformSystem, unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync) = 0;
 	virtual void Finalize() = 0;
 

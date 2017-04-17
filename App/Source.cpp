@@ -38,6 +38,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				SceneManager->Tick();
 			} while (true);
 		}
+		SGraphics::Fianalize();
 	}
 
 	return 0;

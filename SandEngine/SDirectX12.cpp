@@ -19,6 +19,7 @@ SDirectX12::SDirectX12()
 
 SDirectX12::~SDirectX12()
 {
+	Finalize();
 }
 
 bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync)
@@ -294,7 +295,6 @@ void SDirectX12::Finalize()
 
 	if (m_pDevice)
 	{
-		m_pDevice->Finalize();
 		delete m_pDevice;
 		m_pDevice = nullptr;
 	}

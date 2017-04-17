@@ -9,6 +9,8 @@
 class SDirectX12Device
 {
 public:
+	~SDirectX12Device();
+
 	bool Initialize(unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync);
 	void Finalize();
 

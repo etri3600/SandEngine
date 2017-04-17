@@ -5,6 +5,11 @@
 #include "SVulkanDevice.h"
 
 
+SVulkanDevice::~SVulkanDevice()
+{
+	Finalize();
+}
+
 bool SVulkanDevice::Initialize(unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync)
 {
 	std::vector<const char*> layers;

@@ -7,6 +7,7 @@ SVulkan::SVulkan()
 
 SVulkan::~SVulkan()
 {
+	Finalize();
 }
 
 bool SVulkan::Initialize(const SPlatformSystem* pPlayformSystem, unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync)

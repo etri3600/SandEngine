@@ -2,6 +2,11 @@
 #include "SUtils.h"
 #include <d3d12sdklayers.h>
 
+SDirectX12Device::~SDirectX12Device()
+{
+	Finalize();
+}
+
 bool SDirectX12Device::Initialize(unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync)
 {
 	HRESULT hResult;
