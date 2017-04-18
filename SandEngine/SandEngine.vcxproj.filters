@@ -129,6 +129,9 @@
     <ClInclude Include="SNode.h">
       <Filter>NodeTree</Filter>
     </ClInclude>
+    <ClInclude Include="SDX12Pipeline.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDirectX12.cpp">
@@ -181,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="SNode.cpp">
       <Filter>NodeTree</Filter>
+    </ClCompile>
+    <ClCompile Include="SDX12Pipeline.cpp">
+      <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

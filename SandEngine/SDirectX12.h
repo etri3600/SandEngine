@@ -28,6 +28,7 @@ struct SSceneProxy
 
 class SDX12ResourceAllocator;
 class SDX12DescriptorHeapAllocator;
+class SDX12Pipeline;
 class SDirectX12 : public SIGraphicsInterface
 {
 public:
@@ -69,6 +70,7 @@ private:
 	SDirectX12Device* m_pDevice;
 	SDX12ResourceAllocator* m_pResourceAllocator[2];
 	SDX12DescriptorHeapAllocator* m_pDescriptorAllocator[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+	std::vector<SDX12Pipeline*> m_pipelines;
 
 	ID3D12CommandQueue* m_pCommandQueue;
 	ID3D12DescriptorHeap* m_pRenderTargetViewHeap;
@@ -79,11 +81,11 @@ private:
 	ID3D12CommandAllocator* m_pBundleAllocator;
 	ID3D12GraphicsCommandList* m_pBundleList;
 
-	ID3D12PipelineState* m_pPipelineState;
+	//ID3D12PipelineState* m_pPipelineState;
 	ID3D12Fence* m_pFence;
 	unsigned __int64 m_nFenceValue[c_BufferingCount];
 	IDXGISwapChain3* m_pSwapChain;
-	ID3D12RootSignature* m_pRootSignature;
+	//ID3D12RootSignature* m_pRootSignature;
 	unsigned int m_RenderTargetViewDescriptorSize = 0;
 	D3D12_VIEWPORT m_Viewport;
 
