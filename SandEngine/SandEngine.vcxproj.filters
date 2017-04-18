@@ -11,6 +11,7 @@
     </Filter>
     <Filter Include="Shaders">
       <UniqueIdentifier>{4f0e3cf3-f1b2-42a2-b17b-630aff08d4da}</UniqueIdentifier>
+      <Extensions>.hlsl</Extensions>
     </Filter>
     <Filter Include="Graphics">
       <UniqueIdentifier>{da8e48b0-1cf6-457b-afa3-30e85a08c2e4}</UniqueIdentifier>
