@@ -71,7 +71,7 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	CreateSwapChain(pPlatformSystem, m_pDevice->GetDeviceNumerator(), m_pDevice->GetDeviceDenominator());
 
 	SDX12Pipeline* pipeline = new SDX12Pipeline(m_pDevice);
-	pipeline->Init(L"SimpleVertexShader", L"SimplePixelShader");
+	pipeline->Init(L"SkinnedVertexShader", L"SkinnedPixelShader");
 	m_pipelines.push_back(pipeline);
 	// Create Root Signal
 	//D3D12_DESCRIPTOR_RANGE range[1];
