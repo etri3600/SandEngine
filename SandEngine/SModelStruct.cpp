@@ -71,7 +71,6 @@ bool SModel::AddBoneData(unsigned int vertexIndex, unsigned int boneIndex, float
 		Vertices[vertexIndex].weights[minWeightIndex] = weight;
 	}
 
-
 	return minWeightIndex != -1;
 }
 
