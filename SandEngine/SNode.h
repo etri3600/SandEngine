@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 #include "SGraphicsInterface.h"
 
@@ -27,6 +28,6 @@ public:
 
 private:
 	long long m_Time;
-	std::vector<SModel> m_Models;
+	std::map<unsigned int, std::vector<SModel>> m_Models;
 	bool m_bDirty = true;
 };

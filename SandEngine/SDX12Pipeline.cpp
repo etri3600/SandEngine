@@ -1,71 +1,25 @@
 #include "SDX12Pipeline.h"
 #include "SWindows.h"
 
-SDX12Pipeline::SDX12Pipeline(SDirectX12Device * pDevice)
+SDX12Pipeline::SDX12Pipeline(SDirectX12Device * pDevice, ID3D12RootSignature* pRootSignature)
 {
 	m_pDevice = pDevice;
+	m_pRootSignature = pRootSignature;
 }
 
-void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader)
+SDX12Pipeline::~SDX12Pipeline()
 {
-	// Create Root Signal
-	D3D12_DESCRIPTOR_RANGE range[1];
-	range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	range[0].NumDescriptors = 64;
-	range[0].BaseShaderRegister = 0;
-	range[0].RegisterSpace = 0;
-	range[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	if (m_pPipelineState)
+	{
+		m_pPipelineState->Release();
+		m_pPipelineState = nullptr;
+	}
+}
 
-	D3D12_ROOT_PARAMETER parameter[3];
-	parameter[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	parameter[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	parameter[0].Descriptor.ShaderRegister = 0;
-	parameter[0].Descriptor.RegisterSpace = 0;
 
-	parameter[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	parameter[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	parameter[1].Descriptor.ShaderRegister = 1;
-	parameter[1].Descriptor.RegisterSpace = 0;
 
-	parameter[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	parameter[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	parameter[2].DescriptorTable.NumDescriptorRanges = 1;
-	parameter[2].DescriptorTable.pDescriptorRanges = &range[0];
-
-	D3D12_STATIC_SAMPLER_DESC staticSampler;
-	staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	staticSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSampler.MinLOD = 0;
-	staticSampler.MaxLOD = D3D12_FLOAT32_MAX;
-	staticSampler.MipLODBias = 0.0f;
-	staticSampler.MaxAnisotropy = 1;
-	staticSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-	staticSampler.ShaderRegister = 0;
-	staticSampler.RegisterSpace = 0;
-
-	D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // Only the input assembler stage needs access to the constant buffer.
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS;
-	
-	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.Flags = rootSignatureFlags;
-	rootSignatureDesc.NumParameters = 3;
-	rootSignatureDesc.pParameters = parameter;
-	rootSignatureDesc.NumStaticSamplers = 1;
-	rootSignatureDesc.pStaticSamplers = &staticSampler;
-	
-	ID3DBlob* pBlob = nullptr;
-	HRESULT hResult = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pBlob, nullptr);
-	SWindows::OutputErrorMessage(hResult);
-
-	hResult = m_pDevice->GetDevice()->CreateRootSignature(0, pBlob->GetBufferPointer(), pBlob->GetBufferSize(), __uuidof(ID3D12RootSignature), reinterpret_cast<void**>(&m_pRootSignature));
-	SWindows::OutputErrorMessage(hResult);
-
+void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, const SDX12InputVertexAttributes attributes)
+{
 	// Create Shader Binary
 	ID3DBlob* pVertexShader = nullptr, *pPixelShader = nullptr;
 	m_vertexShader = CompileShader(vertexShader.c_str(), "vs_5_1", &pVertexShader);
@@ -75,19 +29,19 @@ void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader)
 		return;
 
 	// Create Pipeline State
-	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
-		{ "BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
-		{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
-	};
+	//D3D12_INPUT_ELEMENT_DESC inputLayout[] =
+	//{
+	//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	//	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	//	{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	//	{ "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	//	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
+	//	{ "BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
+	//	{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
+	//};
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
-	pipelineStateDesc.InputLayout = { inputLayout, sizeof(inputLayout) / sizeof(inputLayout[0]) };
+	pipelineStateDesc.InputLayout = { attributes.GetAttributes(), attributes.GetCount() };
 	pipelineStateDesc.pRootSignature = m_pRootSignature;
 	pipelineStateDesc.VS = { pVertexShader->GetBufferPointer(), pVertexShader->GetBufferSize() };
 	pipelineStateDesc.PS = { pPixelShader->GetBufferPointer(), pPixelShader->GetBufferSize() };
@@ -124,7 +78,7 @@ void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader)
 	pipelineStateDesc.NumRenderTargets = 1;
 	pipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	pipelineStateDesc.SampleDesc.Count = 1;
-	hResult = m_pDevice->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), reinterpret_cast<void**>(&m_pPipelineState));
+	HRESULT hResult = m_pDevice->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), reinterpret_cast<void**>(&m_pPipelineState));
 	SWindows::OutputErrorMessage(hResult);
 
 	m_vertexShader.clear();

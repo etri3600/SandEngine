@@ -133,6 +133,12 @@
     <ClInclude Include="SDX12Pipeline.h">
       <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
+    <ClInclude Include="SDX12InputVertexAttributes.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="SMaterial.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDirectX12.cpp">
@@ -173,7 +179,6 @@
     <ClCompile Include="SDX12ResourceAllocator.cpp">
       <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
-    <ClCompile Include="SDX12DescriptorHeapAllocator.cpp" />
     <ClCompile Include="SVulkanDevice.cpp">
       <Filter>Graphics\Vulkan</Filter>
     </ClCompile>
@@ -189,6 +194,10 @@
     <ClCompile Include="SDX12Pipeline.cpp">
       <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
+    <ClCompile Include="SDX12DescriptorHeapAllocator.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="SDX12InputVertexAttributes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\SimplePixelShader.hlsl">

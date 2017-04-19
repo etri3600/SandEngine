@@ -3,6 +3,7 @@
 #include "SMath.h"
 #include "SUtils.h"
 #include "SImage.h"
+#include "SMaterial.h"
 
 #include <queue>
 
@@ -39,6 +40,7 @@ public:
 
 	std::vector<SMeshInfo> MeshInfoes;
 	std::vector<STexture*> Textures;
+	SMaterial Material;
 
 	SVector3 Location;
 	SQuaternion Rotation;

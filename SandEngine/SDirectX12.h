@@ -19,11 +19,16 @@ struct SObjectProxy
 	std::vector<STexture*> Textures;
 };
 
-struct SSceneProxy
+struct SBatchProxy
 {
 	unsigned int VertexSize = 0;
 	unsigned int IndexSize = 0;
 	std::vector<SObjectProxy> ObjectProxies;
+};
+
+struct SSceneProxy
+{
+	std::map<unsigned int, SBatchProxy> Proxies;
 };
 
 class SDX12ResourceAllocator;
@@ -41,10 +46,10 @@ public:
 	bool CreateSwapChain(const SPlatformSystem* pPlatformSystem, const int nNumerator, const int nDenominator) override;
 	void CreateViewProjection() override;
 
-	void UpdateBoneTransform(const std::vector<SModel>& models) override;
+	void UpdateBoneTransform(const std::map<unsigned int, std::vector<SModel>>& models) override;
 
 	void Reset() override;
-	bool Update(const double delta, std::vector<SModel>& models) override;
+	bool Update(const double delta, std::map<unsigned int, std::vector<SModel>>& models) override;
 	void Draw() override;
 	bool Render() override;
 	void Present() override;
@@ -81,11 +86,11 @@ private:
 	ID3D12CommandAllocator* m_pBundleAllocator;
 	ID3D12GraphicsCommandList* m_pBundleList;
 
+	ID3D12RootSignature* m_pRootSignature;
 	//ID3D12PipelineState* m_pPipelineState;
 	ID3D12Fence* m_pFence;
 	unsigned __int64 m_nFenceValue[c_BufferingCount];
 	IDXGISwapChain3* m_pSwapChain;
-	//ID3D12RootSignature* m_pRootSignature;
 	unsigned int m_RenderTargetViewDescriptorSize = 0;
 	D3D12_VIEWPORT m_Viewport;
 

@@ -25,9 +25,9 @@ void SNode::Tick()
 	}
 }
 
-void SNode::Queue(const SModel & model)
+void SNode::Queue(const SModel& model)
 {
-	m_Models.push_back(model);
+	m_Models[model.Material.Id].push_back(model);
 }
 
 SNode* SNode::GetParent()
@@ -84,6 +84,9 @@ void SNode::UpdateObjects(double delta)
 {
 	for (auto it = m_Models.begin(); it != m_Models.end(); ++it)
 	{
-		it->Update(delta);
+		for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it)
+		{
+			it2->Update(delta);
+		}
 	}
 }

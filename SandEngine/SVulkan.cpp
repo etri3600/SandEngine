@@ -40,7 +40,7 @@ void SVulkan::Reset()
 {
 }
 
-bool SVulkan::Update(const double delta, std::vector<SModel>& models)
+bool SVulkan::Update(const double delta, std::map<unsigned int, std::vector<SModel>>& models)
 {
 	return false;
 }
@@ -67,6 +67,6 @@ void SVulkan::CreateViewProjection()
 {
 }
 
-void SVulkan::UpdateBoneTransform(const std::vector<SModel>& models)
+void SVulkan::UpdateBoneTransform(const std::map<unsigned int, std::vector<SModel>>& models)
 {
 }

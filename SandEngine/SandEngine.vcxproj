@@ -155,6 +155,7 @@
     <ClInclude Include="SDirectX12Device.h" />
     <ClInclude Include="SDX12DescriptorHeapAllocator.h" />
     <ClInclude Include="SDX12Helper.h" />
+    <ClInclude Include="SDX12InputVertexAttributes.h" />
     <ClInclude Include="SDX12ResourceAllocator.h" />
     <ClInclude Include="SDX12Pipeline.h" />
     <ClInclude Include="SGraphics.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="SInputManager.h" />
     <ClInclude Include="SLinux.h" />
     <ClInclude Include="SLoader.h" />
+    <ClInclude Include="SMaterial.h" />
     <ClInclude Include="SMath.h" />
     <ClInclude Include="SModelLoader.h" />
     <ClInclude Include="SModelStruct.h" />
@@ -188,6 +190,7 @@
     <ClCompile Include="SDirectX12Device.cpp" />
     <ClCompile Include="SDX12DescriptorHeapAllocator.cpp" />
     <ClCompile Include="SDX12Helper.cpp" />
+    <ClCompile Include="SDX12InputVertexAttributes.cpp" />
     <ClCompile Include="SDX12ResourceAllocator.cpp" />
     <ClCompile Include="SDX12Pipeline.cpp" />
     <ClCompile Include="SGraphics.cpp" />
