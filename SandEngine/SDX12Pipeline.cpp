@@ -83,6 +83,7 @@ void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, co
 
 	m_vertexShader.clear();
 	m_pixelShader.clear();
+
 }
 
 std::vector<byte>&& SDX12Pipeline::CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob)
@@ -142,4 +143,12 @@ std::vector<byte>&& SDX12Pipeline::CompileShader(const wchar_t* fileName, const 
 #endif
 
 	return std::move(shader);
+}
+
+void SDX12Pipeline::Populate(ID3D12GraphicsCommandList * commandList)
+{
+	for (int i = 0; i < m_pCBVBuffers.size(); ++i)
+	{
+		commandList->SetGraphicsRootConstantBufferView(i, m_pCBVBuffers[i]->GetGPUVirtualAddress());
+	}
 }

@@ -28,6 +28,8 @@ struct SBatchProxy
 
 struct SSceneProxy
 {
+	unsigned int TotalVertexSize = 0;
+	unsigned int TotalIndexSize = 0;
 	std::map<unsigned int, SBatchProxy> Proxies;
 };
 
@@ -57,8 +59,8 @@ public:
 	std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob);
 
 protected:
-	void CreateConstantBuffer(SSceneProxy sceneProxy);
-	void CreateShaderResources(SSceneProxy sceneProxy);
+	void CreateConstantBuffer(SBatchProxy sceneProxy);
+	void CreateShaderResources(SBatchProxy sceneProxy);
 
 	void UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pMappedConstant);
 	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);
@@ -105,9 +107,9 @@ private:
 
 	ID3D12DescriptorHeap* m_pShaderBufferHeap;
 	unsigned int m_uiShaderBufferDescriptorSize = 0;
-	ID3D12Resource* m_pCBVBuffer[2];
-	unsigned int m_uiCBVDescriptorOffset = 0;
-	ID3D12Resource* m_pSRVBuffer;
+	//ID3D12Resource* m_pCBVBuffer[2];
+	//unsigned int m_uiCBVDescriptorOffset = 0;
+	//ID3D12Resource* m_pSRVBuffer;
 
 	ID3D12DescriptorHeap* m_pSamplerHeap;
 
