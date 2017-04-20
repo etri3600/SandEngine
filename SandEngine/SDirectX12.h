@@ -56,12 +56,10 @@ public:
 	bool Render() override;
 	void Present() override;
 
-	std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob);
-
 protected:
-	void CreateShaderResources(SBatchProxy sceneProxy);
+	unsigned int CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy);
 
-	void UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pMappedConstant);
+	void UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int objIndex);
 	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);
 
 private:
@@ -76,7 +74,7 @@ private:
 	SDirectX12Device* m_pDevice;
 	SDX12ResourceAllocator* m_pResourceAllocator[2];
 	SDX12DescriptorHeapAllocator* m_pDescriptorAllocator[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
-	std::vector<SDX12Pipeline*> m_pipelines;
+	std::map<unsigned int, SDX12Pipeline*> m_pipelines;
 
 	ID3D12CommandQueue* m_pCommandQueue;
 	ID3D12DescriptorHeap* m_pRenderTargetViewHeap;

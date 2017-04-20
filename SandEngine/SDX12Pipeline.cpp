@@ -109,7 +109,7 @@ void SDX12Pipeline::Populate(ID3D12GraphicsCommandList * commandList)
 	}
 }
 
-void SDX12Pipeline::CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorSize, SBatchProxy batchProxy)
+void SDX12Pipeline::CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy)
 {
-	m_pResources->CreateConstantBuffer(m_pDevice, pDescriptorHeap, descriptorSize, batchProxy);
+	m_pResources->CreateConstantBuffer(m_pDevice, pDescriptorHeap, descriptorOffset, descriptorSize, batchProxy);
 }

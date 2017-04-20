@@ -18,7 +18,7 @@ public:
 	bool HasType(unsigned int);
 
 	void Populate(ID3D12GraphicsCommandList* commandList);
-	void CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorSize, SBatchProxy batchProxy);
+	void CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy);
 
 private:
 	SDirectX12Device* m_pDevice;

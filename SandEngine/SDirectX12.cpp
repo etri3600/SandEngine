@@ -130,11 +130,11 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 
 	SDX12Pipeline* pipeline = new SDX12Pipeline(m_pDevice, m_pRootSignature);
 	pipeline->Init(L"SkinnedVertexShader", L"SkinnedPixelShader", new SDX12SkinnedResources());
-	m_pipelines.push_back(pipeline);
+	m_pipelines.insert(std::pair<unsigned int, SDX12Pipeline*>(0, pipeline));
 
 	SDX12Pipeline* simplePipeline = new SDX12Pipeline(m_pDevice, m_pRootSignature);
 	simplePipeline->Init(L"SimpleVertexShader", L"SimplePixelShader", new SDX12SimpleResources());
-	m_pipelines.push_back(simplePipeline);
+	m_pipelines.insert(std::pair<unsigned int, SDX12Pipeline*>(1, simplePipeline));
 
 	// Create Command List
 	hResult = m_pDevice->GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, GetCommandAllocator(), nullptr, IID_PPV_ARGS(&m_pCommandList));
@@ -182,7 +182,7 @@ void SDirectX12::Finalize()
 
 	for each (auto pipeline in m_pipelines)
 	{
-		delete pipeline;
+		delete pipeline.second;
 	}
 	m_pipelines.clear();
 
@@ -343,9 +343,9 @@ void SDirectX12::CreateViewProjection()
 	View = MatrixLookAt(eye, at, up);
 }
 
-void SDirectX12::UpdateBoneTransform(const std::map<unsigned int, std::vector<SModel>>& models)
+void SDirectX12::UpdateBoneTransform(const std::map<unsigned int, std::vector<SModel>>& materialmodelmap)
 {
-	for (auto it = models.begin(); it != models.end(); ++it)
+	for (auto it = materialmodelmap.begin(); it != materialmodelmap.end(); ++it)
 	{
 		for (unsigned int i = 0; i < it->second.size(); ++i)
 		{
@@ -526,10 +526,12 @@ void SDirectX12::Draw()
 	m_pShaderBufferHeap->SetName(L"Shader Buffer Descriptor Heap");
 	m_uiShaderBufferDescriptorSize = m_pDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+	unsigned int descriptorOffset = 0;
 	for (auto it = m_SceneProxy.BatchProxies.begin(); it != m_SceneProxy.BatchProxies.end(); ++it)
 	{
-		m_pipelines[it->first]->CreateConstantBuffer(m_pShaderBufferHeap, m_uiShaderBufferDescriptorSize, it->second);
-		CreateShaderResources(it->second);
+		m_pipelines[it->first]->CreateConstantBuffer(m_pShaderBufferHeap, descriptorOffset, m_uiShaderBufferDescriptorSize, it->second);
+		descriptorOffset += m_pipelines[it->first]->GetCBVDescriptorOffset();
+		descriptorOffset += CreateShaderResources(m_pipelines[it->first], it->second);
 	}
 
 	m_VertexBufferView.SizeInBytes = m_SceneProxy.TotalVertexSize;
@@ -552,7 +554,7 @@ bool SDirectX12::Render()
 	HRESULT hResult = GetCommandAllocator()->Reset();
 	SWindows::OutputErrorMessage(hResult);
 
-	hResult = m_pCommandList->Reset(GetCommandAllocator(), m_pipelines[0]->GetPipelineState());
+	hResult = m_pCommandList->Reset(GetCommandAllocator(), nullptr);
 	SWindows::OutputErrorMessage(hResult);
 
 	m_pCommandList->RSSetViewports(1, &m_Viewport);
@@ -579,34 +581,32 @@ bool SDirectX12::Render()
 	m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
 	
 	m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
-	for (int i = 0; i < m_pipelines.size(); ++i)
+	ID3D12DescriptorHeap* ppHeaps[] = { m_pShaderBufferHeap };
+	m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
+	for (auto it = m_pipelines.begin(); it != m_pipelines.end(); ++it)
 	{
-		auto pipeline = m_pipelines[i];
+		auto pipeline = it->second;
+		auto batchProxy = m_SceneProxy.BatchProxies[it->first];
 
 		m_pCommandList->SetPipelineState(pipeline->GetPipelineState());
 		{
-			ID3D12DescriptorHeap* ppHeaps[] = { m_pShaderBufferHeap };
-			m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
 			//auto mvpGPUAddress = m_pCBVBuffer[0]->GetGPUVirtualAddress();
 			//auto boneGPUAddress = m_pCBVBuffer[1]->GetGPUVirtualAddress();
 			D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = m_pShaderBufferHeap->GetGPUDescriptorHandleForHeapStart();
 			gpuHandle.ptr += pipeline->GetCBVDescriptorOffset();
-			for (auto it = m_SceneProxy.BatchProxies.begin(); it != m_SceneProxy.BatchProxies.end(); ++it)
+			for (unsigned int i = 0; i < batchProxy.ObjectProxies.size(); ++i)
 			{
-				for (unsigned int i = 0; i < it->second.ObjectProxies.size(); ++i)
+				pipeline->Populate(m_pCommandList);
+				//m_pCommandList->SetGraphicsRootConstantBufferView(0, mvpGPUAddress);
+				//m_pCommandList->SetGraphicsRootConstantBufferView(1, boneGPUAddress);
+				//mvpGPUAddress += sizeof(SModelViewProjection);
+				//boneGPUAddress += sizeof(SBoneTransform);
+				UpdateConstantBuffer(pipeline, batchProxy, i);
+				for (unsigned int j = 0; j < batchProxy.ObjectProxies[i].MeshProxy.size(); ++j)
 				{
-					pipeline->Populate(m_pCommandList);
-					//m_pCommandList->SetGraphicsRootConstantBufferView(0, mvpGPUAddress);
-					//m_pCommandList->SetGraphicsRootConstantBufferView(1, boneGPUAddress);
-					//mvpGPUAddress += sizeof(SModelViewProjection);
-					//boneGPUAddress += sizeof(SBoneTransform);
-					UpdateConstantBuffer(i, nullptr);
-					for (unsigned int j = 0; j < it->second.ObjectProxies[i].MeshProxy.size(); ++j)
-					{
-						m_pCommandList->SetGraphicsRootDescriptorTable(2, gpuHandle);
-						m_pCommandList->DrawIndexedInstanced(it->second.ObjectProxies[i].MeshProxy[j].NumIndices, 1, it->second.ObjectProxies[i].StartIndexLocation + it->second.ObjectProxies[i].MeshProxy[j].BaseIndex, it->second.ObjectProxies[i].BaseVertexLocation + it->second.ObjectProxies[i].MeshProxy[j].BaseVertex, 0);
-						gpuHandle.ptr += m_uiShaderBufferDescriptorSize;
-					}
+					m_pCommandList->SetGraphicsRootDescriptorTable(2, gpuHandle);
+					m_pCommandList->DrawIndexedInstanced(batchProxy.ObjectProxies[i].MeshProxy[j].NumIndices, 1, batchProxy.ObjectProxies[i].StartIndexLocation + batchProxy.ObjectProxies[i].MeshProxy[j].BaseIndex, batchProxy.ObjectProxies[i].BaseVertexLocation + batchProxy.ObjectProxies[i].MeshProxy[j].BaseVertex, 0);
+					gpuHandle.ptr += m_uiShaderBufferDescriptorSize;
 				}
 			}
 		}
@@ -649,14 +649,10 @@ void SDirectX12::Present()
 	m_pResourceAllocator[1]->CleanUp();
 }
 
-void SDirectX12::CreateShaderResources(SBatchProxy batchProxy)
+unsigned int SDirectX12::CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy)
 {
 	unsigned int nTextureCount = 0;
-	unsigned int cbvDescriptorOffset = 0;
-	for (int i = 0; i < m_pipelines.size(); ++i)
-	{
-		cbvDescriptorOffset += m_pipelines[i]->GetCBVDescriptorOffset();
-	}
+	unsigned int cbvDescriptorOffset = pipeline->GetCBVDescriptorOffset();;
 	for (unsigned int i = 0;i < batchProxy.ObjectProxies.size(); ++i)
 	{
 		for (unsigned int j = 0;j < batchProxy.ObjectProxies[i].Textures.size();++j)
@@ -731,46 +727,43 @@ void SDirectX12::CreateShaderResources(SBatchProxy batchProxy)
 			srvDesc.Format = static_cast<DXGI_FORMAT>(texture->GetTextureFormat());
 			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 			srvDesc.Texture2D.MipLevels = 1;
-			D3D12_CPU_DESCRIPTOR_HANDLE gpuHandle = m_pShaderBufferHeap->GetCPUDescriptorHandleForHeapStart();
-			gpuHandle.ptr += cbvDescriptorOffset + nTextureCount * m_uiShaderBufferDescriptorSize;
-			m_pDevice->GetDevice()->CreateShaderResourceView(pSRVBuffer, &srvDesc, gpuHandle);
+			D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_pShaderBufferHeap->GetCPUDescriptorHandleForHeapStart();
+			cpuHandle.ptr += cbvDescriptorOffset + nTextureCount * m_uiShaderBufferDescriptorSize;
+			m_pDevice->GetDevice()->CreateShaderResourceView(pSRVBuffer, &srvDesc, cpuHandle);
 			++nTextureCount;
 		}
 	}
+
+	return nTextureCount * m_uiShaderBufferDescriptorSize;
 }
 
-void SDirectX12::UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pMappedConstant)
+void SDirectX12::UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int objIndex)
 {
-	for (int i = 0; i < m_pipelines.size(); ++i)
+	// ModelViewProjection
+	if (pipeline->HasType(0))
 	{
-		auto pipline = m_pipelines[i];
-		auto batchProxy = m_SceneProxy.BatchProxies[i];
-		// ModelViewProjection
-		if(pipline->HasType(0))
+		SModelViewProjection mvp;
+		memset(&mvp, 0, sizeof(SModelViewProjection));
+		mvp.View = View;
+		mvp.Projection = Projection;
+
+		mvp.Model = batchProxy.ObjectProxies[objIndex].Tranformation;
+		mvp.NormalMatrix = SMath::NormalMatrix(batchProxy.ObjectProxies[objIndex].Tranformation);
+		SModelViewProjection* pMVP = reinterpret_cast<SModelViewProjection*>(pipeline->GetMappedConstantBuffer(0) + sizeof(SModelViewProjection) * objIndex);
+
+		memcpy(pMVP, &mvp, sizeof(SModelViewProjection));
+	}
+
+	// Bone Transformation
+	if (pipeline->HasType(1))
+	{
+		SBoneTransform bones;
+		for (unsigned int j = 0; j < MAX_BONES; ++j)
 		{
-			SModelViewProjection mvp;
-			memset(&mvp, 0, sizeof(SModelViewProjection));
-			mvp.View = View;
-			mvp.Projection = Projection;
-
-			mvp.Model = batchProxy.ObjectProxies[sceneIndex].Tranformation;
-			mvp.NormalMatrix = SMath::NormalMatrix(batchProxy.ObjectProxies[sceneIndex].Tranformation);
-			SModelViewProjection* pMVP = reinterpret_cast<SModelViewProjection*>(pipline->GetMappedConstantBuffer(0) + sizeof(SModelViewProjection) * sceneIndex);
-
-			memcpy(pMVP, &mvp, sizeof(SModelViewProjection));
+			bones.transform[j] = batchProxy.ObjectProxies[objIndex].BoneTransform[j];
 		}
-
-		if (pipline->HasType(1))
-		// Bone Transformation
-		{
-			SBoneTransform bones;
-			for (unsigned int j = 0; j < MAX_BONES; ++j)
-			{
-				bones.transform[j] = batchProxy.ObjectProxies[sceneIndex].BoneTransform[j];
-			}
-			SBoneTransform* pBone = reinterpret_cast<SBoneTransform*>(pipline->GetMappedConstantBuffer(1) + sizeof(SBoneTransform) * sceneIndex);
-			memcpy(pBone, &bones, sizeof(SBoneTransform));
-		}
+		SBoneTransform* pBone = reinterpret_cast<SBoneTransform*>(pipeline->GetMappedConstantBuffer(1) + sizeof(SBoneTransform) * objIndex);
+		memcpy(pBone, &bones, sizeof(SBoneTransform));
 	}
 }
 

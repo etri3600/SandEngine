@@ -194,6 +194,7 @@
     <ClCompile Include="SDX12InputVertexAttributes.cpp" />
     <ClCompile Include="SDX12ResourceAllocator.cpp" />
     <ClCompile Include="SDX12Pipeline.cpp" />
+    <ClCompile Include="SDX12Resources.cpp" />
     <ClCompile Include="SGraphics.cpp" />
     <ClCompile Include="SImage.cpp" />
     <ClCompile Include="SImageLoader.cpp" />

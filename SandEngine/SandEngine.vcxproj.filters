@@ -201,6 +201,9 @@
       <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
     <ClCompile Include="SDX12InputVertexAttributes.cpp" />
+    <ClCompile Include="SDX12Resources.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\SimplePixelShader.hlsl">
