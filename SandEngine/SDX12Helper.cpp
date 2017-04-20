@@ -1,4 +1,7 @@
 #include "SDX12Helper.h"
+#include <fstream>
+#include <string>
+#include <iterator>
 
 unsigned __int64 UpdateSubresource(ID3D12GraphicsCommandList * pCmdList, ID3D12Resource * pDestinationResource, ID3D12Resource * pIntermediate, unsigned __int64 IntermediateOffset, unsigned int FirstSubresource, unsigned int NumSubresources, D3D12_SUBRESOURCE_DATA * pSrcData)
 {
@@ -70,4 +73,63 @@ unsigned __int64 UpdateSubresource(ID3D12GraphicsCommandList* pCmdList, ID3D12Re
 	}
 
 	return RequiredSize;
+}
+
+std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob)
+{
+	std::vector<byte> shader;
+	constexpr auto shaderFolder = LR"(..\SandEngine\Shaders\)";
+	constexpr auto shaderExtension = L".hlsl";
+	constexpr auto csoFolder = LR"(..\Shaders\)";
+	constexpr auto csoExtension = L".cso";
+	std::wstring file(fileName);
+
+	D3D_SHADER_MACRO defines[] =
+	{
+		{ nullptr, nullptr }
+	};
+	unsigned int flags = D3DCOMPILE_ENABLE_STRICTNESS;
+#if defined(_DEBUG)
+	flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+	ID3DBlob* pShaderCode = nullptr;
+	auto stringFile = shaderFolder + file + shaderExtension;
+	const wchar_t* shaderFileName = stringFile.c_str();
+	HRESULT hResult = D3DCompileFromFile(shaderFileName, defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", version, flags, 0, &pShaderCode, nullptr);
+	if (FAILED(hResult))
+	{
+		pShaderCode->Release();
+
+		std::streampos end;
+
+		std::ifstream vertexFile(csoFolder + file + csoExtension, std::ios::in | std::ios::binary | std::ios::ate);
+		std::noskipws(vertexFile);
+		if (vertexFile.is_open())
+		{
+			end = vertexFile.tellg();
+			vertexFile.seekg(0, std::ios::beg);
+			shader.reserve(end);
+			char* c = new char[end];
+			shader.assign(std::istream_iterator<byte>(vertexFile), std::istream_iterator<byte>());
+			vertexFile.close();
+		}
+	}
+	else
+	{
+		*pBlob = pShaderCode;
+	}
+
+#if defined(_DEBUG)
+	ID3D12ShaderReflection* pReflection = nullptr;
+	if (SUCCEEDED(D3DReflect(pShaderCode->GetBufferPointer(), pShaderCode->GetBufferSize(), IID_ID3D12ShaderReflection, (void**)&pReflection)))
+	{
+		D3D12_SIGNATURE_PARAMETER_DESC desc[4];
+		pReflection->GetInputParameterDesc(0, &desc[0]);
+		pReflection->GetInputParameterDesc(1, &desc[1]);
+		pReflection->GetInputParameterDesc(2, &desc[2]);
+		pReflection->GetInputParameterDesc(3, &desc[3]);
+	}
+#endif
+
+	return std::move(shader);
 }

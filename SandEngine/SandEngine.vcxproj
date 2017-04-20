@@ -158,6 +158,7 @@
     <ClInclude Include="SDX12InputVertexAttributes.h" />
     <ClInclude Include="SDX12ResourceAllocator.h" />
     <ClInclude Include="SDX12Pipeline.h" />
+    <ClInclude Include="SDX12Resources.h" />
     <ClInclude Include="SGraphics.h" />
     <ClInclude Include="SGraphicsInterface.h" />
     <ClInclude Include="SHeader.h" />

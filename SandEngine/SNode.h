@@ -28,6 +28,6 @@ public:
 
 private:
 	long long m_Time;
-	std::map<unsigned int, std::vector<SModel>> m_Models;
+	std::map<unsigned int, std::vector<SModel>> m_MaterialModels;
 	bool m_bDirty = true;
 };

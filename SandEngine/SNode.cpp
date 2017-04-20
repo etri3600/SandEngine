@@ -17,7 +17,7 @@ void SNode::Tick()
 	}
 
 	UpdateObjects(delta);
-	gGraphics->UpdateBoneTransform(m_Models);
+	gGraphics->UpdateBoneTransform(m_MaterialModels);
 
 	for (auto it = m_Children.begin(); it != m_Children.end(); ++it)
 	{
@@ -27,7 +27,7 @@ void SNode::Tick()
 
 void SNode::Queue(const SModel& model)
 {
-	m_Models[model.Material.Id].push_back(model);
+	m_MaterialModels[model.Material.Id].push_back(model);
 }
 
 SNode* SNode::GetParent()
@@ -72,21 +72,21 @@ std::vector<SNode*> SNode::GetChildren()
 
 void SNode::Draw(double delta)
 {
-	gGraphics->Update(delta, m_Models);
+	gGraphics->Update(delta, m_MaterialModels);
 }
 
 void SNode::Reset()
 {
-	m_Models.clear();
+	m_MaterialModels.clear();
 }
 
 void SNode::UpdateObjects(double delta)
 {
-	for (auto it = m_Models.begin(); it != m_Models.end(); ++it)
+	for (auto it = m_MaterialModels.begin(); it != m_MaterialModels.end(); ++it)
 	{
-		for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it)
+		for (auto model_it = it->second.begin(); model_it != it->second.end(); ++model_it)
 		{
-			it2->Update(delta);
+			model_it->Update(delta);
 		}
 	}
 }

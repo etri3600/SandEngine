@@ -1,5 +1,6 @@
 #include "SDX12Pipeline.h"
 #include "SWindows.h"
+#include "SDX12Helper.h"
 
 SDX12Pipeline::SDX12Pipeline(SDirectX12Device * pDevice, ID3D12RootSignature* pRootSignature)
 {
@@ -14,11 +15,17 @@ SDX12Pipeline::~SDX12Pipeline()
 		m_pPipelineState->Release();
 		m_pPipelineState = nullptr;
 	}
+
+	if (m_pResources)
+	{
+		delete m_pResources;
+		m_pResources = nullptr;
+	}
 }
 
 
 
-void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, const SDX12InputVertexAttributes attributes)
+void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, SDX12Resources* pResources)
 {
 	// Create Shader Binary
 	ID3DBlob* pVertexShader = nullptr, *pPixelShader = nullptr;
@@ -29,19 +36,10 @@ void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, co
 		return;
 
 	// Create Pipeline State
-	//D3D12_INPUT_ELEMENT_DESC inputLayout[] =
-	//{
-	//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	//	{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	//	{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	//	{ "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	//	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
-	//	{ "BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
-	//	{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA , 0 },
-	//};
+	m_pResources = pResources;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
-	pipelineStateDesc.InputLayout = { attributes.GetAttributes(), attributes.GetCount() };
+	pipelineStateDesc.InputLayout = { pResources->Attributes.GetAttributes(), pResources->Attributes.GetCount() };
 	pipelineStateDesc.pRootSignature = m_pRootSignature;
 	pipelineStateDesc.VS = { pVertexShader->GetBufferPointer(), pVertexShader->GetBufferSize() };
 	pipelineStateDesc.PS = { pPixelShader->GetBufferPointer(), pPixelShader->GetBufferSize() };
@@ -83,72 +81,35 @@ void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, co
 
 	m_vertexShader.clear();
 	m_pixelShader.clear();
-
 }
 
-std::vector<byte>&& SDX12Pipeline::CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob)
+
+unsigned int SDX12Pipeline::GetCBVDescriptorOffset()
 {
-	std::vector<byte> shader;
-	constexpr auto shaderFolder = LR"(..\SandEngine\Shaders\)";
-	constexpr auto shaderExtension = L".hlsl";
-	constexpr auto csoFolder = LR"(..\Shaders\)";
-	constexpr auto csoExtension = L".cso";
-	std::wstring file(fileName);
+	return m_pResources->GetCBVOffset();
+}
 
-	D3D_SHADER_MACRO defines[] =
-	{
-		{ nullptr, nullptr }
-	};
-	unsigned int flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined(_DEBUG)
-	flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
-	ID3DBlob* pShaderCode = nullptr;
-	auto stringFile = shaderFolder + file + shaderExtension;
-	const wchar_t* shaderFileName = stringFile.c_str();
-	HRESULT hResult = D3DCompileFromFile(shaderFileName, defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", version, flags, 0, &pShaderCode, nullptr);
-	if (FAILED(hResult))
-	{
-		pShaderCode->Release();
+char * SDX12Pipeline::GetMappedConstantBuffer(unsigned int index)
+{
+	return m_pResources->GetMappedConstantBuffer(index);
+}
 
-		std::streampos end;
-
-		std::ifstream vertexFile(csoFolder + file + csoExtension, std::ios::in | std::ios::binary | std::ios::ate);
-		std::noskipws(vertexFile);
-		if (vertexFile.is_open())
-		{
-			end = vertexFile.tellg();
-			vertexFile.seekg(0, std::ios::beg);
-			shader.reserve(end);
-			char* c = new char[end];
-			shader.assign(std::istream_iterator<byte>(vertexFile), std::istream_iterator<byte>());
-			vertexFile.close();
-		}
-	}
-	else
-	{
-		*pBlob = pShaderCode;
-	}
-
-#if defined(_DEBUG)
-	ID3D12ShaderReflection* pReflection = nullptr;
-	if (SUCCEEDED(D3DReflect(pShaderCode->GetBufferPointer(), pShaderCode->GetBufferSize(), IID_ID3D12ShaderReflection, (void**)&pReflection)))
-	{
-		D3D12_SIGNATURE_PARAMETER_DESC desc[4];
-		pReflection->GetInputParameterDesc(0, &desc[0]);
-		pReflection->GetInputParameterDesc(1, &desc[1]);
-		pReflection->GetInputParameterDesc(2, &desc[2]);
-		pReflection->GetInputParameterDesc(3, &desc[3]);
-	}
-#endif
-
-	return std::move(shader);
+bool SDX12Pipeline::HasType(unsigned int index)
+{
+	return m_pResources->HasType(index);
 }
 
 void SDX12Pipeline::Populate(ID3D12GraphicsCommandList * commandList)
 {
-	for (int i = 0; i < m_pCBVBuffers.size(); ++i)
+	int count = 0;
+	auto buffers = m_pResources->GetCBVBuffers(count);
+	for (int i = 0; i < count; ++i)
 	{
-		commandList->SetGraphicsRootConstantBufferView(i, m_pCBVBuffers[i]->GetGPUVirtualAddress());
+		commandList->SetGraphicsRootConstantBufferView(i, buffers[i]->GetGPUVirtualAddress());
 	}
+}
+
+void SDX12Pipeline::CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorSize, SBatchProxy batchProxy)
+{
+	m_pResources->CreateConstantBuffer(m_pDevice, pDescriptorHeap, descriptorSize, batchProxy);
 }

@@ -36,7 +36,6 @@ public:
 
 protected:
 	SModelLoader* ModelLoader = nullptr;
-	char* MappedConstantBuffer[2];
 	SMatrix View, Projection;
 
 	unsigned int m_BufferIndex = 0;

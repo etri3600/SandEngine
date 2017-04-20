@@ -30,7 +30,7 @@ struct SSceneProxy
 {
 	unsigned int TotalVertexSize = 0;
 	unsigned int TotalIndexSize = 0;
-	std::map<unsigned int, SBatchProxy> Proxies;
+	std::map<unsigned int, SBatchProxy> BatchProxies;
 };
 
 class SDX12ResourceAllocator;
@@ -59,7 +59,6 @@ public:
 	std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob);
 
 protected:
-	void CreateConstantBuffer(SBatchProxy sceneProxy);
 	void CreateShaderResources(SBatchProxy sceneProxy);
 
 	void UpdateConstantBuffer(unsigned int sceneIndex, unsigned char* pMappedConstant);
