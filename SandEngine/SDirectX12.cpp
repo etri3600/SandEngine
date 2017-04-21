@@ -71,68 +71,71 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	CreateSwapChain(pPlatformSystem, m_pDevice->GetDeviceNumerator(), m_pDevice->GetDeviceDenominator());
 
 	// Create Root Signal
-	D3D12_DESCRIPTOR_RANGE range[1];
-	range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-	range[0].NumDescriptors = 64;
-	range[0].BaseShaderRegister = 0;
-	range[0].RegisterSpace = 0;
-	range[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	//D3D12_DESCRIPTOR_RANGE range[1];
+	//range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	//range[0].NumDescriptors = 64;
+	//range[0].BaseShaderRegister = 0;
+	//range[0].RegisterSpace = 0;
+	//range[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER parameter[3];
-	parameter[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	parameter[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	parameter[0].Descriptor.ShaderRegister = 0;
-	parameter[0].Descriptor.RegisterSpace = 0;
+	//D3D12_ROOT_PARAMETER parameter[3];
+	//parameter[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	//parameter[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	//parameter[0].Descriptor.ShaderRegister = 0;
+	//parameter[0].Descriptor.RegisterSpace = 0;
 
-	parameter[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-	parameter[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
-	parameter[1].Descriptor.ShaderRegister = 1;
-	parameter[1].Descriptor.RegisterSpace = 0;
+	//parameter[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	//parameter[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+	//parameter[1].Descriptor.ShaderRegister = 1;
+	//parameter[1].Descriptor.RegisterSpace = 0;
 
-	parameter[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	parameter[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	parameter[2].DescriptorTable.NumDescriptorRanges = 1;
-	parameter[2].DescriptorTable.pDescriptorRanges = &range[0];
+	//parameter[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	//parameter[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	//parameter[2].DescriptorTable.NumDescriptorRanges = 1;
+	//parameter[2].DescriptorTable.pDescriptorRanges = &range[0];
 
-	D3D12_STATIC_SAMPLER_DESC staticSampler;
-	staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-	staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	staticSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	staticSampler.MinLOD = 0;
-	staticSampler.MaxLOD = D3D12_FLOAT32_MAX;
-	staticSampler.MipLODBias = 0.0f;
-	staticSampler.MaxAnisotropy = 1;
-	staticSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-	staticSampler.ShaderRegister = 0;
-	staticSampler.RegisterSpace = 0;
+	//D3D12_STATIC_SAMPLER_DESC staticSampler;
+	//staticSampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	//staticSampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	//staticSampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	//staticSampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	//staticSampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	//staticSampler.MinLOD = 0;
+	//staticSampler.MaxLOD = D3D12_FLOAT32_MAX;
+	//staticSampler.MipLODBias = 0.0f;
+	//staticSampler.MaxAnisotropy = 1;
+	//staticSampler.ComparisonFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	//staticSampler.ShaderRegister = 0;
+	//staticSampler.RegisterSpace = 0;
 
-	D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // Only the input assembler stage needs access to the constant buffer.
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
-		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS;
+	//D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
+	//	D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // Only the input assembler stage needs access to the constant buffer.
+	//	D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+	//	D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+	//	D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS;
 	
-	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	rootSignatureDesc.Flags = rootSignatureFlags;
-	rootSignatureDesc.NumParameters = 3;
-	rootSignatureDesc.pParameters = parameter;
-	rootSignatureDesc.NumStaticSamplers = 1;
-	rootSignatureDesc.pStaticSamplers = &staticSampler;
+	//D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+	//rootSignatureDesc.Flags = rootSignatureFlags;
+	//rootSignatureDesc.NumParameters = 3;
+	//rootSignatureDesc.pParameters = parameter;
+	//rootSignatureDesc.NumStaticSamplers = 1;
+	//rootSignatureDesc.pStaticSamplers = &staticSampler;
 	
-	ID3DBlob* pBlob = nullptr;
-	hResult = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pBlob, nullptr);
-	SWindows::OutputErrorMessage(hResult);
+	//ID3DBlob* pBlob = nullptr;
+	//hResult = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pBlob, nullptr);
+	//SWindows::OutputErrorMessage(hResult);
 
-	hResult = m_pDevice->GetDevice()->CreateRootSignature(0, pBlob->GetBufferPointer(), pBlob->GetBufferSize(), __uuidof(ID3D12RootSignature), reinterpret_cast<void**>(&m_pRootSignature));
-	SWindows::OutputErrorMessage(hResult);
+	SDX12RootSignature* skinnedRootSignature = new SDX12RootSignature(m_pDevice, new SDX12BoneRootParameter());
+	m_RootSignatures.insert(std::pair<unsigned int, SDX12RootSignature*>(skinnedRootSignature->GetId(), skinnedRootSignature));
 
-	SDX12Pipeline* pipeline = new SDX12Pipeline(m_pDevice, m_pRootSignature);
+	SDX12Pipeline* pipeline = new SDX12Pipeline(m_pDevice, skinnedRootSignature);
 	pipeline->Init(L"SkinnedVertexShader", L"SkinnedPixelShader", new SDX12SkinnedResources());
 	m_pipelines.insert(std::pair<unsigned int, SDX12Pipeline*>(0, pipeline));
 
-	SDX12Pipeline* simplePipeline = new SDX12Pipeline(m_pDevice, m_pRootSignature);
+	SDX12RootSignature* simpleRootSignature = new SDX12RootSignature(m_pDevice, new SDX12SimpleRootParameter());
+	m_RootSignatures.insert(std::pair<unsigned int, SDX12RootSignature*>(simpleRootSignature->GetId(), simpleRootSignature));
+
+	SDX12Pipeline* simplePipeline = new SDX12Pipeline(m_pDevice, simpleRootSignature);
 	simplePipeline->Init(L"SimpleVertexShader", L"SimplePixelShader", new SDX12SimpleResources());
 	m_pipelines.insert(std::pair<unsigned int, SDX12Pipeline*>(1, simplePipeline));
 
@@ -531,7 +534,7 @@ void SDirectX12::Draw()
 	{
 		m_pipelines[it->first]->CreateConstantBuffer(m_pShaderBufferHeap, descriptorOffset, m_uiShaderBufferDescriptorSize, it->second);
 		descriptorOffset += m_pipelines[it->first]->GetCBVDescriptorOffset();
-		descriptorOffset += CreateShaderResources(m_pipelines[it->first], it->second);
+		descriptorOffset += CreateShaderResources(m_pipelines[it->first], it->second, descriptorOffset);
 	}
 
 	m_VertexBufferView.SizeInBytes = m_SceneProxy.TotalVertexSize;
@@ -580,23 +583,24 @@ bool SDirectX12::Render()
 	m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView);
 	m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
 	
-	m_pCommandList->SetGraphicsRootSignature(m_pRootSignature);
 	ID3D12DescriptorHeap* ppHeaps[] = { m_pShaderBufferHeap };
 	m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
 	for (auto it = m_pipelines.begin(); it != m_pipelines.end(); ++it)
 	{
 		auto pipeline = it->second;
 		auto batchProxy = m_SceneProxy.BatchProxies[it->first];
+		auto signature = pipeline->GetRootSignature();
 
+		m_pCommandList->SetGraphicsRootSignature(pipeline->GetRootSignature()->Get());
 		m_pCommandList->SetPipelineState(pipeline->GetPipelineState());
 		{
 			//auto mvpGPUAddress = m_pCBVBuffer[0]->GetGPUVirtualAddress();
 			//auto boneGPUAddress = m_pCBVBuffer[1]->GetGPUVirtualAddress();
 			D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = m_pShaderBufferHeap->GetGPUDescriptorHandleForHeapStart();
-			gpuHandle.ptr += pipeline->GetCBVDescriptorOffset();
 			for (unsigned int i = 0; i < batchProxy.ObjectProxies.size(); ++i)
 			{
-				pipeline->Populate(m_pCommandList);
+				gpuHandle.ptr += pipeline->GetCBVDescriptorOffset();
+				pipeline->Populate(m_pCommandList, i);
 				//m_pCommandList->SetGraphicsRootConstantBufferView(0, mvpGPUAddress);
 				//m_pCommandList->SetGraphicsRootConstantBufferView(1, boneGPUAddress);
 				//mvpGPUAddress += sizeof(SModelViewProjection);
@@ -604,7 +608,7 @@ bool SDirectX12::Render()
 				UpdateConstantBuffer(pipeline, batchProxy, i);
 				for (unsigned int j = 0; j < batchProxy.ObjectProxies[i].MeshProxy.size(); ++j)
 				{
-					m_pCommandList->SetGraphicsRootDescriptorTable(2, gpuHandle);
+					m_pCommandList->SetGraphicsRootDescriptorTable(signature->GetTableLocation(), gpuHandle);
 					m_pCommandList->DrawIndexedInstanced(batchProxy.ObjectProxies[i].MeshProxy[j].NumIndices, 1, batchProxy.ObjectProxies[i].StartIndexLocation + batchProxy.ObjectProxies[i].MeshProxy[j].BaseIndex, batchProxy.ObjectProxies[i].BaseVertexLocation + batchProxy.ObjectProxies[i].MeshProxy[j].BaseVertex, 0);
 					gpuHandle.ptr += m_uiShaderBufferDescriptorSize;
 				}
@@ -649,10 +653,10 @@ void SDirectX12::Present()
 	m_pResourceAllocator[1]->CleanUp();
 }
 
-unsigned int SDirectX12::CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy)
+unsigned int SDirectX12::CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int offset)
 {
 	unsigned int nTextureCount = 0;
-	unsigned int cbvDescriptorOffset = pipeline->GetCBVDescriptorOffset();;
+	unsigned int cbvDescriptorOffset = offset;
 	for (unsigned int i = 0;i < batchProxy.ObjectProxies.size(); ++i)
 	{
 		for (unsigned int j = 0;j < batchProxy.ObjectProxies[i].Textures.size();++j)

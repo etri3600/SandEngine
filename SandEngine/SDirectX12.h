@@ -36,6 +36,7 @@ struct SSceneProxy
 class SDX12ResourceAllocator;
 class SDX12DescriptorHeapAllocator;
 class SDX12Pipeline;
+class SDX12RootSignature;
 class SDirectX12 : public SIGraphicsInterface
 {
 public:
@@ -57,7 +58,7 @@ public:
 	void Present() override;
 
 protected:
-	unsigned int CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy);
+	unsigned int CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int offset);
 
 	void UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int objIndex);
 	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);
@@ -75,6 +76,7 @@ private:
 	SDX12ResourceAllocator* m_pResourceAllocator[2];
 	SDX12DescriptorHeapAllocator* m_pDescriptorAllocator[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 	std::map<unsigned int, SDX12Pipeline*> m_pipelines;
+	std::map<unsigned int, SDX12RootSignature*> m_RootSignatures;
 
 	ID3D12CommandQueue* m_pCommandQueue;
 	ID3D12DescriptorHeap* m_pRenderTargetViewHeap;
@@ -85,7 +87,6 @@ private:
 	ID3D12CommandAllocator* m_pBundleAllocator;
 	ID3D12GraphicsCommandList* m_pBundleList;
 
-	ID3D12RootSignature* m_pRootSignature;
 	//ID3D12PipelineState* m_pPipelineState;
 	ID3D12Fence* m_pFence;
 	unsigned __int64 m_nFenceValue[c_BufferingCount];

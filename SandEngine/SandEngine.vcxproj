@@ -159,6 +159,8 @@
     <ClInclude Include="SDX12ResourceAllocator.h" />
     <ClInclude Include="SDX12Pipeline.h" />
     <ClInclude Include="SDX12Resources.h" />
+    <ClInclude Include="SDX12RootParameter.h" />
+    <ClInclude Include="SDX12RootSignature.h" />
     <ClInclude Include="SGraphics.h" />
     <ClInclude Include="SGraphicsInterface.h" />
     <ClInclude Include="SHeader.h" />
@@ -195,6 +197,7 @@
     <ClCompile Include="SDX12ResourceAllocator.cpp" />
     <ClCompile Include="SDX12Pipeline.cpp" />
     <ClCompile Include="SDX12Resources.cpp" />
+    <ClCompile Include="SDX12RootSignature.cpp" />
     <ClCompile Include="SGraphics.cpp" />
     <ClCompile Include="SImage.cpp" />
     <ClCompile Include="SImageLoader.cpp" />

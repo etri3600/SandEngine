@@ -71,7 +71,7 @@ void SWindows::OutputErrorMessage(HRESULT hr)
 {
 	if (FAILED(hr))
 	{
-		DWORD error = GetLastError();
+		DWORD error = hr;
 		LPVOID lpMsgBuf;
 		WCHAR ErrorString[256];
 

@@ -2,7 +2,7 @@
 #include "SWindows.h"
 #include "SDX12Helper.h"
 
-SDX12Pipeline::SDX12Pipeline(SDirectX12Device * pDevice, ID3D12RootSignature* pRootSignature)
+SDX12Pipeline::SDX12Pipeline(SDirectX12Device * pDevice, SDX12RootSignature* pRootSignature)
 {
 	m_pDevice = pDevice;
 	m_pRootSignature = pRootSignature;
@@ -40,7 +40,7 @@ void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, SD
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc = {};
 	pipelineStateDesc.InputLayout = { pResources->Attributes.GetAttributes(), pResources->Attributes.GetCount() };
-	pipelineStateDesc.pRootSignature = m_pRootSignature;
+	pipelineStateDesc.pRootSignature = m_pRootSignature->Get();
 	pipelineStateDesc.VS = { pVertexShader->GetBufferPointer(), pVertexShader->GetBufferSize() };
 	pipelineStateDesc.PS = { pPixelShader->GetBufferPointer(), pPixelShader->GetBufferSize() };
 
@@ -99,7 +99,7 @@ bool SDX12Pipeline::HasType(unsigned int index)
 	return m_pResources->HasType(index);
 }
 
-void SDX12Pipeline::Populate(ID3D12GraphicsCommandList * commandList)
+void SDX12Pipeline::Populate(ID3D12GraphicsCommandList * commandList, unsigned int index)
 {
 	int count = 0;
 	auto buffers = m_pResources->GetCBVBuffers(count);

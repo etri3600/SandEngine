@@ -142,6 +142,12 @@
     <ClInclude Include="SDX12Resources.h">
       <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
+    <ClInclude Include="SDX12RootSignature.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="SDX12RootParameter.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDirectX12.cpp">
@@ -202,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="SDX12InputVertexAttributes.cpp" />
     <ClCompile Include="SDX12Resources.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="SDX12RootSignature.cpp">
       <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
   </ItemGroup>

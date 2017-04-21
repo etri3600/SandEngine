@@ -13,5 +13,5 @@ SamplerState samp : register(s0);
 
 float4 main(PixelShaderInput input) : SV_TARGET
 {
-	return diff.Sample(samp, input.uv);
+	return float4(0.3,0.7,0,1);
 }

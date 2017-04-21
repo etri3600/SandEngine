@@ -23,6 +23,9 @@ class SDX12SkinnedResources : public SDX12Resources
 public:
 	SDX12SkinnedResources()
 	{
+		for (int i = 0; i < 2; ++i)
+			m_pCBVBuffers[i] = nullptr;
+
 		Attributes.AddAttribute({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 		Attributes.AddAttribute({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 		Attributes.AddAttribute({ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
@@ -81,6 +84,9 @@ class SDX12SimpleResources : public SDX12Resources
 public:
 	SDX12SimpleResources()
 	{
+		for (int i = 0; i < 1; ++i)
+			m_pCBVBuffers[i] = nullptr;
+
 		Attributes.AddAttribute({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 		Attributes.AddAttribute({ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 		Attributes.AddAttribute({ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
