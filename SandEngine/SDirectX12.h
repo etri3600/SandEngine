@@ -28,8 +28,6 @@ struct SBatchProxy
 
 struct SSceneProxy
 {
-	unsigned int TotalVertexSize = 0;
-	unsigned int TotalIndexSize = 0;
 	std::map<unsigned int, SBatchProxy> BatchProxies;
 };
 
@@ -94,13 +92,11 @@ private:
 	unsigned int m_RenderTargetViewDescriptorSize = 0;
 	D3D12_VIEWPORT m_Viewport;
 
-	D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
 	ID3D12Resource* m_pVertexBuffer;
 	std::vector<byte> m_vertexShader;
 
 	std::vector<byte> m_pixelShader;
 
-	D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
 	ID3D12Resource* m_pIndexBuffer;
 
 	ID3D12DescriptorHeap* m_pShaderBufferHeap;

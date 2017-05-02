@@ -371,8 +371,6 @@ void SDirectX12::Reset()
 		proxy.second.ObjectProxies.clear();
 	} 
 	m_SceneProxy.BatchProxies.clear();
-	m_SceneProxy.TotalVertexSize = 0;
-	m_SceneProxy.TotalIndexSize = 0;
 }
 
 bool SDirectX12::Update(const double delta, std::map<unsigned int, std::vector<SModel>>& models)
@@ -403,8 +401,6 @@ bool SDirectX12::Update(const double delta, std::map<unsigned int, std::vector<S
 			}
 		}
 
-		m_SceneProxy.TotalVertexSize += m_SceneProxy.BatchProxies[it->first].VertexSize;
-		m_SceneProxy.TotalIndexSize += m_SceneProxy.BatchProxies[it->first].IndexSize;
 	}
 
 	return true;
@@ -424,100 +420,104 @@ void SDirectX12::Draw()
 	D3D12_HEAP_PROPERTIES uploadHeapProperties = defaultHeapProperties;
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 
-	// Vertex Buffer
-	ID3D12Resource* vertexBufferUpload = nullptr;
-
-	D3D12_RESOURCE_DESC vertexBufferDesc;
-	vertexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	vertexBufferDesc.Alignment = 0;
-	vertexBufferDesc.Width = m_SceneProxy.TotalVertexSize;
-	vertexBufferDesc.Height = 1;
-	vertexBufferDesc.DepthOrArraySize = 1;
-	vertexBufferDesc.MipLevels = 1;
-	vertexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-	vertexBufferDesc.SampleDesc.Count = 1;
-	vertexBufferDesc.SampleDesc.Quality = 0;
-	vertexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	vertexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_pVertexBuffer));
-	SWindows::OutputErrorMessage(hResult);
-	m_pVertexBuffer->SetName(L"VertexBuffer");
-
-	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexBufferUpload));
-	SWindows::OutputErrorMessage(hResult);
-
-	vertexBufferUpload->SetName(L"VertexBufferUpload");
-
-	std::vector<SModelVertex> vertices;
-	std::vector<unsigned int> indices;
 	for (auto it = m_SceneProxy.BatchProxies.begin(); it != m_SceneProxy.BatchProxies.end(); ++it)
 	{
+		std::vector<SModelVertex> vertices;
+		std::vector<unsigned int> indices;
 		for (unsigned int i = 0; i < it->second.ObjectProxies.size(); ++i)
 		{
 			vertices.insert(std::end(vertices), std::begin(it->second.ObjectProxies[i].Vertices), std::end(it->second.ObjectProxies[i].Vertices));
 			indices.insert(std::end(indices), std::begin(it->second.ObjectProxies[i].Indices), std::end(it->second.ObjectProxies[i].Indices));
 		}
+
+		// Vertex Buffer
+		ID3D12Resource* vertexBufferUpload = nullptr;
+
+		D3D12_RESOURCE_DESC vertexBufferDesc;
+		vertexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		vertexBufferDesc.Alignment = 0;
+		vertexBufferDesc.Width = it->second.VertexSize;
+		vertexBufferDesc.Height = 1;
+		vertexBufferDesc.DepthOrArraySize = 1;
+		vertexBufferDesc.MipLevels = 1;
+		vertexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+		vertexBufferDesc.SampleDesc.Count = 1;
+		vertexBufferDesc.SampleDesc.Quality = 0;
+		vertexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		vertexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_pVertexBuffer));
+		SWindows::OutputErrorMessage(hResult);
+		m_pVertexBuffer->SetName(L"VertexBuffer");
+
+		hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexBufferUpload));
+		SWindows::OutputErrorMessage(hResult);
+
+		vertexBufferUpload->SetName(L"VertexBufferUpload");
+
+		D3D12_SUBRESOURCE_DATA vertexData = {};
+		vertexData.pData = vertices.data();
+		vertexData.RowPitch = vertices.size() * sizeof(SModelVertex);
+		vertexData.SlicePitch = vertexData.RowPitch;
+
+		UpdateSubresource(m_pCommandList, m_pVertexBuffer, vertexBufferUpload, 0, 0, 1, &vertexData);
+
+		D3D12_RESOURCE_BARRIER vertexBufferResourceBarrier;
+		vertexBufferResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		vertexBufferResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		vertexBufferResourceBarrier.Transition.pResource = m_pVertexBuffer;
+		vertexBufferResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		vertexBufferResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		vertexBufferResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+		m_pCommandList->ResourceBarrier(1, &vertexBufferResourceBarrier);
+
+
+		// Index Buffer
+		ID3D12Resource* indexbufferUpload = nullptr;
+		D3D12_RESOURCE_DESC indexBufferDesc;
+		indexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		indexBufferDesc.Alignment = 0;
+		indexBufferDesc.Width = it->second.IndexSize;
+		indexBufferDesc.Height = 1;
+		indexBufferDesc.DepthOrArraySize = 1;
+		indexBufferDesc.MipLevels = 1;
+		indexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+		indexBufferDesc.SampleDesc.Count = 1;
+		indexBufferDesc.SampleDesc.Quality = 0;
+		indexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		indexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_pIndexBuffer));
+		SWindows::OutputErrorMessage(hResult);
+		m_pIndexBuffer->SetName(L"IndexBuffer");
+
+		hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&indexbufferUpload));
+		SWindows::OutputErrorMessage(hResult);
+
+		indexbufferUpload->SetName(L"IndexBufferUpload");
+
+		D3D12_SUBRESOURCE_DATA indexData = {};
+		indexData.pData = indices.data();
+		indexData.RowPitch = indices.size() * sizeof(unsigned int);
+		indexData.SlicePitch = indexData.RowPitch;
+
+		UpdateSubresource(m_pCommandList, m_pIndexBuffer, indexbufferUpload, 0, 0, 1, &indexData);
+
+
+		D3D12_RESOURCE_BARRIER indexBufferResourceBarrier;
+		indexBufferResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		indexBufferResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		indexBufferResourceBarrier.Transition.pResource = m_pIndexBuffer;
+		indexBufferResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		indexBufferResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_INDEX_BUFFER;
+		indexBufferResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+		m_pCommandList->ResourceBarrier(1, &indexBufferResourceBarrier);
+
+		m_pipelines[it->first]->SetVertexBufferView(m_pVertexBuffer->GetGPUVirtualAddress(), it->second.VertexSize, sizeof(SModelVertex));
+		m_pipelines[it->first]->SetIndexBufferView(m_pIndexBuffer->GetGPUVirtualAddress(), it->second.IndexSize, DXGI_FORMAT_R32_UINT);
 	}
-
-	D3D12_SUBRESOURCE_DATA vertexData = {};
-	vertexData.pData = vertices.data();
-	vertexData.RowPitch = vertices.size() * sizeof(SModelVertex);
-	vertexData.SlicePitch = vertexData.RowPitch;
-
-	UpdateSubresource(m_pCommandList, m_pVertexBuffer, vertexBufferUpload, 0, 0, 1, &vertexData);
-
-	D3D12_RESOURCE_BARRIER vertexBufferResourceBarrier;
-	vertexBufferResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	vertexBufferResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	vertexBufferResourceBarrier.Transition.pResource = m_pVertexBuffer;
-	vertexBufferResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	vertexBufferResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-	vertexBufferResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	m_pCommandList->ResourceBarrier(1, &vertexBufferResourceBarrier);
-
-	// Index Buffer
-	ID3D12Resource* indexbufferUpload = nullptr;
-	D3D12_RESOURCE_DESC indexBufferDesc;
-	indexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	indexBufferDesc.Alignment = 0;
-	indexBufferDesc.Width = m_SceneProxy.TotalIndexSize;
-	indexBufferDesc.Height = 1;
-	indexBufferDesc.DepthOrArraySize = 1;
-	indexBufferDesc.MipLevels = 1;
-	indexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-	indexBufferDesc.SampleDesc.Count = 1;
-	indexBufferDesc.SampleDesc.Quality = 0;
-	indexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	indexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_pIndexBuffer));
-	SWindows::OutputErrorMessage(hResult);
-	m_pIndexBuffer->SetName(L"IndexBuffer");
-
-	hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&indexbufferUpload));
-	SWindows::OutputErrorMessage(hResult);
-
-	indexbufferUpload->SetName(L"IndexBufferUpload");
-
-	D3D12_SUBRESOURCE_DATA indexData = {};
-	indexData.pData = indices.data();
-	indexData.RowPitch = indices.size() * sizeof(unsigned int);
-	indexData.SlicePitch = indexData.RowPitch;
-
-	UpdateSubresource(m_pCommandList, m_pIndexBuffer, indexbufferUpload, 0, 0, 1, &indexData);
-
-
-	D3D12_RESOURCE_BARRIER indexBufferResourceBarrier;
-	indexBufferResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	indexBufferResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	indexBufferResourceBarrier.Transition.pResource = m_pIndexBuffer;
-	indexBufferResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	indexBufferResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_INDEX_BUFFER;
-	indexBufferResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	m_pCommandList->ResourceBarrier(1, &indexBufferResourceBarrier);
 
 	// Create Shader buffer
 	D3D12_DESCRIPTOR_HEAP_DESC cbheapDesc = {};
@@ -537,19 +537,10 @@ void SDirectX12::Draw()
 		descriptorOffset += CreateShaderResources(m_pipelines[it->first], it->second, descriptorOffset);
 	}
 
-	m_VertexBufferView.SizeInBytes = m_SceneProxy.TotalVertexSize;
-	m_IndexBufferView.SizeInBytes = m_SceneProxy.TotalIndexSize;
-
 	// Execute Command
 	m_pCommandList->Close();
 	ID3D12CommandList* ppCommandList[] = { m_pCommandList };
 	m_pCommandQueue->ExecuteCommandLists(sizeof(ppCommandList) / sizeof(ppCommandList[0]), ppCommandList);
-
-	m_VertexBufferView.BufferLocation = m_pVertexBuffer->GetGPUVirtualAddress();
-	m_VertexBufferView.StrideInBytes = sizeof(SModelVertex);
-
-	m_IndexBufferView.BufferLocation = m_pIndexBuffer->GetGPUVirtualAddress();
-	m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT;
 }
 
 bool SDirectX12::Render()
@@ -580,8 +571,6 @@ bool SDirectX12::Render()
 	m_pCommandList->OMSetRenderTargets(1, &renderTargetViewHandle, false, nullptr);
 
 	m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_pCommandList->IASetVertexBuffers(0, 1, &m_VertexBufferView);
-	m_pCommandList->IASetIndexBuffer(&m_IndexBufferView);
 	
 	ID3D12DescriptorHeap* ppHeaps[] = { m_pShaderBufferHeap };
 	m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
@@ -591,6 +580,8 @@ bool SDirectX12::Render()
 		auto batchProxy = m_SceneProxy.BatchProxies[it->first];
 		auto signature = pipeline->GetRootSignature();
 
+		m_pCommandList->IASetVertexBuffers(0, 1, &pipeline->GetVertexBufferView());
+		m_pCommandList->IASetIndexBuffer(&pipeline->GetIndexBufferView());
 		m_pCommandList->SetGraphicsRootSignature(pipeline->GetRootSignature()->Get());
 		m_pCommandList->SetPipelineState(pipeline->GetPipelineState());
 		{

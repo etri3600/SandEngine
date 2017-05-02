@@ -113,3 +113,17 @@ void SDX12Pipeline::CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, 
 {
 	m_pResources->CreateConstantBuffer(m_pDevice, pDescriptorHeap, descriptorOffset, descriptorSize, batchProxy);
 }
+
+void SDX12Pipeline::SetVertexBufferView(D3D12_GPU_VIRTUAL_ADDRESS bufferLocation, unsigned int sizeInBytes, unsigned int strideInBytes)
+{
+	m_VertexBufferView.BufferLocation = bufferLocation;
+	m_VertexBufferView.SizeInBytes = sizeInBytes;
+	m_VertexBufferView.StrideInBytes = strideInBytes;
+}
+
+void SDX12Pipeline::SetIndexBufferView(D3D12_GPU_VIRTUAL_ADDRESS bufferLocation, unsigned int sizeInBytes, DXGI_FORMAT format)
+{
+	m_IndexBufferView.BufferLocation = bufferLocation;
+	m_IndexBufferView.SizeInBytes = sizeInBytes;
+	m_IndexBufferView.Format = format;
+}

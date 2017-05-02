@@ -34,7 +34,7 @@ void SDX12SkinnedResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D
 	cbvGPUAddress[1] = m_pCBVBuffers[1]->GetGPUVirtualAddress();
 	D3D12_CPU_DESCRIPTOR_HANDLE cbvCPUHandle = pDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	cbvCPUHandle.ptr += descriptorOffset;
-
+	
 	D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
 
 	for (unsigned int i = 0; i < batchProxy.ObjectProxies.size(); ++i)
