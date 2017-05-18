@@ -126,18 +126,18 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	//SWindows::OutputErrorMessage(hResult);
 
 	SDX12RootSignature* skinnedRootSignature = new SDX12RootSignature(m_pDevice, new SDX12BoneRootParameter());
-	m_RootSignatures.insert(std::pair<unsigned int, SDX12RootSignature*>(skinnedRootSignature->GetId(), skinnedRootSignature));
+	m_RootSignatures.insert(std::pair<MaterialType, SDX12RootSignature*>(skinnedRootSignature->GetType(), skinnedRootSignature));
 
 	SDX12Pipeline* pipeline = new SDX12Pipeline(m_pDevice, skinnedRootSignature);
 	pipeline->Init(L"SkinnedVertexShader", L"SkinnedPixelShader", new SDX12SkinnedResources());
-	m_pipelines.insert(std::pair<unsigned int, SDX12Pipeline*>(0, pipeline));
+	m_pipelines.insert(std::pair<MaterialType, SDX12Pipeline*>(MaterialType::SKINNING, pipeline));
 
-	SDX12RootSignature* simpleRootSignature = new SDX12RootSignature(m_pDevice, new SDX12SimpleRootParameter());
-	m_RootSignatures.insert(std::pair<unsigned int, SDX12RootSignature*>(simpleRootSignature->GetId(), simpleRootSignature));
+	SDX12RootSignature* textureRootSignature = new SDX12RootSignature(m_pDevice, new SDX12TextureRootParameter());
+	m_RootSignatures.insert(std::pair<MaterialType, SDX12RootSignature*>(textureRootSignature->GetType(), textureRootSignature));
 
-	SDX12Pipeline* simplePipeline = new SDX12Pipeline(m_pDevice, simpleRootSignature);
-	simplePipeline->Init(L"SimpleVertexShader", L"SimplePixelShader", new SDX12SimpleResources());
-	m_pipelines.insert(std::pair<unsigned int, SDX12Pipeline*>(1, simplePipeline));
+	SDX12Pipeline* texturePipeline = new SDX12Pipeline(m_pDevice, textureRootSignature);
+	texturePipeline->Init(L"TextureVertexShader", L"TexturePixelShader", new SDX12TextureResources());
+	m_pipelines.insert(std::pair<MaterialType, SDX12Pipeline*>(MaterialType::TEXTURE, texturePipeline));
 
 	// Create Command List
 	hResult = m_pDevice->GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, GetCommandAllocator(), nullptr, IID_PPV_ARGS(&m_pCommandList));
@@ -346,7 +346,7 @@ void SDirectX12::CreateViewProjection()
 	View = MatrixLookAt(eye, at, up);
 }
 
-void SDirectX12::UpdateBoneTransform(const std::map<unsigned int, std::vector<SModel>>& materialmodelmap)
+void SDirectX12::UpdateBoneTransform(const std::map<MaterialType, std::vector<SModel>>& materialmodelmap)
 {
 	for (auto it = materialmodelmap.begin(); it != materialmodelmap.end(); ++it)
 	{
@@ -373,7 +373,7 @@ void SDirectX12::Reset()
 	m_SceneProxy.BatchProxies.clear();
 }
 
-bool SDirectX12::Update(const double delta, std::map<unsigned int, std::vector<SModel>>& models)
+bool SDirectX12::Update(const double delta, std::map<MaterialType, std::vector<SModel>>& models)
 {
 	for (auto it = models.begin(); it != models.end(); ++it)
 	{
@@ -387,7 +387,7 @@ bool SDirectX12::Update(const double delta, std::map<unsigned int, std::vector<S
 			m_SceneProxy.BatchProxies[it->first].ObjectProxies[i].Tranformation = SMath::Transform(model.Scale, model.Location, model.Rotation);
 			m_SceneProxy.BatchProxies[it->first].ObjectProxies[i].Vertices = model.Vertices;
 			m_SceneProxy.BatchProxies[it->first].ObjectProxies[i].Indices = model.Indices;
-			m_SceneProxy.BatchProxies[it->first].ObjectProxies[i].BaseVertexLocation = m_SceneProxy.BatchProxies[it->first].VertexSize / sizeof(SModelVertex);
+			m_SceneProxy.BatchProxies[it->first].ObjectProxies[i].BaseVertexLocation = m_SceneProxy.BatchProxies[it->first].VertexSize / sizeof(SSkinnedModelVertex);
 			m_SceneProxy.BatchProxies[it->first].ObjectProxies[i].VertexSize = static_cast<unsigned int>(model.VertexSize());
 			m_SceneProxy.BatchProxies[it->first].ObjectProxies[i].StartIndexLocation = m_SceneProxy.BatchProxies[it->first].IndexSize / sizeof(unsigned int);
 			m_SceneProxy.BatchProxies[it->first].ObjectProxies[i].IndexSize = static_cast<unsigned int>(model.IndexSize());
@@ -422,7 +422,7 @@ void SDirectX12::Draw()
 
 	for (auto it = m_SceneProxy.BatchProxies.begin(); it != m_SceneProxy.BatchProxies.end(); ++it)
 	{
-		std::vector<SModelVertex> vertices;
+		std::vector<SSkinnedModelVertex> vertices;
 		std::vector<unsigned int> indices;
 		for (unsigned int i = 0; i < it->second.ObjectProxies.size(); ++i)
 		{
@@ -457,7 +457,7 @@ void SDirectX12::Draw()
 
 		D3D12_SUBRESOURCE_DATA vertexData = {};
 		vertexData.pData = vertices.data();
-		vertexData.RowPitch = vertices.size() * sizeof(SModelVertex);
+		vertexData.RowPitch = vertices.size() * sizeof(SSkinnedModelVertex);
 		vertexData.SlicePitch = vertexData.RowPitch;
 
 		UpdateSubresource(m_pCommandList, m_pVertexBuffer, vertexBufferUpload, 0, 0, 1, &vertexData);
@@ -515,7 +515,7 @@ void SDirectX12::Draw()
 
 		m_pCommandList->ResourceBarrier(1, &indexBufferResourceBarrier);
 
-		m_pipelines[it->first]->SetVertexBufferView(m_pVertexBuffer->GetGPUVirtualAddress(), it->second.VertexSize, sizeof(SModelVertex));
+		m_pipelines[it->first]->SetVertexBufferView(m_pVertexBuffer->GetGPUVirtualAddress(), it->second.VertexSize, sizeof(SSkinnedModelVertex));
 		m_pipelines[it->first]->SetIndexBufferView(m_pIndexBuffer->GetGPUVirtualAddress(), it->second.IndexSize, DXGI_FORMAT_R32_UINT);
 	}
 

@@ -136,9 +136,6 @@
     <ClInclude Include="SDX12InputVertexAttributes.h">
       <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
-    <ClInclude Include="SMaterial.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="SDX12Resources.h">
       <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
@@ -147,6 +144,9 @@
     </ClInclude>
     <ClInclude Include="SDX12RootParameter.h">
       <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="SMaterial.h">
+      <Filter>Asset</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -215,16 +215,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\SimplePixelShader.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\SimpleVertexShader.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="Shaders\SkinnedPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\SkinnedVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\TexturePixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\TextureVertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

@@ -84,7 +84,7 @@ void SModelLoader::LoadMeshes(SModel* model, const aiScene* pScene)
 		{
 			for (unsigned int j = 0;j < pMesh->mNumVertices; ++j)
 			{
-				SModelVertex vertex;
+				SSkinnedModelVertex vertex;
 				vertex.position = Vector3FromAI(pMesh->mVertices[j]);
 				vertex.normal = pMesh->HasNormals() ? Vector3FromAI(pMesh->mNormals[j]) : SVector3(1.f, 1.f, 1.f);
 				if (pMesh->HasTangentsAndBitangents())

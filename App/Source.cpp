@@ -23,12 +23,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			auto&& model = ModelLoader->LoadModelFromFile(LR"(boblampclean\boblampclean.md5mesh)");
 			model.Scale = {0.3f, 0.3f, 0.3f};
 			model.Location = { 0.0f, -10.0f, -10.0f };
-			model.Material.Id = 0;
+			model.Material.Type = MaterialType::SKINNING;
 			node->Queue(model);
 			
 			auto&& model2 = ModelLoader->LoadModelFromFile(LR"(Jet_Animation.FBX)");
 			model2.Location = { -2.0f, 0.0f, 0.0f };
-			model2.Material.Id = 1;
+			model2.Material.Type = MaterialType::TEXTURE;
 			node->CreateChild()->Queue(model2);
 			//node->Queue(model2);
 			

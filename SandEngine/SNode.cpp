@@ -27,7 +27,7 @@ void SNode::Tick()
 
 void SNode::Queue(const SModel& model)
 {
-	m_MaterialModels[model.Material.Id].push_back(model);
+	m_MaterialModels[model.Material.Type].push_back(model);
 }
 
 SNode* SNode::GetParent()

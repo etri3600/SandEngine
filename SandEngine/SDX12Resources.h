@@ -79,10 +79,10 @@ private:
 	char* m_MappedConstantBuffers[2];
 };
 
-class SDX12SimpleResources : public SDX12Resources
+class SDX12TextureResources : public SDX12Resources
 {
 public:
-	SDX12SimpleResources()
+	SDX12TextureResources()
 	{
 		for (int i = 0; i < 1; ++i)
 			m_pCBVBuffers[i] = nullptr;
@@ -94,7 +94,7 @@ public:
 		Attributes.AddAttribute({ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 	}
 
-	~SDX12SimpleResources()
+	~SDX12TextureResources()
 	{
 		for (int i = 0; i < 1; ++i)
 		{

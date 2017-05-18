@@ -11,14 +11,14 @@ struct SDX12RootParameter
 	virtual unsigned int GetSamplerDescCount() = 0;
 	virtual unsigned int GetTableLocation() = 0;
 
-	unsigned int Id;
+	MaterialType Type;
 };
 
-struct SDX12SimpleRootParameter : SDX12RootParameter
+struct SDX12TextureRootParameter : SDX12RootParameter
 {
-	SDX12SimpleRootParameter()
+	SDX12TextureRootParameter()
 	{
-		Id = 0;
+		Type = MaterialType::TEXTURE;
 
 		m_range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		m_range[0].NumDescriptors = 32;
@@ -67,7 +67,7 @@ struct SDX12BoneRootParameter : SDX12RootParameter
 {
 	SDX12BoneRootParameter()
 	{
-		Id = 1;
+		Type = MaterialType::SKINNING;
 
 		m_range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		m_range[0].NumDescriptors = 32;

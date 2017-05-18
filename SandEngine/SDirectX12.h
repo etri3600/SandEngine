@@ -12,7 +12,7 @@ struct SObjectProxy
 	unsigned int StartIndexLocation = 0;
 	unsigned int IndexSize = 0;
 	std::vector<SMeshInfo> MeshProxy;
-	std::vector<SModelVertex> Vertices;
+	std::vector<SSkinnedModelVertex> Vertices;
 	std::vector<unsigned int> Indices;
 	SMatrix Tranformation;
 	SMatrix BoneTransform[MAX_BONES];
@@ -28,7 +28,7 @@ struct SBatchProxy
 
 struct SSceneProxy
 {
-	std::map<unsigned int, SBatchProxy> BatchProxies;
+	std::map<MaterialType, SBatchProxy> BatchProxies;
 };
 
 class SDX12ResourceAllocator;
@@ -47,10 +47,10 @@ public:
 	bool CreateSwapChain(const SPlatformSystem* pPlatformSystem, const int nNumerator, const int nDenominator) override;
 	void CreateViewProjection() override;
 
-	void UpdateBoneTransform(const std::map<unsigned int, std::vector<SModel>>& models) override;
+	void UpdateBoneTransform(const std::map<MaterialType, std::vector<SModel>>& models) override;
 
 	void Reset() override;
-	bool Update(const double delta, std::map<unsigned int, std::vector<SModel>>& models) override;
+	bool Update(const double delta, std::map<MaterialType, std::vector<SModel>>& models) override;
 	void Draw() override;
 	bool Render() override;
 	void Present() override;
@@ -73,8 +73,8 @@ private:
 	SDirectX12Device* m_pDevice;
 	SDX12ResourceAllocator* m_pResourceAllocator[2];
 	SDX12DescriptorHeapAllocator* m_pDescriptorAllocator[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
-	std::map<unsigned int, SDX12Pipeline*> m_pipelines;
-	std::map<unsigned int, SDX12RootSignature*> m_RootSignatures;
+	std::map<MaterialType, SDX12Pipeline*> m_pipelines;
+	std::map<MaterialType, SDX12RootSignature*> m_RootSignatures;
 
 	ID3D12CommandQueue* m_pCommandQueue;
 	ID3D12DescriptorHeap* m_pRenderTargetViewHeap;

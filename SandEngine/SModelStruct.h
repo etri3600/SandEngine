@@ -9,7 +9,12 @@
 
 #define BONES_PER_VERTEX 4U
 
-struct SModelVertex
+struct SBaseModelVertex
+{
+
+};
+
+struct SSkinnedModelVertex : SBaseModelVertex
 {
 	SVector3 position;
 	SVector4 color;
@@ -18,6 +23,21 @@ struct SModelVertex
 	SVector2 uv;
 	unsigned int boneIDs[BONES_PER_VERTEX]{};
 	float weights[BONES_PER_VERTEX]{};
+};
+
+struct STextureModelVertex : SBaseModelVertex
+{
+	SVector3 position;
+	SVector4 color;
+	SVector3 normal;
+	SVector4 tangent;
+	SVector2 uv;
+};
+
+struct SSimpleModelVertex : SBaseModelVertex
+{
+	SVector3 position;
+	SVector4 color;
 };
 
 struct SMeshInfo
@@ -34,7 +54,7 @@ class SModel
 public:
 	~SModel();
 
-	std::vector<SModelVertex> Vertices;
+	std::vector<SSkinnedModelVertex> Vertices;
 	std::vector<unsigned int> Indices;
 	SAnimation* Animation;
 
@@ -55,7 +75,7 @@ public:
 	void Update(double delta);
 	
 	static constexpr std::size_t VertexBaseSize() {
-		return sizeof(SModelVertex);
+		return sizeof(SSkinnedModelVertex);
 	}
 
 	auto VertexSize() const {
@@ -146,7 +166,7 @@ class STriangle : public SModel
 public:
 	STriangle::STriangle()
 	{
-		SModelVertex point1, point2, point3;
+		SSkinnedModelVertex point1, point2, point3;
 		point1.position = SVector3(0.0f, 1.0f, 0.0f);
 		point1.color = { 1.0f, 0.0f, 0.0f };
 		point1.normal = SVector3(0.0f, 0.0f, 1.0f);
@@ -180,7 +200,7 @@ class SCube : public SModel
 public:
 	SCube::SCube()
 	{
-		SModelVertex point1, point2, point3, point4, point5, point6, point7, point8;
+		SSkinnedModelVertex point1, point2, point3, point4, point5, point6, point7, point8;
 		point1.position = { -1.0f, 1.0f, 1.0f };
 		point1.color = {1.0f, 1.0f, 1.0f};
 		point1.normal = { 0.0f, 0.0f, 1.0f };
