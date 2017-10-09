@@ -1,14 +1,15 @@
 #pragma once
 
-enum class MaterialType
+enum class EMaterialType
 {
 	SKINNING,
 	TEXTURE,
-	SIMPLE
+	SIMPLE,
+	GBUFFER,
 };
 
 class SMaterial
 {
 public:
-	MaterialType Type;
+	EMaterialType Type;
 };

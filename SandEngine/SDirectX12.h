@@ -28,7 +28,14 @@ struct SBatchProxy
 
 struct SSceneProxy
 {
-	std::map<MaterialType, SBatchProxy> BatchProxies;
+	std::map<EMaterialType, SBatchProxy> BatchProxies;
+};
+
+enum class EGBuffer : unsigned int
+{
+	GB_POSITION = 0,
+	GB_NORMAL,
+	GB_NUM
 };
 
 class SDX12ResourceAllocator;
@@ -47,16 +54,17 @@ public:
 	bool CreateSwapChain(const SPlatformSystem* pPlatformSystem, const int nNumerator, const int nDenominator) override;
 	void CreateViewProjection() override;
 
-	void UpdateBoneTransform(const std::map<MaterialType, std::vector<SModel>>& models) override;
+	void UpdateBoneTransform(const std::map<EMaterialType, std::vector<SModel>>& models) override;
 
 	void Reset() override;
-	bool Update(const double delta, std::map<MaterialType, std::vector<SModel>>& models) override;
+	bool Update(const double delta, std::map<EMaterialType, std::vector<SModel>>& models) override;
 	void Draw() override;
 	bool Render() override;
 	void Present() override;
 
 protected:
 	unsigned int CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int offset);
+	void CreateGBuffers();
 
 	void UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int objIndex);
 	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);
@@ -73,12 +81,10 @@ private:
 	SDirectX12Device* m_pDevice;
 	SDX12ResourceAllocator* m_pResourceAllocator[2];
 	SDX12DescriptorHeapAllocator* m_pDescriptorAllocator[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
-	std::map<MaterialType, SDX12Pipeline*> m_pipelines;
-	std::map<MaterialType, SDX12RootSignature*> m_RootSignatures;
+	std::map<EMaterialType, SDX12Pipeline*> m_pipelines;
+	std::map<EMaterialType, SDX12RootSignature*> m_RootSignatures;
 
 	ID3D12CommandQueue* m_pCommandQueue;
-	ID3D12DescriptorHeap* m_pRenderTargetViewHeap;
-	ID3D12Resource* m_pBackBufferRenterTarget[c_BufferingCount];
 	ID3D12CommandAllocator* m_pCommandAllocator[c_BufferingCount];
 	ID3D12GraphicsCommandList* m_pCommandList;
 
@@ -88,9 +94,12 @@ private:
 	//ID3D12PipelineState* m_pPipelineState;
 	ID3D12Fence* m_pFence;
 	unsigned __int64 m_nFenceValue[c_BufferingCount];
-	IDXGISwapChain3* m_pSwapChain;
+	IDXGISwapChain4* m_pSwapChain;
 	unsigned int m_RenderTargetViewDescriptorSize = 0;
 	D3D12_VIEWPORT m_Viewport;
+
+	ID3D12DescriptorHeap* m_pRenderTargetViewHeap;
+	ID3D12Resource* m_pBackBufferRenterTarget[c_BufferingCount];
 
 	ID3D12Resource* m_pVertexBuffer;
 	std::vector<byte> m_vertexShader;
@@ -106,6 +115,10 @@ private:
 	//ID3D12Resource* m_pSRVBuffer;
 
 	ID3D12DescriptorHeap* m_pSamplerHeap;
+
+	ID3D12DescriptorHeap* m_pGBufferRTVHeap;
+	ID3D12DescriptorHeap* m_pGBufferSRVHeap;
+	ID3D12Resource* m_pGBuffers[EGBuffer::GB_NUM];
 
 	SSceneProxy m_SceneProxy;
 

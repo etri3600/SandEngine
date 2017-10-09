@@ -50,6 +50,9 @@ bool SDirectX12Device::Initialize(unsigned int screenWidth, unsigned int screenH
 	adapter->GetDesc(&adapterDesc);
 	m_videoCardMemory = adapterDesc.DedicatedVideoMemory / 1024 / 1024;
 
+	m_ScreenWidth = screenWidth;
+	m_ScreenHeight = screenHeight;
+
 	if (adapterOutput)
 	{
 		// Get DisplayInfo

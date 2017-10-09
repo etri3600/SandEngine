@@ -25,12 +25,12 @@ SDX12Pipeline::~SDX12Pipeline()
 
 
 
-void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, SDX12Resources* pResources)
+void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, std::string entrypointName, SDX12Resources* pResources)
 {
 	// Create Shader Binary
 	ID3DBlob* pVertexShader = nullptr, *pPixelShader = nullptr;
-	m_vertexShader = CompileShader(vertexShader.c_str(), "vs_5_1", &pVertexShader);
-	m_pixelShader = CompileShader(pixelShader.c_str(), "ps_5_1", &pPixelShader);
+	m_vertexShader = CompileShader(vertexShader.c_str(), "vs_5_1", entrypointName.c_str(), &pVertexShader);
+	m_pixelShader = CompileShader(pixelShader.c_str(), "ps_5_1", entrypointName.c_str(), &pPixelShader);
 
 	if ((m_vertexShader.size() == 0 && pVertexShader == nullptr) || (m_pixelShader.size() == 0 && pPixelShader == nullptr))
 		return;

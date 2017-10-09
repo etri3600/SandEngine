@@ -28,6 +28,6 @@ public:
 
 private:
 	long long m_Time;
-	std::map<MaterialType, std::vector<SModel>> m_MaterialModels;
+	std::map<EMaterialType, std::vector<SModel>> m_MaterialModels;
 	bool m_bDirty = true;
 };

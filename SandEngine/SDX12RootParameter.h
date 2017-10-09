@@ -11,14 +11,14 @@ struct SDX12RootParameter
 	virtual unsigned int GetSamplerDescCount() = 0;
 	virtual unsigned int GetTableLocation() = 0;
 
-	MaterialType Type;
+	EMaterialType Type;
 };
 
 struct SDX12TextureRootParameter : SDX12RootParameter
 {
 	SDX12TextureRootParameter()
 	{
-		Type = MaterialType::TEXTURE;
+		Type = EMaterialType::TEXTURE;
 
 		m_range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		m_range[0].NumDescriptors = 32;
@@ -67,7 +67,7 @@ struct SDX12BoneRootParameter : SDX12RootParameter
 {
 	SDX12BoneRootParameter()
 	{
-		Type = MaterialType::SKINNING;
+		Type = EMaterialType::SKINNING;
 
 		m_range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		m_range[0].NumDescriptors = 32;
@@ -115,4 +115,27 @@ public:
 	D3D12_DESCRIPTOR_RANGE m_range[1];
 	D3D12_ROOT_PARAMETER m_parameters[3];
 	D3D12_STATIC_SAMPLER_DESC m_samplerDesc;
+};
+
+struct SDX12GBufferRootParameter : SDX12RootParameter
+{
+	SDX12GBufferRootParameter()
+	{
+		Type = EMaterialType::GBUFFER;
+
+		m_parameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+		m_parameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+		m_parameters[0].Descriptor.ShaderRegister = 0;
+		m_parameters[0].Descriptor.RegisterSpace = 0;
+	}
+
+	unsigned int GetParameterCount() { return sizeof(m_parameters) / sizeof(m_parameters[0]); }
+	const D3D12_ROOT_PARAMETER* GetParameters() override { return m_parameters; }
+
+	const D3D12_STATIC_SAMPLER_DESC* GetSamplerDescs() override { return nullptr; };
+	unsigned int GetSamplerDescCount() override { return 0; }
+
+	unsigned int GetTableLocation() override { return -1; }
+public:
+	D3D12_ROOT_PARAMETER m_parameters[1];
 };

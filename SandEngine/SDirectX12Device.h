@@ -15,14 +15,17 @@ public:
 	void Finalize();
 
 	ID3D12Device* GetDevice() const { return m_pDevice; }
-	IDXGIFactory4* GetDXGIFactory() const { return m_pDXGIFactory; }
+	IDXGIFactory5* GetDXGIFactory() const { return m_pDXGIFactory; }
 
 	unsigned int GetDeviceNumerator() const { return m_numerator; }
 	unsigned int GetDeviceDenominator() const { return m_denominator; }
 
+public:
+	unsigned int m_ScreenWidth, m_ScreenHeight;
+
 private:
 	ID3D12Device* m_pDevice;
-	IDXGIFactory4* m_pDXGIFactory;
+	IDXGIFactory5* m_pDXGIFactory;
 
 	size_t m_videoCardMemory;
 	unsigned int m_numerator, m_denominator;

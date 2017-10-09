@@ -21,7 +21,7 @@ public:
 	virtual void Finalize() = 0;
 
 	virtual void Reset() = 0;
-	virtual bool Update(const double delta, std::map<MaterialType, std::vector<SModel>>& models) = 0;
+	virtual bool Update(const double delta, std::map<EMaterialType, std::vector<SModel>>& models) = 0;
 	virtual void Draw() = 0;
 	virtual bool Render() = 0;
 	virtual void Present() = 0;
@@ -29,7 +29,7 @@ public:
 	virtual bool CreateSwapChain(const SPlatformSystem* pPlatformSystem, const int nNumerator, const int nDenominator) = 0;
 	virtual void CreateViewProjection() = 0;
 
-	virtual void UpdateBoneTransform(const std::map<MaterialType, std::vector<SModel>>& models) = 0;
+	virtual void UpdateBoneTransform(const std::map<EMaterialType, std::vector<SModel>>& models) = 0;
 
 public:
 	static constexpr unsigned int c_BufferingCount = 3;

@@ -75,7 +75,7 @@ unsigned __int64 UpdateSubresource(ID3D12GraphicsCommandList* pCmdList, ID3D12Re
 	return RequiredSize;
 }
 
-std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, ID3DBlob** pBlob)
+std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, const char* entrypointName, ID3DBlob** pBlob)
 {
 	std::vector<byte> shader;
 	constexpr auto shaderFolder = LR"(..\SandEngine\Shaders\)";
@@ -95,7 +95,7 @@ std::vector<byte>&& CompileShader(const wchar_t* fileName, const char* version, 
 	ID3DBlob* pShaderCode = nullptr;
 	auto stringFile = shaderFolder + file + shaderExtension;
 	const wchar_t* shaderFileName = stringFile.c_str();
-	HRESULT hResult = D3DCompileFromFile(shaderFileName, defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", version, flags, 0, &pShaderCode, nullptr);
+	HRESULT hResult = D3DCompileFromFile(shaderFileName, defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, entrypointName, version, flags, 0, &pShaderCode, nullptr);
 	if (FAILED(hResult))
 	{
 		pShaderCode->Release();

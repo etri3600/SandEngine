@@ -10,7 +10,7 @@ public:
 	SDX12Pipeline(SDirectX12Device* pDevice, SDX12RootSignature* pRootSignature);
 	~SDX12Pipeline();
 
-	void Init(std::wstring vertexShader, std::wstring pixelShader, SDX12Resources* pResources);
+	void Init(std::wstring vertexShader, std::wstring pixelShader, std::string entrypointName, SDX12Resources* pResources);
 
 	SDX12RootSignature* GetRootSignature() { return m_pRootSignature; }
 	ID3D12PipelineState* GetPipelineState() { return m_pPipelineState; }

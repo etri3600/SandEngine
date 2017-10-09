@@ -13,13 +13,13 @@ public:
 	void Finalize() override;
 
 	virtual void Reset() override;
-	virtual bool Update(const double delta, std::map<MaterialType, std::vector<SModel>>& models) override;
+	virtual bool Update(const double delta, std::map<EMaterialType, std::vector<SModel>>& models) override;
 	virtual void Draw() override;
 	virtual bool Render() override;
 	virtual void Present() override;
 	virtual bool CreateSwapChain(const SPlatformSystem * pPlatformSystem, const int nNumerator, const int nDenominator) override;
 	virtual void CreateViewProjection() override;
-	virtual void UpdateBoneTransform(const std::map<MaterialType,std::vector<SModel>>& models) override;
+	virtual void UpdateBoneTransform(const std::map<EMaterialType,std::vector<SModel>>& models) override;
 
 	vk::SurfaceKHR CreateSurface(const SPlatformSystem * pPlayformSystem);
 
