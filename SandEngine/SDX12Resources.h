@@ -138,10 +138,10 @@ private:
 	char* m_MappedConstantBuffers[1];
 };
 
-class SDX12GBufferPosResources : public SDX12Resources
+class SDX12LightResources : public SDX12Resources
 {
 public:
-	SDX12GBufferPosResources()
+	SDX12LightResources()
 	{
 		for (int i = 0; i < 1; ++i)
 			m_pCBVBuffers[i] = nullptr;
@@ -149,63 +149,7 @@ public:
 		Attributes.AddAttribute({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 	}
 
-	~SDX12GBufferPosResources()
-	{
-		for (int i = 0; i < 1; ++i)
-		{
-			if (m_pCBVBuffers[i])
-			{
-				m_pCBVBuffers[i]->Unmap(0, nullptr);
-				m_pCBVBuffers[i]->Release();
-				m_pCBVBuffers[i] = nullptr;
-			}
-		}
-	}
-
-	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy) override;
-
-	ID3D12Resource** GetCBVBuffers(int& count) override
-	{
-		count = sizeof(m_pCBVBuffers) / sizeof(m_pCBVBuffers[0]);
-		return m_pCBVBuffers;
-	}
-
-	unsigned int GetCBVOffset() override
-	{
-		return m_uiCBVDescriptorOffset;
-	}
-
-	char* GetMappedConstantBuffer(unsigned int index) override
-	{
-		return m_MappedConstantBuffers[index];
-	}
-
-	bool HasType(unsigned int index) override
-	{
-		return index < 1;
-	}
-
-public:
-	unsigned int m_uiCBVDescriptorOffset = 0;
-
-private:
-	ID3D12Resource* m_pCBVBuffers[1];
-	char* m_MappedConstantBuffers[1];
-};
-
-class SDX12GBufferNormalResources : public SDX12Resources
-{
-public:
-	SDX12GBufferNormalResources()
-	{
-		for (int i = 0; i < 1; ++i)
-			m_pCBVBuffers[i] = nullptr;
-
-		Attributes.AddAttribute({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
-		Attributes.AddAttribute({ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
-	}
-
-	~SDX12GBufferNormalResources()
+	~SDX12LightResources()
 	{
 		for (int i = 0; i < 1; ++i)
 		{

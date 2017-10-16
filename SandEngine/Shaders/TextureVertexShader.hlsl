@@ -38,7 +38,7 @@ PixelShaderInput main(VertexShaderInput input)
 	output.fragPos = pos;
 	output.PosW = posW.xyz;
 	output.color = input.color;
-	output.NormalW = mul(ViewProjectionConstantBuffer.normalMatrix, input.normal).xyz;
+	output.NormalW = mul(ViewProjectionConstantBuffer.normalMatrix, float4(input.normal, 1)).xyz;
 	output.TangentW = mul(ViewProjectionConstantBuffer.normalMatrix, input.tangent).xyz;
 	output.uv = input.uv;
 

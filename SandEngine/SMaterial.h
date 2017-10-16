@@ -5,7 +5,8 @@ enum class EMaterialType
 	SKINNING,
 	TEXTURE,
 	SIMPLE,
-	GBUFFER,
+	LIGHT,
+	MT_MAX
 };
 
 class SMaterial

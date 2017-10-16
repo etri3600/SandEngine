@@ -25,14 +25,14 @@ SDX12Pipeline::~SDX12Pipeline()
 
 
 
-void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, std::string entrypointName, SDX12Resources* pResources)
+void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring fragmentShader, std::string vertexEntrypointName, std::string fragmentEntrypointName, SDX12Resources* pResources, UINT renderTargetCount, DXGI_FORMAT* renderTargetFormats)
 {
 	// Create Shader Binary
 	ID3DBlob* pVertexShader = nullptr, *pPixelShader = nullptr;
-	m_vertexShader = CompileShader(vertexShader.c_str(), "vs_5_1", entrypointName.c_str(), &pVertexShader);
-	m_pixelShader = CompileShader(pixelShader.c_str(), "ps_5_1", entrypointName.c_str(), &pPixelShader);
+	CompileShader(vertexShader.c_str(), "vs_5_1", vertexEntrypointName.c_str(), &pVertexShader);
+	CompileShader(fragmentShader.c_str(), "ps_5_1", fragmentEntrypointName.c_str(), &pPixelShader);
 
-	if ((m_vertexShader.size() == 0 && pVertexShader == nullptr) || (m_pixelShader.size() == 0 && pPixelShader == nullptr))
+	if (pVertexShader == nullptr || pPixelShader == nullptr)
 		return;
 
 	// Create Pipeline State
@@ -73,16 +73,13 @@ void SDX12Pipeline::Init(std::wstring vertexShader, std::wstring pixelShader, st
 	pipelineStateDesc.DepthStencilState.StencilEnable = FALSE;
 	pipelineStateDesc.SampleMask = UINT_MAX;
 	pipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	pipelineStateDesc.NumRenderTargets = 1;
-	pipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	pipelineStateDesc.NumRenderTargets = renderTargetCount;
+	for(int i = 0; i < renderTargetCount; ++i)
+		pipelineStateDesc.RTVFormats[i] = renderTargetFormats[i];
 	pipelineStateDesc.SampleDesc.Count = 1;
 	HRESULT hResult = m_pDevice->GetDevice()->CreateGraphicsPipelineState(&pipelineStateDesc, __uuidof(ID3D12PipelineState), reinterpret_cast<void**>(&m_pPipelineState));
 	SWindows::OutputErrorMessage(hResult);
-
-	m_vertexShader.clear();
-	m_pixelShader.clear();
 }
-
 
 unsigned int SDX12Pipeline::GetCBVDescriptorOffset()
 {
