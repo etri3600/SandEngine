@@ -33,7 +33,8 @@ struct SSceneProxy
 
 enum class EGBuffer : unsigned int
 {
-	GB_POSITION = 0,
+	GB_COLOR = 0,
+	GB_DEPTH,
 	GB_NORMAL,
 	GB_NUM
 };
@@ -66,7 +67,7 @@ protected:
 	unsigned int CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int offset);
 	void CreateGBuffers();
 
-	void UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int objIndex);
+	void UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy* batchProxy, unsigned int objIndex);
 	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);
 
 private:
@@ -81,8 +82,8 @@ private:
 	SDirectX12Device* m_pDevice;
 	SDX12ResourceAllocator* m_pResourceAllocator[2];
 	SDX12DescriptorHeapAllocator* m_pDescriptorAllocator[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
-	std::map<EMaterialType, SDX12Pipeline*> m_pipelines;
-	std::map<EMaterialType, SDX12RootSignature*> m_RootSignatures;
+	std::vector<SDX12RootSignature*> m_RootSignatures;
+	std::vector<SDX12Pipeline*> m_pipelines;
 
 	ID3D12CommandQueue* m_pCommandQueue;
 	ID3D12CommandAllocator* m_pCommandAllocator[c_BufferingCount];
@@ -117,7 +118,7 @@ private:
 	ID3D12DescriptorHeap* m_pSamplerHeap;
 
 	ID3D12DescriptorHeap* m_pGBufferRTVHeap;
-	ID3D12DescriptorHeap* m_pGBufferSRVHeap;
+	ID3D12DescriptorHeap* m_pGBufferCbvSrvHeap;
 	ID3D12Resource* m_pGBuffers[EGBuffer::GB_NUM];
 
 	SSceneProxy m_SceneProxy;

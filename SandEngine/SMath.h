@@ -7,6 +7,8 @@
 
 #include "SUtils.h"
 
+#define S_PI 3.14159265358979323846
+
 struct SVector2
 {
 	SVector2()
@@ -395,9 +397,9 @@ inline void ScalarSinCos
 	assert(pSin);
 	assert(pCos);
 
-	static constexpr float SM_1DIV2PI = 1.0f / 2.0f * static_cast<float>(M_PI);
-	static constexpr float SM_2PI = static_cast<float>(M_PI) * 2.0f;
-	static constexpr float SM_PIDIV2 = static_cast<float>(M_PI) / 2.0f;
+	static constexpr float SM_1DIV2PI = 1.0f / 2.0f * static_cast<float>(S_PI);
+	static constexpr float SM_2PI = static_cast<float>(S_PI) * 2.0f;
+	static constexpr float SM_PIDIV2 = static_cast<float>(S_PI) / 2.0f;
 
 	// Map Value to y in [-pi,pi], x = 2*pi*quotient + remainder.
 	float quotient = SM_1DIV2PI * Value;
@@ -415,12 +417,12 @@ inline void ScalarSinCos
 	float sign;
 	if (y > SM_PIDIV2)
 	{
-		y = static_cast<float>(M_PI) - y;
+		y = static_cast<float>(S_PI) - y;
 		sign = -1.0f;
 	}
 	else if (y < -SM_PIDIV2)
 	{
-		y = -static_cast<float>(M_PI) - y;
+		y = -static_cast<float>(S_PI) - y;
 		sign = -1.0f;
 	}
 	else

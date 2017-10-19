@@ -1,6 +1,8 @@
 #include "SDX12Resources.h"
 
-void SDX12SkinnedResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy)
+#define ALIGNED_SIZE(size, align) ((size + (align-1)) & ~(align-1))
+
+void SDX12SkinnedResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy)
 {
 	D3D12_HEAP_PROPERTIES uploadHeapProperties;
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -21,11 +23,11 @@ void SDX12SkinnedResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D
 	constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	constantBufferDesc.Width = sizeof(SModelViewProjection) * batchProxy.ObjectProxies.size();
+	constantBufferDesc.Width = sizeof(SModelViewProjection) * batchProxy->ObjectProxies.size();
 	HRESULT hResult = pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pCBVBuffers[0]));
 	m_pCBVBuffers[0]->SetName(L"MVP Buffer");
 
-	constantBufferDesc.Width = sizeof(SBoneTransform) * batchProxy.ObjectProxies.size();
+	constantBufferDesc.Width = sizeof(SBoneTransform) * batchProxy->ObjectProxies.size();
 	hResult = pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pCBVBuffers[1]));
 	m_pCBVBuffers[1]->SetName(L"Bone Buffer");
 
@@ -37,7 +39,7 @@ void SDX12SkinnedResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D
 	
 	D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
 
-	for (unsigned int i = 0; i < batchProxy.ObjectProxies.size(); ++i)
+	for (unsigned int i = 0; i < batchProxy->ObjectProxies.size(); ++i)
 	{
 		desc.BufferLocation = cbvGPUAddress[0];
 		desc.SizeInBytes = sizeof(SModelViewProjection);
@@ -59,13 +61,13 @@ void SDX12SkinnedResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D
 	D3D12_RANGE readRange;
 	readRange.Begin = readRange.End = 0;
 	m_pCBVBuffers[0]->Map(0, &readRange, reinterpret_cast<void**>(&m_MappedConstantBuffers[0]));
-	memset(m_MappedConstantBuffers[0], 0, sizeof(SModelViewProjection) * batchProxy.ObjectProxies.size());
+	memset(m_MappedConstantBuffers[0], 0, sizeof(SModelViewProjection) * batchProxy->ObjectProxies.size());
 
 	m_pCBVBuffers[1]->Map(0, &readRange, reinterpret_cast<void**>(&m_MappedConstantBuffers[1]));
-	memset(m_MappedConstantBuffers[1], 0, sizeof(SBoneTransform) * batchProxy.ObjectProxies.size());
+	memset(m_MappedConstantBuffers[1], 0, sizeof(SBoneTransform) * batchProxy->ObjectProxies.size());
 }
 
-void SDX12TextureResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy)
+void SDX12TextureResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy)
 {
 	D3D12_HEAP_PROPERTIES uploadHeapProperties;
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -86,7 +88,7 @@ void SDX12TextureResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D
 	constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	constantBufferDesc.Width = sizeof(SModelViewProjection) * batchProxy.ObjectProxies.size();
+	constantBufferDesc.Width = sizeof(SModelViewProjection) * batchProxy->ObjectProxies.size();
 	HRESULT hResult = pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pCBVBuffers[0]));
 	m_pCBVBuffers[0]->SetName(L"MVP Buffer");
 
@@ -97,7 +99,7 @@ void SDX12TextureResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
 
-	for (unsigned int i = 0; i < batchProxy.ObjectProxies.size(); ++i)
+	for (unsigned int i = 0; i < batchProxy->ObjectProxies.size(); ++i)
 	{
 		desc.BufferLocation = cbvGPUAddress[0];
 		desc.SizeInBytes = sizeof(SModelViewProjection);
@@ -112,10 +114,10 @@ void SDX12TextureResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D
 	D3D12_RANGE readRange;
 	readRange.Begin = readRange.End = 0;
 	m_pCBVBuffers[0]->Map(0, &readRange, reinterpret_cast<void**>(&m_MappedConstantBuffers[0]));
-	memset(m_MappedConstantBuffers[0], 0, sizeof(SModelViewProjection) * batchProxy.ObjectProxies.size());
+	memset(m_MappedConstantBuffers[0], 0, sizeof(SModelViewProjection) * batchProxy->ObjectProxies.size());
 }
 
-void SDX12LightResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy)
+void SDX12LightResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy)
 {
 	D3D12_HEAP_PROPERTIES uploadHeapProperties;
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -136,9 +138,9 @@ void SDX12LightResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12
 	constantBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 	constantBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	constantBufferDesc.Width = sizeof(SModelViewProjection) * batchProxy.ObjectProxies.size();
+	constantBufferDesc.Width = ALIGNED_SIZE(sizeof(SMatrix), 256);
 	HRESULT hResult = pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &constantBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_pCBVBuffers[0]));
-	m_pCBVBuffers[0]->SetName(L"MVP Buffer");
+	m_pCBVBuffers[0]->SetName(L"Inverse Projection Matrix");
 
 	D3D12_GPU_VIRTUAL_ADDRESS cbvGPUAddress[1];
 	cbvGPUAddress[0] = m_pCBVBuffers[0]->GetGPUVirtualAddress();
@@ -146,21 +148,12 @@ void SDX12LightResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12
 	cbvCPUHandle.ptr += descriptorOffset;
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC desc;
-
-	for (unsigned int i = 0; i < batchProxy.ObjectProxies.size(); ++i)
-	{
-		desc.BufferLocation = cbvGPUAddress[0];
-		desc.SizeInBytes = sizeof(SModelViewProjection);
-		pDevice->GetDevice()->CreateConstantBufferView(&desc, cbvCPUHandle);
-
-		cbvGPUAddress[0] += desc.SizeInBytes;
-		cbvCPUHandle.ptr += descriptorSize;
-
-		m_uiCBVDescriptorOffset += descriptorSize;
-	}
+	desc.BufferLocation = cbvGPUAddress[0];
+	desc.SizeInBytes = ALIGNED_SIZE(sizeof(SMatrix), 256);
+	pDevice->GetDevice()->CreateConstantBufferView(&desc, cbvCPUHandle);
 
 	D3D12_RANGE readRange;
 	readRange.Begin = readRange.End = 0;
 	m_pCBVBuffers[0]->Map(0, &readRange, reinterpret_cast<void**>(&m_MappedConstantBuffers[0]));
-	memset(m_MappedConstantBuffers[0], 0, sizeof(SModelViewProjection) * batchProxy.ObjectProxies.size());
+	memset(m_MappedConstantBuffers[0], 0, ALIGNED_SIZE(sizeof(SMatrix), 256));
 }

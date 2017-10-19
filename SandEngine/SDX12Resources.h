@@ -7,11 +7,11 @@ class SDX12Resources
 public:
 	virtual ~SDX12Resources() {}
 	
-	virtual void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy) = 0;
+	virtual void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy) = 0;
 	virtual ID3D12Resource** GetCBVBuffers(int& count) = 0;
 	virtual unsigned int GetCBVOffset() = 0;
 	virtual char* GetMappedConstantBuffer(unsigned int index) = 0;
-	virtual bool HasType(unsigned int index) = 0;
+	virtual void UpdateConstantBuffer(SBatchProxy* batchProxy, unsigned int objIndex, SMatrix view, SMatrix projection) = 0;
 
 public:
 	SDX12InputVertexAttributes Attributes;
@@ -48,7 +48,7 @@ public:
 		}
 	}
 
-	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy) override;
+	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
 
 	ID3D12Resource** GetCBVBuffers(int& count) override
 	{
@@ -66,9 +66,28 @@ public:
 		return m_MappedConstantBuffers[index];
 	}
 
-	bool HasType(unsigned int index) override
+	void UpdateConstantBuffer(SBatchProxy* batchProxy, unsigned int objIndex, SMatrix view, SMatrix projection) override
 	{
-		return index < 2;
+		// ModelViewProjection
+		SModelViewProjection mvp;
+		memset(&mvp, 0, sizeof(SModelViewProjection));
+		mvp.View = view;
+		mvp.Projection = projection;
+
+		mvp.Model = batchProxy->ObjectProxies[objIndex].Tranformation;
+		mvp.NormalMatrix = SMath::NormalMatrix(batchProxy->ObjectProxies[objIndex].Tranformation);
+		SModelViewProjection* pMVP = reinterpret_cast<SModelViewProjection*>(GetMappedConstantBuffer(0) + sizeof(SModelViewProjection) * objIndex);
+
+		memcpy(pMVP, &mvp, sizeof(SModelViewProjection));
+
+		// Bone Transformation
+		SBoneTransform bones;
+		for (unsigned int j = 0; j < MAX_BONES; ++j)
+		{
+			bones.transform[j] = batchProxy->ObjectProxies[objIndex].BoneTransform[j];
+		}
+		SBoneTransform* pBone = reinterpret_cast<SBoneTransform*>(GetMappedConstantBuffer(1) + sizeof(SBoneTransform) * objIndex);
+		memcpy(pBone, &bones, sizeof(SBoneTransform));
 	}
 
 public:
@@ -107,7 +126,7 @@ public:
 		}
 	}
 
-	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy) override;
+	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
 
 	ID3D12Resource** GetCBVBuffers(int& count) override
 	{
@@ -125,9 +144,19 @@ public:
 		return m_MappedConstantBuffers[index];
 	}
 
-	bool HasType(unsigned int index) override
+	void UpdateConstantBuffer(SBatchProxy* batchProxy, unsigned int objIndex, SMatrix view, SMatrix projection) override
 	{
-		return index < 1;
+		// ModelViewProjection
+		SModelViewProjection mvp;
+		memset(&mvp, 0, sizeof(SModelViewProjection));
+		mvp.View = view;
+		mvp.Projection = projection;
+
+		mvp.Model = batchProxy->ObjectProxies[objIndex].Tranformation;
+		mvp.NormalMatrix = SMath::NormalMatrix(batchProxy->ObjectProxies[objIndex].Tranformation);
+		SModelViewProjection* pMVP = reinterpret_cast<SModelViewProjection*>(GetMappedConstantBuffer(0) + sizeof(SModelViewProjection) * objIndex);
+
+		memcpy(pMVP, &mvp, sizeof(SModelViewProjection));
 	}
 
 public:
@@ -145,8 +174,6 @@ public:
 	{
 		for (int i = 0; i < 1; ++i)
 			m_pCBVBuffers[i] = nullptr;
-
-		Attributes.AddAttribute({ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 	}
 
 	~SDX12LightResources()
@@ -162,7 +189,7 @@ public:
 		}
 	}
 
-	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy) override;
+	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
 
 	ID3D12Resource** GetCBVBuffers(int& count) override
 	{
@@ -180,9 +207,25 @@ public:
 		return m_MappedConstantBuffers[index];
 	}
 
-	bool HasType(unsigned int index) override
+	void UpdateConstantBuffer(SBatchProxy* batchProxy, unsigned int objIndex, SMatrix view, SMatrix projection) override
 	{
-		return index < 1;
+		// Invert Projection
+		float a = projection.m[0].x;
+		float b = projection.m[1].y;
+		float c = projection.m[2].z;
+		float d = projection.m[3].z;
+		float e = projection.m[2].w;
+
+		SMatrix invProj;
+		invProj.m[0].x = 1.0f / a;
+		invProj.m[1].y = 1.0f / b;
+		invProj.m[2].w = 1.0f / d;
+		invProj.m[2].z = 0;
+		invProj.m[3].z = 1.0f / e;
+		invProj.m[3].w = -c / (d * e);
+
+		SMatrix* pInvProj = reinterpret_cast<SMatrix*>(GetMappedConstantBuffer(0));
+		memcpy(pInvProj, &invProj, sizeof(SMatrix));
 	}
 
 public:

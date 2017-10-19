@@ -68,33 +68,39 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	m_hFenceEvent = CreateEventEx(nullptr, FALSE, FALSE, EVENT_ALL_ACCESS);
 
 	CreateSwapChain(pPlatformSystem, m_pDevice->GetDeviceNumerator(), m_pDevice->GetDeviceDenominator());
+	
+	// Create Shader buffer
+	D3D12_DESCRIPTOR_HEAP_DESC cbheapDesc = {};
+	cbheapDesc.NumDescriptors = c_NumDescriptorsPerHeap;
+	cbheapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	cbheapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	hResult = m_pDevice->GetDevice()->CreateDescriptorHeap(&cbheapDesc, IID_PPV_ARGS(&m_pShaderBufferHeap));
+	SWindows::OutputErrorMessage(hResult);
+	m_pShaderBufferHeap->SetName(L"Shader Buffer Descriptor Heap");
+	m_uiShaderBufferDescriptorSize = m_pDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	CreateGBuffers();
 
-	SDX12RootSignature* skinnedRootSignature = new SDX12RootSignature(m_pDevice, new SDX12BoneRootParameter());
-	m_RootSignatures.insert(std::pair<EMaterialType, SDX12RootSignature*>(skinnedRootSignature->GetType(), skinnedRootSignature));
+	std::pair<std::map<EMaterialType, SDX12Pipeline*>::iterator, bool> pipeIt;
 
-	DXGI_FORMAT rtvFormats[2] = { DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R8G8B8A8_UNORM };
+	// Create PSO for GBuffers
+	DXGI_FORMAT rtvFormats[static_cast<unsigned int>(EGBuffer::GB_NUM)] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT };
 
-	SDX12Pipeline* pipeline = new SDX12Pipeline(m_pDevice, skinnedRootSignature);
-	pipeline->Init(L"SkinnedShader", L"SkinnedShader", "vert", "frag", new SDX12SkinnedResources(), 2, rtvFormats);
-	m_pipelines.insert(std::pair<EMaterialType, SDX12Pipeline*>(EMaterialType::SKINNING, pipeline));
+	m_RootSignatures.push_back(new SDX12RootSignature(m_pDevice, new SDX12BoneRootParameter()));
+	m_pipelines.push_back(new SDX12Pipeline(m_pDevice, m_RootSignatures.back(), EMaterialType::SKINNING));
+	m_pipelines.back()->Init(L"SkinnedShader", L"SkinnedShader", "vert", "frag", new SDX12SkinnedResources(), 3, rtvFormats);
 
-	SDX12RootSignature* textureRootSignature = new SDX12RootSignature(m_pDevice, new SDX12TextureRootParameter());
-	m_RootSignatures.insert(std::pair<EMaterialType, SDX12RootSignature*>(textureRootSignature->GetType(), textureRootSignature));
+	m_RootSignatures.push_back(new SDX12RootSignature(m_pDevice, new SDX12TextureRootParameter()));
+	m_pipelines.push_back(new SDX12Pipeline(m_pDevice, m_RootSignatures.back(), EMaterialType::TEXTURE));
+	m_pipelines.back()->Init(L"TextureVertexShader", L"TexturePixelShader", "main", "main", new SDX12TextureResources(), 3, rtvFormats);
 
-	SDX12Pipeline* texturePipeline = new SDX12Pipeline(m_pDevice, textureRootSignature);
-	texturePipeline->Init(L"TextureVertexShader", L"TexturePixelShader", "main", "main", new SDX12TextureResources(), 2, rtvFormats);
-	m_pipelines.insert(std::pair<EMaterialType, SDX12Pipeline*>(EMaterialType::TEXTURE, texturePipeline));
+	// Create PSO for Light
+	DXGI_FORMAT lightFormats[1] = { DXGI_FORMAT_R8G8B8A8_UNORM };
+	m_RootSignatures.push_back(new SDX12RootSignature(m_pDevice, new SDX12TextureRootParameter()));
 
-
-	DXGI_FORMAT lightFormats[1] = { DXGI_FORMAT_R16G16B16A16_FLOAT };
-	SDX12RootSignature* lightRootSignature = new SDX12RootSignature(m_pDevice, new SDX12LightRootParameter());
-	m_RootSignatures.insert(std::pair<EMaterialType, SDX12RootSignature*>(lightRootSignature->GetType(), lightRootSignature));
-
-	SDX12Pipeline* lightPipeline = new SDX12Pipeline(m_pDevice, lightRootSignature);
+	SDX12Pipeline* lightPipeline = new SDX12Pipeline(m_pDevice, m_RootSignatures.back(), EMaterialType::LIGHT);
 	lightPipeline->Init(L"DeferredLighting", L"DeferredLighting", "vert", "frag", new SDX12LightResources(), 1, lightFormats);
-	m_pipelines.insert(std::pair<EMaterialType, SDX12Pipeline*>(EMaterialType::LIGHT, lightPipeline));
+	m_pipelines.push_back(lightPipeline);
 
 	// Create Command List
 	hResult = m_pDevice->GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, GetCommandAllocator(), nullptr, IID_PPV_ARGS(&m_pCommandList));
@@ -140,9 +146,9 @@ void SDirectX12::Finalize()
 {
 	WaitForIdle();
 
-	for each (auto pipeline in m_pipelines)
+	for (auto& pipeline : m_pipelines)
 	{
-		delete pipeline.second;
+		delete pipeline;
 	}
 	m_pipelines.clear();
 
@@ -154,20 +160,6 @@ void SDirectX12::Finalize()
 
 	if (m_pShaderBufferHeap)
 		m_pShaderBufferHeap->Release();
-
-	//if (m_pCBVBuffer[0])
-	//{
-	//	m_pCBVBuffer[0]->Unmap(0, nullptr);
-	//	m_pCBVBuffer[0]->Release();
-	//	MappedConstantBuffer[0] = nullptr;
-	//}
-
-	//if (m_pCBVBuffer[1])
-	//{
-	//	m_pCBVBuffer[1]->Unmap(0, nullptr);
-	//	m_pCBVBuffer[1]->Release();
-	//	MappedConstantBuffer[1] = nullptr;
-	//}
 
 	if (m_pSwapChain)
 		m_pSwapChain->SetFullscreenState(false, nullptr);
@@ -195,8 +187,8 @@ void SDirectX12::Finalize()
 	if (m_pGBufferRTVHeap)
 		m_pGBufferRTVHeap->Release();
 
-	if (m_pGBufferSRVHeap)
-		m_pGBufferSRVHeap->Release();
+	if (m_pGBufferCbvSrvHeap)
+		m_pGBufferCbvSrvHeap->Release();
 
 	if (m_pRenderTargetViewHeap)
 		m_pRenderTargetViewHeap->Release();
@@ -286,7 +278,7 @@ bool SDirectX12::CreateSwapChain(const SPlatformSystem* pPlatformSystem, const i
 void SDirectX12::CreateViewProjection()
 {
 	float aspectRatio = static_cast<float>(m_ScreenWidth) / static_cast<float>(m_ScreenHeight);
-	float fovAngleY = static_cast<float>(70.0f * M_PI) / 180.0f;
+	float fovAngleY = static_cast<float>(70.0f * S_PI) / 180.0f;
 
 	if (aspectRatio < 1.0f)
 	{
@@ -329,7 +321,7 @@ void SDirectX12::UpdateBoneTransform(const std::map<EMaterialType, std::vector<S
 
 void SDirectX12::Reset()
 {
-	for each (auto proxy in m_SceneProxy.BatchProxies)
+	for (auto& proxy : m_SceneProxy.BatchProxies)
 	{
 		proxy.second.ObjectProxies.clear();
 	} 
@@ -383,121 +375,125 @@ void SDirectX12::Draw()
 	D3D12_HEAP_PROPERTIES uploadHeapProperties = defaultHeapProperties;
 	uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
 
-	for (auto it = m_SceneProxy.BatchProxies.begin(); it != m_SceneProxy.BatchProxies.end(); ++it)
-	{
-		std::vector<SSkinnedModelVertex> vertices;
-		std::vector<unsigned int> indices;
-		for (unsigned int i = 0; i < it->second.ObjectProxies.size(); ++i)
+	for (auto& pipeline : m_pipelines)
+	{	
+		auto it = m_SceneProxy.BatchProxies.find(pipeline->GetMaterialType());
+		if (it != m_SceneProxy.BatchProxies.end())
 		{
-			vertices.insert(std::end(vertices), std::begin(it->second.ObjectProxies[i].Vertices), std::end(it->second.ObjectProxies[i].Vertices));
-			indices.insert(std::end(indices), std::begin(it->second.ObjectProxies[i].Indices), std::end(it->second.ObjectProxies[i].Indices));
+			SBatchProxy* pBatchProxy = &it->second;
+
+			std::vector<SSkinnedModelVertex> vertices;
+			std::vector<unsigned int> indices;
+			for (unsigned int i = 0; i < pBatchProxy->ObjectProxies.size(); ++i)
+			{
+				vertices.insert(std::end(vertices), std::begin(pBatchProxy->ObjectProxies[i].Vertices), std::end(pBatchProxy->ObjectProxies[i].Vertices));
+				indices.insert(std::end(indices), std::begin(pBatchProxy->ObjectProxies[i].Indices), std::end(pBatchProxy->ObjectProxies[i].Indices));
+			}
+
+			// Vertex Buffer
+			ID3D12Resource* vertexBufferUpload = nullptr;
+
+			D3D12_RESOURCE_DESC vertexBufferDesc;
+			vertexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+			vertexBufferDesc.Alignment = 0;
+			vertexBufferDesc.Width = pBatchProxy->VertexSize;
+			vertexBufferDesc.Height = 1;
+			vertexBufferDesc.DepthOrArraySize = 1;
+			vertexBufferDesc.MipLevels = 1;
+			vertexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+			vertexBufferDesc.SampleDesc.Count = 1;
+			vertexBufferDesc.SampleDesc.Quality = 0;
+			vertexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+			vertexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+			hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_pVertexBuffer));
+			SWindows::OutputErrorMessage(hResult);
+			m_pVertexBuffer->SetName(L"VertexBuffer");
+
+			hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexBufferUpload));
+			SWindows::OutputErrorMessage(hResult);
+
+			vertexBufferUpload->SetName(L"VertexBufferUpload");
+
+			D3D12_SUBRESOURCE_DATA vertexData = {};
+			vertexData.pData = vertices.data();
+			vertexData.RowPitch = vertices.size() * sizeof(SSkinnedModelVertex);
+			vertexData.SlicePitch = vertexData.RowPitch;
+
+			UpdateSubresource(m_pCommandList, m_pVertexBuffer, vertexBufferUpload, 0, 0, 1, &vertexData);
+
+			D3D12_RESOURCE_BARRIER vertexBufferResourceBarrier;
+			vertexBufferResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			vertexBufferResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			vertexBufferResourceBarrier.Transition.pResource = m_pVertexBuffer;
+			vertexBufferResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+			vertexBufferResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+			vertexBufferResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+			m_pCommandList->ResourceBarrier(1, &vertexBufferResourceBarrier);
+
+
+			// Index Buffer
+			ID3D12Resource* indexbufferUpload = nullptr;
+			D3D12_RESOURCE_DESC indexBufferDesc;
+			indexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+			indexBufferDesc.Alignment = 0;
+			indexBufferDesc.Width = pBatchProxy->IndexSize;
+			indexBufferDesc.Height = 1;
+			indexBufferDesc.DepthOrArraySize = 1;
+			indexBufferDesc.MipLevels = 1;
+			indexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+			indexBufferDesc.SampleDesc.Count = 1;
+			indexBufferDesc.SampleDesc.Quality = 0;
+			indexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+			indexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+			hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_pIndexBuffer));
+			SWindows::OutputErrorMessage(hResult);
+			m_pIndexBuffer->SetName(L"IndexBuffer");
+
+			hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&indexbufferUpload));
+			SWindows::OutputErrorMessage(hResult);
+
+			indexbufferUpload->SetName(L"IndexBufferUpload");
+
+			D3D12_SUBRESOURCE_DATA indexData = {};
+			indexData.pData = indices.data();
+			indexData.RowPitch = indices.size() * sizeof(unsigned int);
+			indexData.SlicePitch = indexData.RowPitch;
+
+			UpdateSubresource(m_pCommandList, m_pIndexBuffer, indexbufferUpload, 0, 0, 1, &indexData);
+
+
+			D3D12_RESOURCE_BARRIER indexBufferResourceBarrier;
+			indexBufferResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			indexBufferResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			indexBufferResourceBarrier.Transition.pResource = m_pIndexBuffer;
+			indexBufferResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+			indexBufferResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_INDEX_BUFFER;
+			indexBufferResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+			m_pCommandList->ResourceBarrier(1, &indexBufferResourceBarrier);
+
+			pipeline->SetVertexBufferView(m_pVertexBuffer->GetGPUVirtualAddress(), pBatchProxy->VertexSize, sizeof(SSkinnedModelVertex));
+			pipeline->SetIndexBufferView(m_pIndexBuffer->GetGPUVirtualAddress(), pBatchProxy->IndexSize, DXGI_FORMAT_R32_UINT);
 		}
-
-		// Vertex Buffer
-		ID3D12Resource* vertexBufferUpload = nullptr;
-
-		D3D12_RESOURCE_DESC vertexBufferDesc;
-		vertexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		vertexBufferDesc.Alignment = 0;
-		vertexBufferDesc.Width = it->second.VertexSize;
-		vertexBufferDesc.Height = 1;
-		vertexBufferDesc.DepthOrArraySize = 1;
-		vertexBufferDesc.MipLevels = 1;
-		vertexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-		vertexBufferDesc.SampleDesc.Count = 1;
-		vertexBufferDesc.SampleDesc.Quality = 0;
-		vertexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		vertexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-		hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_pVertexBuffer));
-		SWindows::OutputErrorMessage(hResult);
-		m_pVertexBuffer->SetName(L"VertexBuffer");
-
-		hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertexBufferUpload));
-		SWindows::OutputErrorMessage(hResult);
-
-		vertexBufferUpload->SetName(L"VertexBufferUpload");
-
-		D3D12_SUBRESOURCE_DATA vertexData = {};
-		vertexData.pData = vertices.data();
-		vertexData.RowPitch = vertices.size() * sizeof(SSkinnedModelVertex);
-		vertexData.SlicePitch = vertexData.RowPitch;
-
-		UpdateSubresource(m_pCommandList, m_pVertexBuffer, vertexBufferUpload, 0, 0, 1, &vertexData);
-
-		D3D12_RESOURCE_BARRIER vertexBufferResourceBarrier;
-		vertexBufferResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		vertexBufferResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		vertexBufferResourceBarrier.Transition.pResource = m_pVertexBuffer;
-		vertexBufferResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		vertexBufferResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-		vertexBufferResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-		m_pCommandList->ResourceBarrier(1, &vertexBufferResourceBarrier);
-
-
-		// Index Buffer
-		ID3D12Resource* indexbufferUpload = nullptr;
-		D3D12_RESOURCE_DESC indexBufferDesc;
-		indexBufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		indexBufferDesc.Alignment = 0;
-		indexBufferDesc.Width = it->second.IndexSize;
-		indexBufferDesc.Height = 1;
-		indexBufferDesc.DepthOrArraySize = 1;
-		indexBufferDesc.MipLevels = 1;
-		indexBufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-		indexBufferDesc.SampleDesc.Count = 1;
-		indexBufferDesc.SampleDesc.Quality = 0;
-		indexBufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		indexBufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-		hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&m_pIndexBuffer));
-		SWindows::OutputErrorMessage(hResult);
-		m_pIndexBuffer->SetName(L"IndexBuffer");
-
-		hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&indexbufferUpload));
-		SWindows::OutputErrorMessage(hResult);
-
-		indexbufferUpload->SetName(L"IndexBufferUpload");
-
-		D3D12_SUBRESOURCE_DATA indexData = {};
-		indexData.pData = indices.data();
-		indexData.RowPitch = indices.size() * sizeof(unsigned int);
-		indexData.SlicePitch = indexData.RowPitch;
-
-		UpdateSubresource(m_pCommandList, m_pIndexBuffer, indexbufferUpload, 0, 0, 1, &indexData);
-
-
-		D3D12_RESOURCE_BARRIER indexBufferResourceBarrier;
-		indexBufferResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		indexBufferResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		indexBufferResourceBarrier.Transition.pResource = m_pIndexBuffer;
-		indexBufferResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		indexBufferResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_INDEX_BUFFER;
-		indexBufferResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-		m_pCommandList->ResourceBarrier(1, &indexBufferResourceBarrier);
-
-		m_pipelines[it->first]->SetVertexBufferView(m_pVertexBuffer->GetGPUVirtualAddress(), it->second.VertexSize, sizeof(SSkinnedModelVertex));
-		m_pipelines[it->first]->SetIndexBufferView(m_pIndexBuffer->GetGPUVirtualAddress(), it->second.IndexSize, DXGI_FORMAT_R32_UINT);
 	}
 
-	// Create Shader buffer
-	D3D12_DESCRIPTOR_HEAP_DESC cbheapDesc = {};
-	cbheapDesc.NumDescriptors = c_NumDescriptorsPerHeap;
-	cbheapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	cbheapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	hResult = m_pDevice->GetDevice()->CreateDescriptorHeap(&cbheapDesc, IID_PPV_ARGS(&m_pShaderBufferHeap));
-	SWindows::OutputErrorMessage(hResult);
-	m_pShaderBufferHeap->SetName(L"Shader Buffer Descriptor Heap");
-	m_uiShaderBufferDescriptorSize = m_pDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
 	unsigned int descriptorOffset = 0;
-	for (auto it = m_SceneProxy.BatchProxies.begin(); it != m_SceneProxy.BatchProxies.end(); ++it)
+	for (auto it = m_pipelines.begin(); it != m_pipelines.end(); ++it)
 	{
-		m_pipelines[it->first]->CreateConstantBuffer(m_pShaderBufferHeap, descriptorOffset, m_uiShaderBufferDescriptorSize, it->second);
-		descriptorOffset += m_pipelines[it->first]->GetCBVDescriptorOffset();
-		descriptorOffset += CreateShaderResources(m_pipelines[it->first], it->second, descriptorOffset);
+		auto batchProxyIter = m_SceneProxy.BatchProxies.find((*it)->GetMaterialType());
+		if (batchProxyIter != m_SceneProxy.BatchProxies.end())
+		{
+			(*it)->CreateConstantBuffer(m_pShaderBufferHeap, descriptorOffset, m_uiShaderBufferDescriptorSize, &batchProxyIter->second);
+			descriptorOffset += (*it)->GetCBVDescriptorOffset();
+			descriptorOffset += CreateShaderResources(*it, batchProxyIter->second, descriptorOffset);
+		}
+		else
+		{
+			(*it)->CreateConstantBuffer(m_pGBufferCbvSrvHeap, m_RenderTargetViewDescriptorSize * 3, m_uiShaderBufferDescriptorSize, nullptr);
+		}
 	}
 
 	// Execute Command
@@ -518,30 +514,28 @@ bool SDirectX12::Render()
 	D3D12_RECT ScissorRect = { 0L, 0L, static_cast<long>(m_Viewport.Width), static_cast<long>(m_Viewport.Height) };
 	m_pCommandList->RSSetScissorRects(1, &ScissorRect);
 
-	D3D12_RESOURCE_BARRIER swapResourceBarrier;
-	swapResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	swapResourceBarrier.Transition.pResource = GetRenderTarget();
-	swapResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	swapResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	swapResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	swapResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	m_pCommandList->ResourceBarrier(1, &swapResourceBarrier);
-
-	D3D12_RESOURCE_BARRIER gBufferResourceBarriers[2] = {};
+	D3D12_RESOURCE_BARRIER gBufferResourceBarriers[static_cast<unsigned int>(EGBuffer::GB_NUM)] = {};
 	gBufferResourceBarriers[0].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	gBufferResourceBarriers[0].Transition.pResource = m_pGBuffers[static_cast<int>(EGBuffer::GB_POSITION)];
+	gBufferResourceBarriers[0].Transition.pResource = m_pGBuffers[static_cast<int>(EGBuffer::GB_COLOR)];
 	gBufferResourceBarriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
 	gBufferResourceBarriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	gBufferResourceBarriers[0].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	gBufferResourceBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 
 	gBufferResourceBarriers[1].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	gBufferResourceBarriers[1].Transition.pResource = m_pGBuffers[static_cast<int>(EGBuffer::GB_NORMAL)];
+	gBufferResourceBarriers[1].Transition.pResource = m_pGBuffers[static_cast<int>(EGBuffer::GB_DEPTH)];
 	gBufferResourceBarriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
 	gBufferResourceBarriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	gBufferResourceBarriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	gBufferResourceBarriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	//m_pCommandList->ResourceBarrier(static_cast<UINT>(EGBuffer::GB_NUM), gBufferResourceBarriers);
+
+	gBufferResourceBarriers[2].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	gBufferResourceBarriers[2].Transition.pResource = m_pGBuffers[static_cast<int>(EGBuffer::GB_NORMAL)];
+	gBufferResourceBarriers[2].Transition.StateBefore = D3D12_RESOURCE_STATE_GENERIC_READ;
+	gBufferResourceBarriers[2].Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	gBufferResourceBarriers[2].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	gBufferResourceBarriers[2].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	m_pCommandList->ResourceBarrier(static_cast<UINT>(EGBuffer::GB_NUM), gBufferResourceBarriers);
 
 	const float color[4] = { 0.1f, 0.5f, 0.7f, 1.0f };
 	D3D12_CPU_DESCRIPTOR_HANDLE renderTargetViewHandle;
@@ -553,71 +547,101 @@ bool SDirectX12::Render()
 		handle.ptr = renderTargetViewHandle.ptr + m_RenderTargetViewDescriptorSize * i;
 		m_pCommandList->ClearRenderTargetView(handle, color, 0, nullptr);
 	}
-	m_pCommandList->OMSetRenderTargets(2, &renderTargetViewHandle, true, nullptr);
+	m_pCommandList->OMSetRenderTargets(static_cast<UINT>(EGBuffer::GB_NUM), &renderTargetViewHandle, true, nullptr);
 	
 	m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
 	ID3D12DescriptorHeap* ppHeaps[] = { m_pShaderBufferHeap };
 	m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
-	for (int i = static_cast<int>(EMaterialType::SKINNING); i < static_cast<int>(EMaterialType::LIGHT); ++i)
+	for (auto& pipeline : m_pipelines)
 	{
-		auto pipeline = m_pipelines[static_cast<EMaterialType>(i)];
-		auto batchProxy = m_SceneProxy.BatchProxies[static_cast<EMaterialType>(i)];
-		auto signature = pipeline->GetRootSignature();
-
-		m_pCommandList->IASetVertexBuffers(0, 1, &pipeline->GetVertexBufferView());
-		m_pCommandList->IASetIndexBuffer(&pipeline->GetIndexBufferView());
-		m_pCommandList->SetGraphicsRootSignature(pipeline->GetRootSignature()->Get());
-		m_pCommandList->SetPipelineState(pipeline->GetPipelineState());
+		if (pipeline && pipeline->GetMaterialType() < EMaterialType::LIGHT)
 		{
-			//auto mvpGPUAddress = m_pCBVBuffer[0]->GetGPUVirtualAddress();
-			//auto boneGPUAddress = m_pCBVBuffer[1]->GetGPUVirtualAddress();
-			D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = m_pShaderBufferHeap->GetGPUDescriptorHandleForHeapStart();
-			for (unsigned int i = 0; i < batchProxy.ObjectProxies.size(); ++i)
+			SBatchProxy* batchProxy = &m_SceneProxy.BatchProxies[pipeline->GetMaterialType()];
+			auto signature = pipeline->GetRootSignature();
+
+			m_pCommandList->IASetVertexBuffers(0, 1, &pipeline->GetVertexBufferView());
+			m_pCommandList->IASetIndexBuffer(&pipeline->GetIndexBufferView());
+			m_pCommandList->SetGraphicsRootSignature(pipeline->GetRootSignature()->Get());
+			m_pCommandList->SetPipelineState(pipeline->GetPipelineState());
 			{
-				gpuHandle.ptr += pipeline->GetCBVDescriptorOffset();
-				pipeline->Populate(m_pCommandList, i);
-				//m_pCommandList->SetGraphicsRootConstantBufferView(0, mvpGPUAddress);
-				//m_pCommandList->SetGraphicsRootConstantBufferView(1, boneGPUAddress);
-				//mvpGPUAddress += sizeof(SModelViewProjection);
-				//boneGPUAddress += sizeof(SBoneTransform);
-				UpdateConstantBuffer(pipeline, batchProxy, i);
-				for (unsigned int j = 0; j < batchProxy.ObjectProxies[i].MeshProxy.size(); ++j)
+				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = m_pShaderBufferHeap->GetGPUDescriptorHandleForHeapStart();
+				for (unsigned int i = 0; i < batchProxy->ObjectProxies.size(); ++i)
 				{
-					m_pCommandList->SetGraphicsRootDescriptorTable(signature->GetTableLocation(), gpuHandle);
-					m_pCommandList->DrawIndexedInstanced(batchProxy.ObjectProxies[i].MeshProxy[j].NumIndices, 1, batchProxy.ObjectProxies[i].StartIndexLocation + batchProxy.ObjectProxies[i].MeshProxy[j].BaseIndex, batchProxy.ObjectProxies[i].BaseVertexLocation + batchProxy.ObjectProxies[i].MeshProxy[j].BaseVertex, 0);
-					gpuHandle.ptr += m_uiShaderBufferDescriptorSize;
+					gpuHandle.ptr += pipeline->GetCBVDescriptorOffset();
+					pipeline->Populate(m_pCommandList, i);
+					UpdateConstantBuffer(pipeline, batchProxy, i);
+					for (unsigned int j = 0; j < batchProxy->ObjectProxies[i].MeshProxy.size(); ++j)
+					{
+						m_pCommandList->SetGraphicsRootDescriptorTable(signature->GetTableLocation(), gpuHandle);
+						m_pCommandList->DrawIndexedInstanced(batchProxy->ObjectProxies[i].MeshProxy[j].NumIndices, 1, batchProxy->ObjectProxies[i].StartIndexLocation + batchProxy->ObjectProxies[i].MeshProxy[j].BaseIndex, batchProxy->ObjectProxies[i].BaseVertexLocation + batchProxy->ObjectProxies[i].MeshProxy[j].BaseVertex, 0);
+						gpuHandle.ptr += m_uiShaderBufferDescriptorSize;
+					}
 				}
 			}
 		}
 	}
 
+	D3D12_RESOURCE_BARRIER gbuffersResourceBarriers[static_cast<unsigned int>(EGBuffer::GB_NUM)] = {};
+	gbuffersResourceBarriers[0].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	gbuffersResourceBarriers[0].Transition.pResource = m_pGBuffers[static_cast<int>(EGBuffer::GB_COLOR)];
+	gbuffersResourceBarriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	gbuffersResourceBarriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+	gbuffersResourceBarriers[0].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	gbuffersResourceBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+
+	gbuffersResourceBarriers[1].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	gbuffersResourceBarriers[1].Transition.pResource = m_pGBuffers[static_cast<int>(EGBuffer::GB_DEPTH)];
+	gbuffersResourceBarriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	gbuffersResourceBarriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+	gbuffersResourceBarriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	gbuffersResourceBarriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+
+	gbuffersResourceBarriers[2].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	gbuffersResourceBarriers[2].Transition.pResource = m_pGBuffers[static_cast<int>(EGBuffer::GB_NORMAL)];
+	gbuffersResourceBarriers[2].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	gbuffersResourceBarriers[2].Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+	gbuffersResourceBarriers[2].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	gbuffersResourceBarriers[2].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	m_pCommandList->ResourceBarrier(static_cast<UINT>(EGBuffer::GB_NUM), gbuffersResourceBarriers);
+
+	D3D12_RESOURCE_BARRIER swapResourceBarrier;
+	swapResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	swapResourceBarrier.Transition.pResource = GetRenderTarget();
+	swapResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	swapResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	swapResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	swapResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	m_pCommandList->ResourceBarrier(1, &swapResourceBarrier);
+
+	float backColor[4] = { 0, 1.0f, 1.0f, 1.0f };
+
 	renderTargetViewHandle.ptr = m_pRenderTargetViewHeap->GetCPUDescriptorHandleForHeapStart().ptr + m_BufferIndex * m_RenderTargetViewDescriptorSize;
-	m_pCommandList->ClearRenderTargetView(renderTargetViewHandle, color, 0, nullptr);
+	m_pCommandList->ClearRenderTargetView(renderTargetViewHandle, backColor, 0, nullptr);
 	m_pCommandList->OMSetRenderTargets(1, &renderTargetViewHandle, false, nullptr);
 
-	D3D12_RESOURCE_BARRIER presentResourceBarriers[2] = {};
-	presentResourceBarriers[0].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	presentResourceBarriers[0].Transition.pResource = m_pGBuffers[static_cast<int>(EGBuffer::GB_POSITION)];
-	presentResourceBarriers[0].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	presentResourceBarriers[0].Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	presentResourceBarriers[0].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	presentResourceBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	ID3D12DescriptorHeap* ppLightHeaps[] = { m_pGBufferCbvSrvHeap };
+	m_pCommandList->SetDescriptorHeaps(sizeof(ppLightHeaps) / sizeof(ppLightHeaps[0]), ppLightHeaps);
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuGBuffersHandle = m_pGBufferCbvSrvHeap->GetGPUDescriptorHandleForHeapStart();
 
-	presentResourceBarriers[1].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	presentResourceBarriers[1].Transition.pResource = m_pGBuffers[static_cast<int>(EGBuffer::GB_NORMAL)];
-	presentResourceBarriers[1].Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	presentResourceBarriers[1].Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-	presentResourceBarriers[1].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	presentResourceBarriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	m_pCommandList->ResourceBarrier(static_cast<UINT>(EGBuffer::GB_NUM), presentResourceBarriers);
+	m_pCommandList->RSSetViewports(1, &m_Viewport);
+	m_pCommandList->RSSetScissorRects(1, &ScissorRect);
 
-	for (int i = static_cast<int>(EMaterialType::LIGHT); i < static_cast<int>(EMaterialType::MT_MAX); ++i)
+	m_pCommandList->IASetVertexBuffers(0, 0, nullptr);
+	m_pCommandList->IASetIndexBuffer(nullptr);
+	m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	for (auto& pipeline : m_pipelines)
 	{
-		auto pipeline = m_pipelines[static_cast<EMaterialType>(i)];
-
-		m_pCommandList->SetGraphicsRootSignature(pipeline->GetRootSignature()->Get());
-		m_pCommandList->SetPipelineState(pipeline->GetPipelineState());
+		if (pipeline && pipeline->GetMaterialType() >= EMaterialType::LIGHT)
+		{
+			gpuGBuffersHandle.ptr += pipeline->GetCBVDescriptorOffset();
+			m_pCommandList->SetGraphicsRootSignature(pipeline->GetRootSignature()->Get());
+			m_pCommandList->SetPipelineState(pipeline->GetPipelineState());
+			pipeline->Populate(m_pCommandList, 0);
+			UpdateConstantBuffer(pipeline, nullptr, 0);
+			m_pCommandList->SetGraphicsRootDescriptorTable(pipeline->GetRootSignature()->GetTableLocation(), gpuGBuffersHandle);
+			m_pCommandList->DrawInstanced(6, 1, 0, 0);
+		}
 	}
 
 	swapResourceBarrier.Transition.pResource = GetRenderTarget();
@@ -629,7 +653,6 @@ bool SDirectX12::Render()
 	ID3D12CommandList* ppCommandLists[] = { m_pCommandList };
 	m_pCommandQueue->ExecuteCommandLists(sizeof(ppCommandLists) / sizeof(ppCommandLists[0]), ppCommandLists);
 
-
 	return true;
 }
 
@@ -639,10 +662,12 @@ void SDirectX12::Present()
 
 	const auto currentFenceValue = m_nFenceValue[m_BufferIndex];
 	HRESULT hResult = m_pCommandQueue->Signal(m_pFence, currentFenceValue);
+	
 	SWindows::OutputErrorMessage(hResult);
 
 	m_BufferIndex = (m_BufferIndex + 1) % c_BufferingCount;
-	if (m_pFence->GetCompletedValue() < m_nFenceValue[m_BufferIndex])
+	UINT64 completedValue = m_pFence->GetCompletedValue();
+	if (completedValue < m_nFenceValue[m_BufferIndex])
 	{
 		WaitForGPU(m_nFenceValue[m_BufferIndex]);
 	}
@@ -757,29 +782,30 @@ void SDirectX12::CreateGBuffers()
 	gbufferDesc.Height = m_pDevice->m_ScreenHeight;
 	gbufferDesc.DepthOrArraySize = 1;
 	gbufferDesc.MipLevels = 1;
+	gbufferDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 	gbufferDesc.SampleDesc.Count = 1;
 	gbufferDesc.SampleDesc.Quality = 0;
 	gbufferDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	gbufferDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
+	D3D12_CLEAR_VALUE clearValue;
+	clearValue.Color[0] = 0.1f;
+	clearValue.Color[1] = 0.5f;
+	clearValue.Color[2] = 0.7f;
+	clearValue.Color[3] = 1.0f;
+	// todo format
 	for (int i = 0; i < static_cast<int>(EGBuffer::GB_NUM); ++i)
 	{
-		if (i == 0)
-		{
-			gbufferDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-		}
-		else
-		{
+		if(i == 0)
 			gbufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		}
-		m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &gbufferDesc, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&m_pGBuffers[i]));
+		else
+			gbufferDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		clearValue.Format = gbufferDesc.Format;
+		m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &gbufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, &clearValue, IID_PPV_ARGS(&m_pGBuffers[i]));
+		m_pGBuffers[i]->SetName(L"GBuffer");
 	}
 
-	D3D12_RENDER_TARGET_VIEW_DESC rtDesc = {};
-	rtDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-	rtDesc.Texture2D.MipSlice = 0;
-	rtDesc.Texture2D.PlaneSlice = 0;
-	
+
 	D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
 	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	heapDesc.NumDescriptors = static_cast<UINT>(EGBuffer::GB_NUM);
@@ -787,67 +813,51 @@ void SDirectX12::CreateGBuffers()
 
 	m_pGBufferRTVHeap = nullptr;
 	m_pDevice->GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_pGBufferRTVHeap));
-	
+
+	D3D12_RENDER_TARGET_VIEW_DESC rtDesc = {};
+	rtDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+	rtDesc.Texture2D.MipSlice = 0;
+	rtDesc.Texture2D.PlaneSlice = 0;
+	rtDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvCpuHandle = m_pGBufferRTVHeap->GetCPUDescriptorHandleForHeapStart();
 	for (int i = 0; i < static_cast<int>(EGBuffer::GB_NUM); ++i)
 	{
-		if(i==0)
-			rtDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-		else
+		if (i == 0)
 			rtDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		else
+			rtDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		m_pDevice->GetDevice()->CreateRenderTargetView(m_pGBuffers[i], &rtDesc, rtvCpuHandle);
 		rtvCpuHandle.ptr += m_RenderTargetViewDescriptorSize;
 	}
 	
-	m_pGBufferSRVHeap = nullptr;
+	m_pGBufferCbvSrvHeap = nullptr;
+	heapDesc.NumDescriptors = c_NumDescriptorsPerHeap;
 	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	m_pDevice->GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_pGBufferSRVHeap));
+	heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	m_pDevice->GetDevice()->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_pGBufferCbvSrvHeap));
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Texture2D.MipLevels = gbufferDesc.MipLevels;
+	srvDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = m_pGBufferSRVHeap->GetCPUDescriptorHandleForHeapStart();
+	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = m_pGBufferCbvSrvHeap->GetCPUDescriptorHandleForHeapStart();
 	for (int i = 0; i < static_cast<int>(EGBuffer::GB_NUM); ++i) {
 		if (i == 0)
-			srvDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-		else
 			srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		else
+			srvDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		m_pDevice->GetDevice()->CreateShaderResourceView(m_pGBuffers[i], &srvDesc, srvCpuHandle);
 		srvCpuHandle.ptr += m_uiShaderBufferDescriptorSize;
 	}
 }
 
-void SDirectX12::UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int objIndex)
+void SDirectX12::UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy* batchProxy, unsigned int objIndex)
 {
-	// ModelViewProjection
-	if (pipeline->HasType(0))
-	{
-		SModelViewProjection mvp;
-		memset(&mvp, 0, sizeof(SModelViewProjection));
-		mvp.View = View;
-		mvp.Projection = Projection;
-
-		mvp.Model = batchProxy.ObjectProxies[objIndex].Tranformation;
-		mvp.NormalMatrix = SMath::NormalMatrix(batchProxy.ObjectProxies[objIndex].Tranformation);
-		SModelViewProjection* pMVP = reinterpret_cast<SModelViewProjection*>(pipeline->GetMappedConstantBuffer(0) + sizeof(SModelViewProjection) * objIndex);
-
-		memcpy(pMVP, &mvp, sizeof(SModelViewProjection));
-	}
-
-	// Bone Transformation
-	if (pipeline->HasType(1))
-	{
-		SBoneTransform bones;
-		for (unsigned int j = 0; j < MAX_BONES; ++j)
-		{
-			bones.transform[j] = batchProxy.ObjectProxies[objIndex].BoneTransform[j];
-		}
-		SBoneTransform* pBone = reinterpret_cast<SBoneTransform*>(pipeline->GetMappedConstantBuffer(1) + sizeof(SBoneTransform) * objIndex);
-		memcpy(pBone, &bones, sizeof(SBoneTransform));
-	}
+	pipeline->UpdateConstantBuffer(batchProxy, objIndex, View, Projection);
 }
 
 void SDirectX12::BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex)

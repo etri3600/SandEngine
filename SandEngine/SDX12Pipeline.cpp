@@ -2,7 +2,8 @@
 #include "SWindows.h"
 #include "SDX12Helper.h"
 
-SDX12Pipeline::SDX12Pipeline(SDirectX12Device * pDevice, SDX12RootSignature* pRootSignature)
+SDX12Pipeline::SDX12Pipeline(SDirectX12Device * pDevice, SDX12RootSignature* pRootSignature, EMaterialType materialType)
+	:m_MaterialType(materialType)
 {
 	m_pDevice = pDevice;
 	m_pRootSignature = pRootSignature;
@@ -91,11 +92,6 @@ char * SDX12Pipeline::GetMappedConstantBuffer(unsigned int index)
 	return m_pResources->GetMappedConstantBuffer(index);
 }
 
-bool SDX12Pipeline::HasType(unsigned int index)
-{
-	return m_pResources->HasType(index);
-}
-
 void SDX12Pipeline::Populate(ID3D12GraphicsCommandList * commandList, unsigned int index)
 {
 	int count = 0;
@@ -106,7 +102,7 @@ void SDX12Pipeline::Populate(ID3D12GraphicsCommandList * commandList, unsigned i
 	}
 }
 
-void SDX12Pipeline::CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy batchProxy)
+void SDX12Pipeline::CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy)
 {
 	m_pResources->CreateConstantBuffer(m_pDevice, pDescriptorHeap, descriptorOffset, descriptorSize, batchProxy);
 }
@@ -123,4 +119,9 @@ void SDX12Pipeline::SetIndexBufferView(D3D12_GPU_VIRTUAL_ADDRESS bufferLocation,
 	m_IndexBufferView.BufferLocation = bufferLocation;
 	m_IndexBufferView.SizeInBytes = sizeInBytes;
 	m_IndexBufferView.Format = format;
+}
+
+void SDX12Pipeline::UpdateConstantBuffer(SBatchProxy* batchProxy, unsigned int objIndex, SMatrix view, SMatrix projection)
+{
+	m_pResources->UpdateConstantBuffer(batchProxy, objIndex, view, projection);
 }

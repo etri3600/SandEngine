@@ -224,18 +224,15 @@
     <FxCompile Include="Shaders\SkinnedShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\GBuffers.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="DeferredLighting.hlsl">
+    <FxCompile Include="Shaders\DeferredLighting.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Common.hlsli">
+    <None Include="Shaders\Common.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Skinned.hlsli">
+    <None Include="Shaders\Skinned.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

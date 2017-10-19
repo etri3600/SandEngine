@@ -8,10 +8,21 @@ struct PixelShaderInput
 	float2 uv : TEXCOORD0;
 };
 
+struct FragmentOutput
+{
+	float4 Color : SV_Target0;
+	float4 Depth : SV_Target1;
+	float4 Normal : SV_Target2;
+};
+
 Texture2D<half4> diff : register(t0);
 SamplerState samp : register(s0);
 
-float4 main(PixelShaderInput input) : SV_TARGET
+FragmentOutput main(PixelShaderInput input)
 {
-	return float4(0.3,0.7,0,1);
+	FragmentOutput output;
+	output.Color = diff.Sample(samp, input.uv);
+	output.Depth = float4(1, 1, 0, 1);
+	output.Normal = float4(1, 0, 1, 1);
+	return output;
 }

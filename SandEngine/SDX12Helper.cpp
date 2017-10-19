@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <iterator>
+#include "SWindows.h"
 
 unsigned __int64 UpdateSubresource(ID3D12GraphicsCommandList * pCmdList, ID3D12Resource * pDestinationResource, ID3D12Resource * pIntermediate, unsigned __int64 IntermediateOffset, unsigned int FirstSubresource, unsigned int NumSubresources, D3D12_SUBRESOURCE_DATA * pSrcData)
 {
@@ -93,25 +94,34 @@ void CompileShader(const wchar_t* fileName, const char* version, const char* ent
 	flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 	ID3DBlob* pShaderCode = nullptr;
+	ID3DBlob* pErrorCode = nullptr;
 	auto stringFile = shaderFolder + file + shaderExtension;
 	const wchar_t* shaderFileName = stringFile.c_str();
-	HRESULT hResult = D3DCompileFromFile(shaderFileName, defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, entrypointName, version, flags, 0, &pShaderCode, nullptr);
+	HRESULT hResult = D3DCompileFromFile(shaderFileName, defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, entrypointName, version, flags, 0, &pShaderCode, &pErrorCode);
 	if (FAILED(hResult))
 	{
-		pShaderCode->Release();
-
-		std::streampos end;
-
-		std::ifstream vertexFile(csoFolder + file + csoExtension, std::ios::in | std::ios::binary | std::ios::ate);
-		std::noskipws(vertexFile);
-		if (vertexFile.is_open())
+		if (pErrorCode)
 		{
-			end = vertexFile.tellg();
-			vertexFile.seekg(0, std::ios::beg);
-			shader.reserve(end);
-			char* c = new char[end];
-			shader.assign(std::istream_iterator<byte>(vertexFile), std::istream_iterator<byte>());
-			vertexFile.close();
+			std::string errorMsg(static_cast<const char*>(pErrorCode->GetBufferPointer()), pErrorCode->GetBufferSize());
+			OutputDebugStringA(errorMsg.c_str());
+		}
+		else if(pShaderCode)
+		{
+			pShaderCode->Release();
+
+			std::streampos end;
+
+			std::ifstream vertexFile(csoFolder + file + csoExtension, std::ios::in | std::ios::binary | std::ios::ate);
+			std::noskipws(vertexFile);
+			if (vertexFile.is_open())
+			{
+				end = vertexFile.tellg();
+				vertexFile.seekg(0, std::ios::beg);
+				shader.reserve(end);
+				char* c = new char[end];
+				shader.assign(std::istream_iterator<byte>(vertexFile), std::istream_iterator<byte>());
+				vertexFile.close();
+			}
 		}
 	}
 	else
@@ -121,7 +131,7 @@ void CompileShader(const wchar_t* fileName, const char* version, const char* ent
 
 #if defined(_DEBUG)
 	ID3D12ShaderReflection* pReflection = nullptr;
-	if (SUCCEEDED(D3DReflect(pShaderCode->GetBufferPointer(), pShaderCode->GetBufferSize(), IID_ID3D12ShaderReflection, (void**)&pReflection)))
+	if (pShaderCode && SUCCEEDED(D3DReflect(pShaderCode->GetBufferPointer(), pShaderCode->GetBufferSize(), IID_ID3D12ShaderReflection, (void**)&pReflection)))
 	{
 		D3D12_SIGNATURE_PARAMETER_DESC desc[4];
 		pReflection->GetInputParameterDesc(0, &desc[0]);

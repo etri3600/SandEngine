@@ -33,9 +33,10 @@ struct PixelShaderInput
 	float4 fragPos : SV_POSITION;
 	float3 PosW : POSITION0;
 	float4 color : COLOR0;
-	float3 NormalW : NORMAL0;
-	float3 TangentW : TANGENT0;
+	float4 NormalV : NORMAL0;
+	float4 TangentV : TANGENT0;
 	float2 uv : TEXCOORD0;
+	float4 PosV : TEXCOORD1;
 };
 
 PixelShaderInput vert(VertexShaderInput input)
@@ -51,10 +52,13 @@ PixelShaderInput vert(VertexShaderInput input)
 
 	output.fragPos = pos;
 	output.PosW = posW.xyz;
-	output.color = input.color;
-	output.NormalW = mul(ViewProjectionConstantBuffer.normalMatrix, mul(boneTransform, float4(input.normal, 1))).xyz;
-	output.TangentW = mul(ViewProjectionConstantBuffer.normalMatrix, mul(boneTransform, input.tangent)).xyz;
+	output.color = input.color;	
+	float4 normalW = mul(ViewProjectionConstantBuffer.normalMatrix, mul(boneTransform, float4(input.normal, 1)));
+	float4 tangentW = mul(ViewProjectionConstantBuffer.normalMatrix, mul(boneTransform, input.tangent));
+	output.NormalV = mul(ViewProjectionConstantBuffer.view, normalW);
+	output.TangentV = mul(ViewProjectionConstantBuffer.view, tangentW);
 	output.uv = input.uv;
+	output.PosV = mul(ViewProjectionConstantBuffer.view, posW);
 
 	return output;
 }
@@ -62,7 +66,18 @@ PixelShaderInput vert(VertexShaderInput input)
 Texture2D<half4> diff : register(t0);
 SamplerState samp : register(s0);
 
-float4 frag(PixelShaderInput input) : SV_TARGET
+struct FragmentOutput
 {
-	return diff.Sample(samp, input.uv);
+	float4 Color : SV_Target0;
+	float4 Depth : SV_Target1;
+	float4 Normal : SV_Target2;
+};
+
+FragmentOutput frag(PixelShaderInput input)
+{
+	FragmentOutput output;
+	output.Color = diff.Sample(samp, input.uv);
+	output.Depth = input.PosV;
+	output.Normal = input.NormalV;
+	return output;
 }
