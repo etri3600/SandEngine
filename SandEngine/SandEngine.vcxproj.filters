@@ -148,6 +148,9 @@
     <ClInclude Include="SMaterial.h">
       <Filter>Asset</Filter>
     </ClInclude>
+    <ClInclude Include="SLighting.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDirectX12.cpp">
@@ -227,12 +230,18 @@
     <FxCompile Include="Shaders\DeferredLighting.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="SsAo.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Common.hlsli">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\Skinned.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Lighting.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

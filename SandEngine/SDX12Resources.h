@@ -167,16 +167,16 @@ private:
 	char* m_MappedConstantBuffers[1];
 };
 
-class SDX12LightResources : public SDX12Resources
+class SDX12SsAoResources : public SDX12Resources
 {
 public:
-	SDX12LightResources()
+	SDX12SsAoResources()
 	{
 		for (int i = 0; i < 1; ++i)
 			m_pCBVBuffers[i] = nullptr;
 	}
 
-	~SDX12LightResources()
+	~SDX12SsAoResources()
 	{
 		for (int i = 0; i < 1; ++i)
 		{
@@ -224,8 +224,14 @@ public:
 		invProj.m[3].z = 1.0f / e;
 		invProj.m[3].w = -c / (d * e);
 
-		SMatrix* pInvProj = reinterpret_cast<SMatrix*>(GetMappedConstantBuffer(0));
-		memcpy(pInvProj, &invProj, sizeof(SMatrix));
+		SViewProjection viewProj;
+		viewProj.InvProjection = invProj;
+		viewProj.InvView = view.Inverse();
+		viewProj.View = view;
+		viewProj.Projection = projection;
+
+		SViewProjection* pViewProj = reinterpret_cast<SViewProjection*>(GetMappedConstantBuffer(0));
+		memcpy(pViewProj, &viewProj, sizeof(SViewProjection));
 	}
 
 public:

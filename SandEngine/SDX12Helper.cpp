@@ -87,7 +87,7 @@ void CompileShader(const wchar_t* fileName, const char* version, const char* ent
 
 	D3D_SHADER_MACRO defines[] =
 	{
-		{ nullptr, nullptr }
+		NULL, NULL
 	};
 	unsigned int flags = D3DCOMPILE_ENABLE_STRICTNESS;
 #if defined(_DEBUG)

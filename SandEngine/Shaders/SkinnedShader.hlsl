@@ -1,7 +1,7 @@
 #include "Common.hlsli"
 #include "Skinned.hlsli"
 
-struct ViewProjection
+struct ModelViewProjection
 {
 	column_major matrix model;
 	column_major matrix view;
@@ -14,7 +14,7 @@ struct BoneTransform
 	column_major matrix transform[MAX_BONES];
 };
 
-ConstantBuffer<ViewProjection> ViewProjectionConstantBuffer : register(b0);
+ConstantBuffer<ModelViewProjection> ModelViewProjectionConstantBuffer : register(b0);
 ConstantBuffer<BoneTransform> BoneTransformConstantBuffer : register(b1);
 
 struct VertexShaderInput
@@ -46,19 +46,19 @@ PixelShaderInput vert(VertexShaderInput input)
 	column_major matrix boneTransform = CalcBoneTransform(BoneTransformConstantBuffer.transform, input.bone, input.weight);
 
 	float4 posW = mul(boneTransform, float4(input.pos, 1.0f));
-	posW = mul(ViewProjectionConstantBuffer.model, posW);
-	float4 pos = mul(ViewProjectionConstantBuffer.view, posW);
-	pos = mul(ViewProjectionConstantBuffer.projection, pos);
+	posW = mul(ModelViewProjectionConstantBuffer.model, posW);
+	float4 pos = mul(ModelViewProjectionConstantBuffer.view, posW);
+	pos = mul(ModelViewProjectionConstantBuffer.projection, pos);
 
 	output.fragPos = pos;
 	output.PosW = posW.xyz;
 	output.color = input.color;	
-	float4 normalW = mul(ViewProjectionConstantBuffer.normalMatrix, mul(boneTransform, float4(input.normal, 1)));
-	float4 tangentW = mul(ViewProjectionConstantBuffer.normalMatrix, mul(boneTransform, input.tangent));
-	output.NormalV = mul(ViewProjectionConstantBuffer.view, normalW);
-	output.TangentV = mul(ViewProjectionConstantBuffer.view, tangentW);
+	float4 normalW = mul(ModelViewProjectionConstantBuffer.normalMatrix, mul(boneTransform, float4(input.normal, 1)));
+	float4 tangentW = mul(ModelViewProjectionConstantBuffer.normalMatrix, mul(boneTransform, input.tangent));
+	output.NormalV = mul(ModelViewProjectionConstantBuffer.view, normalW);
+	output.TangentV = mul(ModelViewProjectionConstantBuffer.view, tangentW);
 	output.uv = input.uv;
-	output.PosV = mul(ViewProjectionConstantBuffer.view, posW);
+	output.PosV = mul(ModelViewProjectionConstantBuffer.view, posW);
 
 	return output;
 }

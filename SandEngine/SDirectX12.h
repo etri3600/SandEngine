@@ -66,6 +66,7 @@ public:
 protected:
 	unsigned int CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int offset);
 	void CreateGBuffers();
+	void CreatePostProcessResources();
 
 	void UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy* batchProxy, unsigned int objIndex);
 	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);
@@ -120,6 +121,10 @@ private:
 	ID3D12DescriptorHeap* m_pGBufferRTVHeap;
 	ID3D12DescriptorHeap* m_pGBufferCbvSrvHeap;
 	ID3D12Resource* m_pGBuffers[EGBuffer::GB_NUM];
+
+	ID3D12DescriptorHeap* m_pPostProcessRTVHeap;
+	ID3D12DescriptorHeap* m_pPostProcessCbvSrvHeap;
+	ID3D12Resource* m_pPostProcessResource;
 
 	SSceneProxy m_SceneProxy;
 

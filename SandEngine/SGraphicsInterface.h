@@ -4,6 +4,7 @@
 #include "SUtils.h"
 #include "SModelLoader.h"
 #include "SConstantBuffer.h"
+#include "SLighting.h"
 
 enum class GraphicsInterfaceEnum
 {

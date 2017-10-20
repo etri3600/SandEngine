@@ -27,7 +27,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			node->Queue(model);
 			
 			auto&& model2 = ModelLoader->LoadModelFromFile(LR"(Jet_Animation.FBX)");
-			model2.Location = { -2.0f, 0.0f, 0.0f };
+			model2.Location = { 8.0f, 0.0f, 0.0f };
+			model2.Scale = { 0.2f, 0.2f, 0.2f };
 			model2.Material.Type = EMaterialType::TEXTURE;
 			node->CreateChild()->Queue(model2);
 			//node->Queue(model2);
