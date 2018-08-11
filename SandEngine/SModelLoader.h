@@ -12,6 +12,7 @@
 #include "SMath.h"
 #include "SModelStruct.h"
 #include "SAnimation.h"
+#include "SImageLoader.h"
 
 class SModel;
 class SAnimation;

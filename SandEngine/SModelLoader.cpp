@@ -4,7 +4,6 @@
 
 #include "SModelStruct.h"
 #include "SAnimation.h"
-#include "SImageLoader.h"
 #include "SBone.h"
 
 namespace {
