@@ -5,8 +5,8 @@ enum class EMaterialType
 	SKINNING,
 	TEXTURE,
 	SIMPLE,
-	POSTPROCESS,
 	LIGHT,
+	POSTPROCESS,
 	MT_MAX
 };
 

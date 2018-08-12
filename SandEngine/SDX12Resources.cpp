@@ -117,6 +117,10 @@ void SDX12TextureResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D
 	memset(m_MappedConstantBuffers[0], 0, sizeof(SModelViewProjection) * batchProxy->ObjectProxies.size());
 }
 
+void SDX12LightResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy)
+{
+}
+
 void SDX12SsAoResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy)
 {
 	D3D12_HEAP_PROPERTIES uploadHeapProperties;

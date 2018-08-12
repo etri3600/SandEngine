@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ostream>
+
 #include "SGraphicsInterface.h"
 #include "SDirectX12Device.h"
 
@@ -31,13 +33,15 @@ struct SSceneProxy
 	std::map<EMaterialType, SBatchProxy> BatchProxies;
 };
 
-enum class EGBuffer : unsigned int
+enum class EGBuffer : unsigned short
 {
 	GB_COLOR = 0,
 	GB_DEPTH,
 	GB_NORMAL,
 	GB_NUM
 };
+
+std::wostream& operator<<(std::wostream& stream, EGBuffer buffer);
 
 class SDX12ResourceAllocator;
 class SDX12DescriptorHeapAllocator;
@@ -69,7 +73,6 @@ protected:
 	void CreatePostProcessResources();
 
 	void UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy* batchProxy, unsigned int objIndex);
-	void BindShaderResource(unsigned int sceneIndex, unsigned int meshIndex);
 
 private:
 	void WaitForGPU(unsigned long long fenceValue);
@@ -120,7 +123,7 @@ private:
 
 	ID3D12DescriptorHeap* m_pGBufferRTVHeap;
 	ID3D12DescriptorHeap* m_pGBufferCbvSrvHeap;
-	ID3D12Resource* m_pGBuffers[EGBuffer::GB_NUM];
+	ID3D12Resource* m_pGBuffers[static_cast<unsigned short>(EGBuffer::GB_NUM)];
 
 	ID3D12DescriptorHeap* m_pPostProcessRTVHeap;
 	ID3D12DescriptorHeap* m_pPostProcessCbvSrvHeap;

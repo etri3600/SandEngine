@@ -230,7 +230,7 @@
     <FxCompile Include="Shaders\DeferredLighting.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="SsAo.hlsl">
+    <FxCompile Include="Shaders\SsAo.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

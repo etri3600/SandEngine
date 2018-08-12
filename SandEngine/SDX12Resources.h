@@ -167,6 +167,61 @@ private:
 	char* m_MappedConstantBuffers[1];
 };
 
+class SDX12LightResources : public SDX12Resources
+{
+public:
+	SDX12LightResources()
+	{
+		for (int i = 0; i < 3; ++i)
+			m_pCBVBuffers[i] = nullptr;
+	}
+
+	~SDX12LightResources()
+	{
+		for (int i = 0; i < 3; ++i)
+		{
+			if (m_pCBVBuffers[i])
+			{
+				m_pCBVBuffers[i]->Unmap(0, nullptr);
+				m_pCBVBuffers[i]->Release();
+				m_pCBVBuffers[i] = nullptr;
+			}
+		}
+	}
+
+	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
+
+	ID3D12Resource** GetCBVBuffers(int& count) override
+	{
+		count = sizeof(m_pCBVBuffers) / sizeof(m_pCBVBuffers[0]);
+		return m_pCBVBuffers;
+	}
+
+	unsigned int GetCBVOffset() override
+	{
+		return m_uiCBVDescriptorOffset;
+	}
+
+	char* GetMappedConstantBuffer(unsigned int index) override
+	{
+		return m_MappedConstantBuffers[index];
+	}
+
+	void UpdateConstantBuffer(SBatchProxy* batchProxy, unsigned int objIndex, SMatrix view, SMatrix projection) override
+	{
+		// Color
+		// Depth
+		// Normal
+	}
+
+public:
+	unsigned int m_uiCBVDescriptorOffset = 0;
+
+private:
+	ID3D12Resource * m_pCBVBuffers[3];
+	char* m_MappedConstantBuffers[3];
+};
+
 class SDX12SsAoResources : public SDX12Resources
 {
 public:

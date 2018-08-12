@@ -105,7 +105,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)\x64\Debug;$(SolutionDir)\SandEngine\Lib\assimp\Debug;$(SolutionDir)\SandEngine\Lib\IL;$(VULKAN_SDK)\Source\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)x64\Debug;$(SolutionDir)SandEngine\Lib\assimp\Debug;$(SolutionDir)SandEngine\Lib\IL;$(VULKAN_SDK)\Source\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SandEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
