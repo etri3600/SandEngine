@@ -68,11 +68,8 @@ public:
 	void Present() override;
 
 protected:
-	unsigned int CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int offset);
 	void CreateGBuffers();
 	void CreatePostProcessResources();
-
-	void UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy* batchProxy, unsigned int objIndex);
 
 private:
 	void WaitForGPU(unsigned long long fenceValue);

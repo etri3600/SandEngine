@@ -107,6 +107,95 @@ void SDX12Pipeline::CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, 
 	m_pResources->CreateConstantBuffer(m_pDevice, pDescriptorHeap, descriptorOffset, descriptorSize, batchProxy);
 }
 
+unsigned int SDX12Pipeline::CreateShaderResources(ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* heap, SBatchProxy* batchProxy, unsigned int offset)
+{
+	unsigned int nTextureCount = 0;
+	unsigned int cbvDescriptorOffset = offset;
+	const unsigned int svr_descriptor_size = m_pDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	for (unsigned int i = 0; i < batchProxy->ObjectProxies.size(); ++i)
+	{
+		for (unsigned int j = 0; j < batchProxy->ObjectProxies[i].Textures.size(); ++j)
+		{
+			auto& texture = batchProxy->ObjectProxies[i].Textures[j];
+
+			if (texture->MipTextures.size() == 0)
+				continue;
+
+			unsigned int TextureWidth = static_cast<unsigned int>(texture->GetWidth()), TextureHeight = static_cast<unsigned int>(texture->GetHeight());
+
+			// Create Texture
+			D3D12_HEAP_PROPERTIES defaultHeapProperties;
+			defaultHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
+			defaultHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+			defaultHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+			defaultHeapProperties.CreationNodeMask = 1;
+			defaultHeapProperties.VisibleNodeMask = 1;
+
+			D3D12_HEAP_PROPERTIES uploadHeapProperties = defaultHeapProperties;
+			uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+			ID3D12Resource* texturebuffer = nullptr;
+			D3D12_RESOURCE_DESC textureDesc = {};
+			textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+			textureDesc.Alignment = 0;
+			textureDesc.Width = TextureWidth;
+			textureDesc.Height = TextureHeight;
+			textureDesc.DepthOrArraySize = 1;
+			textureDesc.MipLevels = 1;
+			textureDesc.Format = static_cast<DXGI_FORMAT>(texture->GetTextureFormat());
+			textureDesc.SampleDesc.Count = 1;
+			textureDesc.SampleDesc.Quality = 0;
+			textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+			textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+			ID3D12Resource* pSRVBuffer = nullptr;
+			HRESULT hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&pSRVBuffer));
+			SWindows::OutputErrorMessage(hResult);
+			pSRVBuffer->SetName(L"Texture2D");
+
+			auto uploadBufferSize = GetRequiredIntermediateSize(pSRVBuffer, 0, 1);
+
+			textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+			textureDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+			textureDesc.Format = DXGI_FORMAT_UNKNOWN;
+			textureDesc.Width = uploadBufferSize;
+			textureDesc.Height = 1;
+			hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&texturebuffer));
+			SWindows::OutputErrorMessage(hResult);
+			texturebuffer->SetName(L"Upload Texture2D");
+
+			D3D12_SUBRESOURCE_DATA textureData = {};
+			textureData.pData = texture->GetCurrentMipTexture().pTexData;
+			textureData.RowPitch = TextureWidth * texture->GetTexelSize();
+			textureData.SlicePitch = textureData.RowPitch * TextureHeight;
+
+			UpdateSubresource(commandList, pSRVBuffer, texturebuffer, 0, 0, 1, &textureData);
+
+			D3D12_RESOURCE_BARRIER SRVResourceBarrier;
+			SRVResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			SRVResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			SRVResourceBarrier.Transition.pResource = pSRVBuffer;
+			SRVResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+			SRVResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+			SRVResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			commandList->ResourceBarrier(1, &SRVResourceBarrier);
+
+			// Describe and create a SRV for the texture.
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			srvDesc.Format = static_cast<DXGI_FORMAT>(texture->GetTextureFormat());
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			srvDesc.Texture2D.MipLevels = 1;
+			D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = heap->GetCPUDescriptorHandleForHeapStart();
+			cpuHandle.ptr += cbvDescriptorOffset + nTextureCount * svr_descriptor_size;
+			m_pDevice->GetDevice()->CreateShaderResourceView(pSRVBuffer, &srvDesc, cpuHandle);
+			++nTextureCount;
+		}
+	}
+
+	return nTextureCount * svr_descriptor_size;
+}
+
 void SDX12Pipeline::SetVertexBufferView(D3D12_GPU_VIRTUAL_ADDRESS bufferLocation, unsigned int sizeInBytes, unsigned int strideInBytes)
 {
 	m_VertexBufferView.BufferLocation = bufferLocation;

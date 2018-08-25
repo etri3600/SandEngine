@@ -167,16 +167,16 @@ private:
 	char* m_MappedConstantBuffers[1];
 };
 
-class SDX12LightResources : public SDX12Resources
+class SDX12DeferredResources : public SDX12Resources
 {
 public:
-	SDX12LightResources()
+	SDX12DeferredResources()
 	{
 		for (int i = 0; i < 3; ++i)
 			m_pCBVBuffers[i] = nullptr;
 	}
 
-	~SDX12LightResources()
+	~SDX12DeferredResources()
 	{
 		for (int i = 0; i < 3; ++i)
 		{

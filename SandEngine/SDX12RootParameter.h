@@ -170,7 +170,7 @@ struct SDX12LightRootParameter : SDX12RootParameter
 {
 	SDX12LightRootParameter()
 	{
-		Type = EMaterialType::LIGHT;
+		Type = EMaterialType::DEFERRED;
 
 		m_range[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
 		m_range[0].NumDescriptors = 32;

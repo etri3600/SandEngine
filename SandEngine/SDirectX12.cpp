@@ -108,13 +108,13 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	m_pipelines.push_back(new SDX12Pipeline(m_pDevice, m_RootSignatures.back(), EMaterialType::TEXTURE));
 	m_pipelines.back()->Init(L"TextureVertexShader", L"TexturePixelShader", "main", "main", new SDX12TextureResources(), 3, rtvFormats);
 
-	// Create PSO for Light
-	DXGI_FORMAT lightFormats[1] = { DXGI_FORMAT_R8G8B8A8_UNORM };
+	// Create PSO for Deferred Pass
+	DXGI_FORMAT deferredFormats[1] = { DXGI_FORMAT_R8G8B8A8_UNORM };
 	m_RootSignatures.push_back(new SDX12RootSignature(m_pDevice, new SDX12SsAoRootParameter()));
 
-	SDX12Pipeline* lightPipeline = new SDX12Pipeline(m_pDevice, m_RootSignatures.back(), EMaterialType::LIGHT);
-	lightPipeline->Init(L"DeferredLighting", L"DeferredLighting", "vert", "frag", new SDX12LightResources(), 1, lightFormats);
-	m_pipelines.push_back(lightPipeline);
+	SDX12Pipeline* deferredPipeline = new SDX12Pipeline(m_pDevice, m_RootSignatures.back(), EMaterialType::DEFERRED);
+	deferredPipeline->Init(L"DeferredLighting", L"DeferredLighting", "vert", "frag", new SDX12DeferredResources(), 1, deferredFormats);
+	m_pipelines.push_back(deferredPipeline);
 
 	// Create PSO for Postprocess
 	DXGI_FORMAT postprocessFormats[1] = { DXGI_FORMAT_R16_FLOAT };
@@ -179,9 +179,6 @@ void SDirectX12::Finalize()
 	
 	if (m_pIndexBuffer)
 		m_pIndexBuffer->Release();
-
-	if (m_pShaderBufferHeap)
-		m_pShaderBufferHeap->Release();
 
 	if (m_pSwapChain)
 		m_pSwapChain->SetFullscreenState(false, nullptr);
@@ -510,7 +507,7 @@ void SDirectX12::Draw()
 		{
 			(*it)->CreateConstantBuffer(m_pShaderBufferHeap, descriptorOffset, m_uiShaderBufferDescriptorSize, &batchProxyIter->second);
 			descriptorOffset += (*it)->GetCBVDescriptorOffset();
-			descriptorOffset += CreateShaderResources(*it, batchProxyIter->second, descriptorOffset);
+			descriptorOffset += (*it)->CreateShaderResources(m_pCommandList, m_pShaderBufferHeap, &batchProxyIter->second, descriptorOffset);
 		}
 		else
 		{
@@ -577,7 +574,7 @@ bool SDirectX12::Render()
 	m_pCommandList->SetDescriptorHeaps(sizeof(ppHeaps) / sizeof(ppHeaps[0]), ppHeaps);
 	for (auto& pipeline : m_pipelines)
 	{
-		if (pipeline && pipeline->GetMaterialType() < EMaterialType::LIGHT)
+		if (pipeline && pipeline->GetMaterialType() < EMaterialType::DEFERRED)
 		{
 			SBatchProxy* batchProxy = &m_SceneProxy.BatchProxies[pipeline->GetMaterialType()];
 			auto signature = pipeline->GetRootSignature();
@@ -592,7 +589,7 @@ bool SDirectX12::Render()
 				{
 					gpuHandle.ptr += pipeline->GetCBVDescriptorOffset();
 					pipeline->Populate(m_pCommandList, i);
-					UpdateConstantBuffer(pipeline, batchProxy, i);
+					pipeline->UpdateConstantBuffer(batchProxy, i, View, Projection);
 					for (unsigned int j = 0; j < batchProxy->ObjectProxies[i].MeshProxy.size(); ++j)
 					{
 						m_pCommandList->SetGraphicsRootDescriptorTable(signature->GetTableLocation(), gpuHandle);
@@ -642,15 +639,15 @@ bool SDirectX12::Render()
 	m_pCommandList->OMSetRenderTargets(1, &renderTargetViewHandle, false, nullptr);
 	m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	ID3D12DescriptorHeap* ppLightHeaps[] = { m_pGBufferCbvSrvHeap };
-	m_pCommandList->SetDescriptorHeaps(sizeof(ppLightHeaps) / sizeof(ppLightHeaps[0]), ppLightHeaps);
-	D3D12_GPU_DESCRIPTOR_HANDLE gpuLightHandle = m_pGBufferCbvSrvHeap->GetGPUDescriptorHandleForHeapStart();
+	ID3D12DescriptorHeap* ppDeferredHeaps[] = { m_pGBufferCbvSrvHeap };
+	m_pCommandList->SetDescriptorHeaps(sizeof(ppDeferredHeaps) / sizeof(ppDeferredHeaps[0]), ppDeferredHeaps);
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuDeferredHandle = m_pGBufferCbvSrvHeap->GetGPUDescriptorHandleForHeapStart();
 
 	for (auto& pipeline : m_pipelines)
 	{
 		if (pipeline)
 		{
-			if (pipeline->GetMaterialType() == EMaterialType::LIGHT)
+			if (pipeline->GetMaterialType() == EMaterialType::DEFERRED)
 			{
 				auto signature = pipeline->GetRootSignature();
 				m_pCommandList->IASetVertexBuffers(0, 1, &pipeline->GetVertexBufferView());
@@ -707,7 +704,7 @@ bool SDirectX12::Render()
 			m_pCommandList->SetGraphicsRootSignature(pipeline->GetRootSignature()->Get());
 			m_pCommandList->SetPipelineState(pipeline->GetPipelineState());
 			pipeline->Populate(m_pCommandList, 0);
-			UpdateConstantBuffer(pipeline, nullptr, 0);
+			pipeline->UpdateConstantBuffer(nullptr, 0, View, Projection);
 			m_pCommandList->SetGraphicsRootDescriptorTable(pipeline->GetRootSignature()->GetTableLocation(), gpuPostprocessHandle);
 			m_pCommandList->DrawInstanced(6, 1, 0, 0);
 		}
@@ -744,94 +741,6 @@ void SDirectX12::Present()
 
 	m_pResourceAllocator[0]->CleanUp();
 	m_pResourceAllocator[1]->CleanUp();
-}
-
-unsigned int SDirectX12::CreateShaderResources(SDX12Pipeline* pipeline, SBatchProxy batchProxy, unsigned int offset)
-{
-	unsigned int nTextureCount = 0;
-	unsigned int cbvDescriptorOffset = offset;
-	for (unsigned int i = 0;i < batchProxy.ObjectProxies.size(); ++i)
-	{
-		for (unsigned int j = 0;j < batchProxy.ObjectProxies[i].Textures.size();++j)
-		{
-			auto& texture = batchProxy.ObjectProxies[i].Textures[j];
-
-			if (texture->MipTextures.size() == 0)
-				continue;
-
-			unsigned int TextureWidth = static_cast<unsigned int>(texture->GetWidth()), TextureHeight = static_cast<unsigned int>(texture->GetHeight());
-
-			// Create Texture
-			D3D12_HEAP_PROPERTIES defaultHeapProperties;
-			defaultHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
-			defaultHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-			defaultHeapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-			defaultHeapProperties.CreationNodeMask = 1;
-			defaultHeapProperties.VisibleNodeMask = 1;
-
-			D3D12_HEAP_PROPERTIES uploadHeapProperties = defaultHeapProperties;
-			uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
-
-			ID3D12Resource* texturebuffer = nullptr;
-			D3D12_RESOURCE_DESC textureDesc = {};
-			textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-			textureDesc.Alignment = 0;
-			textureDesc.Width = TextureWidth;
-			textureDesc.Height = TextureHeight;
-			textureDesc.DepthOrArraySize = 1;
-			textureDesc.MipLevels = 1;
-			textureDesc.Format = static_cast<DXGI_FORMAT>(texture->GetTextureFormat());
-			textureDesc.SampleDesc.Count = 1;
-			textureDesc.SampleDesc.Quality = 0;
-			textureDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-			textureDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-			ID3D12Resource* pSRVBuffer = nullptr;
-			HRESULT hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&pSRVBuffer));
-			SWindows::OutputErrorMessage(hResult);
-			pSRVBuffer->SetName(L"Texture2D");
-
-			auto uploadBufferSize = GetRequiredIntermediateSize(pSRVBuffer, 0, 1);
-
-			textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-			textureDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-			textureDesc.Format = DXGI_FORMAT_UNKNOWN;
-			textureDesc.Width = uploadBufferSize;
-			textureDesc.Height = 1;
-			hResult = m_pDevice->GetDevice()->CreateCommittedResource(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &textureDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&texturebuffer));
-			SWindows::OutputErrorMessage(hResult);
-			texturebuffer->SetName(L"Upload Texture2D");
-
-			D3D12_SUBRESOURCE_DATA textureData = {};
-			textureData.pData = texture->GetCurrentMipTexture().pTexData;
-			textureData.RowPitch = TextureWidth * texture->GetTexelSize();
-			textureData.SlicePitch = textureData.RowPitch * TextureHeight;
-
-			UpdateSubresource(m_pCommandList, pSRVBuffer, texturebuffer, 0, 0, 1, &textureData);
-
-			D3D12_RESOURCE_BARRIER SRVResourceBarrier;
-			SRVResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			SRVResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-			SRVResourceBarrier.Transition.pResource = pSRVBuffer;
-			SRVResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-			SRVResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-			SRVResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-			m_pCommandList->ResourceBarrier(1, &SRVResourceBarrier);
-
-			// Describe and create a SRV for the texture.
-			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-			srvDesc.Format = static_cast<DXGI_FORMAT>(texture->GetTextureFormat());
-			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-			srvDesc.Texture2D.MipLevels = 1;
-			D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = m_pShaderBufferHeap->GetCPUDescriptorHandleForHeapStart();
-			cpuHandle.ptr += cbvDescriptorOffset + nTextureCount * m_uiShaderBufferDescriptorSize;
-			m_pDevice->GetDevice()->CreateShaderResourceView(pSRVBuffer, &srvDesc, cpuHandle);
-			++nTextureCount;
-		}
-	}
-
-	return nTextureCount * m_uiShaderBufferDescriptorSize;
 }
 
 void SDirectX12::CreateGBuffers()
@@ -984,11 +893,6 @@ void SDirectX12::CreatePostProcessResources()
 
 	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = m_pPostProcessCbvSrvHeap->GetCPUDescriptorHandleForHeapStart();
 	m_pDevice->GetDevice()->CreateShaderResourceView(m_pPostProcessResource, &srvDesc, srvCpuHandle);
-}
-
-void SDirectX12::UpdateConstantBuffer(SDX12Pipeline* pipeline, SBatchProxy* batchProxy, unsigned int objIndex)
-{
-	pipeline->UpdateConstantBuffer(batchProxy, objIndex, View, Projection);
 }
 
 void SDirectX12::WaitForGPU(unsigned long long fenceValue)
