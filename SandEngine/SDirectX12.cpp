@@ -108,6 +108,9 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	m_pipelines.push_back(new SDX12Pipeline(m_pDevice, m_RootSignatures.back(), EMaterialType::TEXTURE));
 	m_pipelines.back()->Init(L"TextureVertexShader", L"TexturePixelShader", "main", "main", new SDX12TextureResources(), 3, rtvFormats);
 
+	// Create PSO for Light Pass
+
+
 	// Create PSO for Deferred Pass
 	DXGI_FORMAT deferredFormats[1] = { DXGI_FORMAT_R8G8B8A8_UNORM };
 	m_RootSignatures.push_back(new SDX12RootSignature(m_pDevice, new SDX12SsAoRootParameter()));
@@ -202,6 +205,9 @@ void SDirectX12::Finalize()
 		if (m_pCommandAllocator[i])
 			m_pCommandAllocator[i]->Release();
 	}
+
+	if (m_pShaderBufferHeap)
+		m_pShaderBufferHeap->Release();
 
 	if (m_pGBufferRTVHeap)
 		m_pGBufferRTVHeap->Release();
@@ -502,13 +508,16 @@ void SDirectX12::Draw()
 	unsigned int descriptorOffset = 0;
 	for (auto it = m_pipelines.begin(); it != m_pipelines.end(); ++it)
 	{
-		auto batchProxyIter = m_SceneProxy.BatchProxies.find((*it)->GetMaterialType());
+		EMaterialType mat_type = (*it)->GetMaterialType();
+		auto batchProxyIter = m_SceneProxy.BatchProxies.find(mat_type);
+		// gbuffers
 		if (batchProxyIter != m_SceneProxy.BatchProxies.end())
 		{
 			(*it)->CreateConstantBuffer(m_pShaderBufferHeap, descriptorOffset, m_uiShaderBufferDescriptorSize, &batchProxyIter->second);
 			descriptorOffset += (*it)->GetCBVDescriptorOffset();
 			descriptorOffset += (*it)->CreateShaderResources(m_pCommandList, m_pShaderBufferHeap, &batchProxyIter->second, descriptorOffset);
 		}
+		// others
 		else
 		{
 			(*it)->CreateConstantBuffer(m_pGBufferCbvSrvHeap, m_RenderTargetViewDescriptorSize * 3, m_uiShaderBufferDescriptorSize, nullptr);

@@ -66,5 +66,5 @@ float4 frag(FragmentInput input) : SV_Target0
 	//half4 normalW = mul(ViewProjectionConstantBuffer.InvView, normal);
 	//float ndotl = saturate(dot(normalW.xyz, -light.Direction));
 	
-	return -depth;
+	return color;
 }
