@@ -48,173 +48,176 @@
     <ClInclude Include="SandEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SGraphics.h">
+    <ClInclude Include="Animation.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Bone.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelStruct.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Lighting.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="SGraphicsInterface.h">
+    <ClInclude Include="GraphicsInterface.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="SDirectX12.h">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClInclude Include="Graphics.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="SDirectX12Device.h">
-      <Filter>Graphics\DirectX12</Filter>
-    </ClInclude>
-    <ClInclude Include="SWindows.h">
-      <Filter>Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="SPlatformSystem.h">
-      <Filter>Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="SPlatformManager.h">
-      <Filter>Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="SLinux.h">
-      <Filter>Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="SUtils.h" />
-    <ClInclude Include="STime.h" />
-    <ClInclude Include="SSingletone.h" />
-    <ClInclude Include="SMath.h" />
-    <ClInclude Include="SSceneManager.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="SImageLoader.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="SLoader.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="SModelLoader.h">
-      <Filter>Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="SInput.h">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="SInputManager.h">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="SImage.h">
-      <Filter>Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="SModelStruct.h">
-      <Filter>Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="SDX12Helper.h">
-      <Filter>Graphics\DirectX12</Filter>
-    </ClInclude>
-    <ClInclude Include="SConstantBuffer.h">
-      <Filter>Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="SAnimation.h">
-      <Filter>Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="SBone.h">
-      <Filter>Asset</Filter>
-    </ClInclude>
-    <ClInclude Include="SDX12ResourceAllocator.h">
-      <Filter>Graphics\DirectX12</Filter>
-    </ClInclude>
-    <ClInclude Include="SDX12DescriptorHeapAllocator.h">
-      <Filter>Graphics\DirectX12</Filter>
-    </ClInclude>
-    <ClInclude Include="SVulkanDevice.h">
+    <ClInclude Include="Vulkan.h">
       <Filter>Graphics\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="SVulkan.h">
+    <ClInclude Include="VulkanDevice.h">
       <Filter>Graphics\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="SScene.h">
-      <Filter>Scene</Filter>
+    <ClInclude Include="DirectX12.h">
+      <Filter>Graphics\DirectX12</Filter>
     </ClInclude>
-    <ClInclude Include="SNode.h">
+    <ClInclude Include="DirectX12Device.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12DescriptorHeapAllocator.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12Helper.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12InputVertexAttributes.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12Pipeline.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12ResourceAllocator.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12Resources.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12RootParameter.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12RootSignature.h">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
       <Filter>NodeTree</Filter>
     </ClInclude>
-    <ClInclude Include="SDX12Pipeline.h">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClInclude Include="Linux.h">
+      <Filter>Platform</Filter>
     </ClInclude>
-    <ClInclude Include="SDX12InputVertexAttributes.h">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClInclude Include="PlatformManager.h">
+      <Filter>Platform</Filter>
     </ClInclude>
-    <ClInclude Include="SDX12Resources.h">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClInclude Include="PlatformSystem.h">
+      <Filter>Platform</Filter>
     </ClInclude>
-    <ClInclude Include="SDX12RootSignature.h">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClInclude Include="Windows.h">
+      <Filter>Platform</Filter>
     </ClInclude>
-    <ClInclude Include="SDX12RootParameter.h">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClInclude Include="Math.h" />
+    <ClInclude Include="Singletone.h" />
+    <ClInclude Include="Time.h" />
+    <ClInclude Include="Utils.h" />
+    <ClInclude Include="Scene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="SMaterial.h">
-      <Filter>Asset</Filter>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="SLighting.h">
-      <Filter>Graphics</Filter>
+    <ClInclude Include="SceneObj.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageLoader.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Loader.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SDirectX12.cpp">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Asset</Filter>
     </ClCompile>
-    <ClCompile Include="SDirectX12Device.cpp">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClCompile Include="Image.cpp">
+      <Filter>Asset</Filter>
     </ClCompile>
-    <ClCompile Include="SGraphics.cpp">
+    <ClCompile Include="ModelStruct.cpp">
+      <Filter>Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="SWindows.cpp">
-      <Filter>Platform</Filter>
-    </ClCompile>
-    <ClCompile Include="SUtils.cpp" />
-    <ClCompile Include="SMath.cpp" />
-    <ClCompile Include="SSceneManager.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="SImageLoader.cpp">
-      <Filter>Loader</Filter>
-    </ClCompile>
-    <ClCompile Include="SModelLoader.cpp">
-      <Filter>Loader</Filter>
-    </ClCompile>
-    <ClCompile Include="SImage.cpp">
-      <Filter>Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="SDX12Helper.cpp">
-      <Filter>Graphics\DirectX12</Filter>
-    </ClCompile>
-    <ClCompile Include="SModelStruct.cpp">
-      <Filter>Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="SAnimation.cpp">
-      <Filter>Asset</Filter>
-    </ClCompile>
-    <ClCompile Include="SDX12ResourceAllocator.cpp">
-      <Filter>Graphics\DirectX12</Filter>
-    </ClCompile>
-    <ClCompile Include="SVulkanDevice.cpp">
+    <ClCompile Include="Vulkan.cpp">
       <Filter>Graphics\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="SVulkan.cpp">
+    <ClCompile Include="VulkanDevice.cpp">
       <Filter>Graphics\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="SScene.cpp">
-      <Filter>Scene</Filter>
+    <ClCompile Include="DirectX12.cpp">
+      <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
-    <ClCompile Include="SNode.cpp">
+    <ClCompile Include="DirectX12Device.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12DescriptorHeapAllocator.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12Helper.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12Pipeline.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12ResourceAllocator.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12Resources.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12RootSignature.cpp">
+      <Filter>Graphics\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
       <Filter>NodeTree</Filter>
     </ClCompile>
-    <ClCompile Include="SDX12Pipeline.cpp">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClCompile Include="Windows.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
-    <ClCompile Include="SDX12DescriptorHeapAllocator.cpp">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClCompile Include="Math.cpp" />
+    <ClCompile Include="DX12InputVertexAttributes.cpp" />
+    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="Scene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="SDX12InputVertexAttributes.cpp" />
-    <ClCompile Include="SDX12Resources.cpp">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="SDX12RootSignature.cpp">
-      <Filter>Graphics\DirectX12</Filter>
+    <ClCompile Include="ImageLoader.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

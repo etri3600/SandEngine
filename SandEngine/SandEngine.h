@@ -1,5 +1,5 @@
 #pragma once
 
-#include "SPlatformManager.h"
-#include "SGraphics.h"
-#include "SSceneManager.h"
+#include "PlatformManager.h"
+#include "Graphics.h"
+#include "SceneManager.h"
