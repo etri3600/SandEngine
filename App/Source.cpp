@@ -9,7 +9,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	auto framework = SPlatformManager::CreateFramework();
 	if (framework && framework->Init())
 	{
-		SIGraphicsInterface* pGraphics = SGraphics::Initialize(EGraphicsInterfaceEnum::DX12);
+		IGraphicsInterface* pGraphics = SGraphics::Initialize(EGraphicsInterfaceEnum::DX12);
 		if (pGraphics && pGraphics->Initialize(framework, 1920, 1080, false, true))
 		{
 			SModelLoader* ModelLoader = new SModelLoader();

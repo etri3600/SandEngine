@@ -1,7 +1,7 @@
 #include "SceneManager.h"
 #include "Time.h"
 
-extern SIGraphicsInterface* gGraphics;
+extern IGraphicsInterface* gGraphics;
 
 SScene* SSceneManager::CreateScene(wchar_t* name)
 {

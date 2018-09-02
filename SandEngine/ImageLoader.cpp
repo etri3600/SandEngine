@@ -33,7 +33,8 @@ bool SImageLoader::LoadTextureFromFile(const wchar_t* file, STexture* pTexture)
 		ilGenImages(1, &imageId);
 		ilBindImage(imageId);
 
-		if (ilLoadImage((DirPath + file).c_str()))
+		auto path = (DirPath + file).c_str();
+		if (ilLoadImage(path))
 		{
 			ILboolean success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 

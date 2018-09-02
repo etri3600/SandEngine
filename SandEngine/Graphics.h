@@ -5,7 +5,7 @@
 class SGraphics
 {
 public:
-	static SIGraphicsInterface* Initialize(const EGraphicsInterfaceEnum giInterface);
+	static IGraphicsInterface* Initialize(const EGraphicsInterfaceEnum giInterface);
 	static void Fianalize();
 
 	static EGraphicsInterfaceEnum s_eGraphicInterface;

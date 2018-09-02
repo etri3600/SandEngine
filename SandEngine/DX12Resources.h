@@ -172,13 +172,13 @@ class SDX12DeferredResources : public SDX12Resources
 public:
 	SDX12DeferredResources()
 	{
-		for (int i = 0; i < 3; ++i)
+		for (int i = 0; i < 1; ++i)
 			m_pCBVBuffers[i] = nullptr;
 	}
 
 	~SDX12DeferredResources()
 	{
-		for (int i = 0; i < 3; ++i)
+		for (int i = 0; i < 1; ++i)
 		{
 			if (m_pCBVBuffers[i])
 			{
@@ -209,17 +209,21 @@ public:
 
 	void UpdateConstantBuffer(SBatchProxy* batchProxy, unsigned int objIndex, SMatrix view, SMatrix projection) override
 	{
-		// Color
-		// Depth
-		// Normal
+		// Lights
+		SLight lights[32];
+		memset(lights, 0, sizeof(SLight) * 32);
+
+		SLight* pLights = reinterpret_cast<SLight*>(GetMappedConstantBuffer(0) + sizeof(SLight));
+
+		memcpy(pLights, lights, sizeof(SLight) * 32);
 	}
 
 public:
 	unsigned int m_uiCBVDescriptorOffset = 0;
 
 private:
-	ID3D12Resource * m_pCBVBuffers[3];
-	char* m_MappedConstantBuffers[3];
+	ID3D12Resource* m_pCBVBuffers[1];
+	char* m_MappedConstantBuffers[1];
 };
 
 class SDX12SsAoResources : public SDX12Resources

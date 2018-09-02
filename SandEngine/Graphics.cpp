@@ -3,11 +3,11 @@
 #include "DirectX12.h"
 #include "Vulkan.h"
 
-SIGraphicsInterface* gGraphics = nullptr;
+IGraphicsInterface* gGraphics = nullptr;
 
 EGraphicsInterfaceEnum SGraphics::s_eGraphicInterface = EGraphicsInterfaceEnum::DX12;
 
-SIGraphicsInterface* SGraphics::Initialize(const EGraphicsInterfaceEnum giInterface)
+IGraphicsInterface* SGraphics::Initialize(const EGraphicsInterfaceEnum giInterface)
 {
 	s_eGraphicInterface = giInterface;
 	switch (giInterface)

@@ -98,7 +98,7 @@ bool SDirectX12::Initialize(const SPlatformSystem* pPlatformSystem, unsigned int
 	std::pair<std::map<EMaterialType, SDX12Pipeline*>::iterator, bool> pipeIt;
 
 	// Create PSO for GBuffers
-	DXGI_FORMAT rtvFormats[static_cast<unsigned int>(EGBuffer::GB_NUM)] = { DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT };
+	DXGI_FORMAT rtvFormats[static_cast<unsigned int>(EGBuffer::GB_NUM)] = { DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT };
 
 	m_RootSignatures.push_back(new SDX12RootSignature(m_pDevice, new SDX12BoneRootParameter()));
 	m_pipelines.push_back(new SDX12Pipeline(m_pDevice, m_RootSignatures.back(), EMaterialType::SKINNING));
@@ -332,7 +332,7 @@ void SDirectX12::UpdateBoneTransform(const std::map<EMaterialType, std::vector<S
 	{
 		for (unsigned int i = 0; i < it->second.size(); ++i)
 		{
-			auto model = static_cast<SModel*>(it->second[i]);
+			auto model = dynamic_cast<SModel*>(it->second[i]);
 			if (model)
 			{
 				if (model->HasAnimation())
@@ -760,6 +760,8 @@ void SDirectX12::Present()
 
 void SDirectX12::CreateGBuffers()
 {
+	HRESULT hResult;
+
 	D3D12_HEAP_PROPERTIES defaultHeapProperties;
 	defaultHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;
 	defaultHeapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -788,13 +790,9 @@ void SDirectX12::CreateGBuffers()
 	// todo format
 	for (auto i = 0; i < static_cast<unsigned short>(EGBuffer::GB_NUM); ++i)
 	{
-		if(i == static_cast<unsigned short>(EGBuffer::GB_COLOR))
-			gbufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		else
-			gbufferDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		clearValue.Format = gbufferDesc.Format;
-		m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &gbufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, &clearValue, IID_PPV_ARGS(&m_pGBuffers[i]));
-
+		hResult = m_pDevice->GetDevice()->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE, &gbufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, &clearValue, IID_PPV_ARGS(&m_pGBuffers[i]));
+		
 		std::wostringstream name;
 		name << L"GBuffer " << static_cast<EGBuffer>(i);
 		m_pGBuffers[i]->SetName(name.str().c_str());
@@ -818,10 +816,6 @@ void SDirectX12::CreateGBuffers()
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvCpuHandle = m_pGBufferRTVHeap->GetCPUDescriptorHandleForHeapStart();
 	for (int i = 0; i < static_cast<int>(EGBuffer::GB_NUM); ++i)
 	{
-		if (i == 0)
-			rtDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		else
-			rtDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		m_pDevice->GetDevice()->CreateRenderTargetView(m_pGBuffers[i], &rtDesc, rtvCpuHandle);
 		rtvCpuHandle.ptr += m_RenderTargetViewDescriptorSize;
 	}
@@ -841,11 +835,6 @@ void SDirectX12::CreateGBuffers()
 
 	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = m_pGBufferCbvSrvHeap->GetCPUDescriptorHandleForHeapStart();
 	for (int i = 0; i < static_cast<int>(EGBuffer::GB_NUM); ++i) {
-		if (i == static_cast<int>(EGBuffer::GB_COLOR))
-			srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		else
-			srvDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-
 		m_pDevice->GetDevice()->CreateShaderResourceView(m_pGBuffers[i], &srvDesc, srvCpuHandle);
 		srvCpuHandle.ptr += m_uiShaderBufferDescriptorSize;
 	}

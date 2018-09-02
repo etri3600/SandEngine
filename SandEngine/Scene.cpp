@@ -3,7 +3,7 @@
 #include "Scene.h"
 #include "Time.h"
 
-extern SIGraphicsInterface* gGraphics;
+extern IGraphicsInterface* gGraphics;
 
 void SScene::Tick()
 {

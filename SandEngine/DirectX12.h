@@ -47,7 +47,7 @@ class SDX12ResourceAllocator;
 class SDX12DescriptorHeapAllocator;
 class SDX12Pipeline;
 class SDX12RootSignature;
-class SDirectX12 : public SIGraphicsInterface
+class SDirectX12 : public IGraphicsInterface
 {
 public:
 	SDirectX12();

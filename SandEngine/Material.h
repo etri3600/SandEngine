@@ -4,7 +4,6 @@ enum class EMaterialType
 {
 	SKINNING,
 	TEXTURE,
-	SIMPLE,
 	DEFERRED,
 	POSTPROCESS,
 	MT_MAX

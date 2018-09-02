@@ -98,7 +98,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Source\lib\;$(ProjectDir)Lib\IL;$(ProjectDir)Lib\assimp\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc140-mt.lib;DevIL.lib;ILU.lib;ILUT.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc140-mt.lib;DevIL.lib;ILU.lib;ILUT.lib;vulkan-1.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
       <Command>copy "$(OutDir)SandEngine.lib" "$(SolutionDir)Lib\SandEngine.lib"</Command>
@@ -138,7 +138,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Source\lib\;$(ProjectDir)Lib\IL;$(ProjectDir)Lib\assimp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc140-mt.lib;DevIL.lib;ILU.lib;ILUT.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc140-mt.lib;DevIL.lib;ILU.lib;ILUT.lib;vulkan-1.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
       <Command>copy "$(OutDir)SandEngine.lib" "$(SolutionDir)Lib\SandEngine.lib"</Command>

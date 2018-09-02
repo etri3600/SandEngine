@@ -2,7 +2,7 @@
 
 #include "VulkanDevice.h"
 
-class SVulkan : public SIGraphicsInterface
+class SVulkan : public IGraphicsInterface
 {
 public:
 	SVulkan();

@@ -4,4 +4,3 @@ struct Light
 	float3 Direction;
 	float3 Position;
 };
-

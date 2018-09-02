@@ -26,12 +26,8 @@ static const float2 gTexCoords[6] =
 	float2(1.0f, 0.0f),
 };
 
-static const Light light =
-{
-	float3(0.5f, 0.5f, 0.5f),
-	float3(0.0f, -1.0f, 0.0f),
-	float3(0.0f, 0.0f, 0.0f),
-};
+static const int LIGHT_NUM = 32;
+Light lights[LIGHT_NUM];
 
 struct VertexInput
 {
@@ -63,8 +59,5 @@ float4 frag(FragmentInput input) : SV_Target0
 	half depth = depthTexture.Sample(linearClampSampler, input.TexCoord).z;
 	half4 normal = normalTexture.Sample(linearClampSampler, input.TexCoord);
 
-	//half4 normalW = mul(ViewProjectionConstantBuffer.InvView, normal);
-	//float ndotl = saturate(dot(normalW.xyz, -light.Direction));
-	
 	return color;
 }

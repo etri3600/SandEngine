@@ -9,14 +9,14 @@
 enum class EGraphicsInterfaceEnum : unsigned char
 {
 	DX12,
-	//GI_GL_4,
+	//GL4,
 	VULKAN
 };
 
-class SIGraphicsInterface
+class IGraphicsInterface
 {
 public:
-	virtual ~SIGraphicsInterface() {}
+	virtual ~IGraphicsInterface() {}
 
 	virtual bool Initialize(const SPlatformSystem* pPlatformSystem, unsigned int screenWidth, unsigned int screenHeight, bool fullScreen, bool vSync) = 0;
 	virtual void Finalize() = 0;

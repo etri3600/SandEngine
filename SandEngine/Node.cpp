@@ -1,7 +1,7 @@
 #include "Node.h"
 #include "Time.h"
 
-extern SIGraphicsInterface* gGraphics;
+extern IGraphicsInterface* gGraphics;
 
 void SNode::Tick()
 {

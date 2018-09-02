@@ -205,7 +205,6 @@
       <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="Math.cpp" />
-    <ClCompile Include="DX12InputVertexAttributes.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Scene.cpp">
       <Filter>Scene</Filter>
@@ -218,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12InputVertexAttributes.cpp">
+      <Filter>Graphics\DirectX12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
