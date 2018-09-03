@@ -133,11 +133,6 @@ else()
 	link_directories(${PROJECT_DIR}/Lib/assimp/Release)
 endif()
 
-# Add library to build.
-add_library(${PROJECT_NAME} STATIC
-   ${SRC_FILES} ${HEADERS_FILES}
-)
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	find_library(assimp NAMES assimp-vc140-mt HINTS ${PROJECT_DIR}/Lib/assimp/Debug)
 else()
@@ -147,6 +142,11 @@ find_library(DevIL NAMES DevIL HINTS ${PROJECT_DIR}/Lib/IL)
 find_library(ILU NAMES ILU HINTS ${PROJECT_DIR}/Lib/IL)
 find_library(ILUT NAMES ILUT HINTS ${PROJECT_DIR}/Lib/IL)
 find_library(vulkan NAMES vulkan-1 HINTS $ENV{VULKAN_SDK}/Source/lib)
+
+# Add library to build.
+add_library(${PROJECT_NAME} STATIC
+   ${SRC_FILES} ${HEADERS_FILES}
+)
 
 ######################### Flags ############################
 # Defines Flags for Windows and Linux                      #
@@ -177,6 +177,4 @@ endif()
 # Add project dependencies and Link to project             #
 ############################################################
 
-if(MSVC)
-   target_link_libraries(${PROJECT_NAME} PUBLIC ${assimp} ${DevIL} ${ILU} ${ILUT} ${vulkan})
-endif(MSVC)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${assimp} ${DevIL} ${ILU} ${ILUT} ${vulkan})
