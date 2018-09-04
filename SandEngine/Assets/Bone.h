@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "Math.h"
+#include "SMath.h"
 
 struct SBoneNode
 {

@@ -1,7 +1,7 @@
 #include "Graphics.h"
-#include "PlatformManager.h"
-#include "DirectX12.h"
-#include "Vulkan.h"
+#include "Platform/PlatformManager.h"
+#include "Directx12/DirectX12.h"
+#include "Vulkan/Vulkan.h"
 
 IGraphicsInterface* gGraphics = nullptr;
 

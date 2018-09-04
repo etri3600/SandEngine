@@ -1,5 +1,5 @@
 #include "DirectX12Device.h"
-#include "Utils.h"
+#include "SUtils.h"
 #include <d3d12sdklayers.h>
 
 SDirectX12Device::~SDirectX12Device()

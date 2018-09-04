@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Material.h"
+#include "Assets/Material.h"
 
 class SSceneObj
 {

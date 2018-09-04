@@ -9,9 +9,9 @@
 #include <map>
 #include <vector>
 
-#include "Math.h"
-#include "ModelStruct.h"
-#include "Animation.h"
+#include "SMath.h"
+#include "Assets/ModelStruct.h"
+#include "Assets/Animation.h"
 #include "ImageLoader.h"
 
 class SModel;

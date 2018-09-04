@@ -1,4 +1,4 @@
-#include "Math.h"
+#include "SMath.h"
 
 
 const SMatrix SMatrix::Identity(SVector3(1.0f,0.0f,0.0f), SVector3(0.0f, 1.0f, 0.0f), SVector3(0.0f, 0.0f, 1.0f));

@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "Image.h"
+#include "Assets/Image.h"
 
 class SImageLoader : public SLoader
 {

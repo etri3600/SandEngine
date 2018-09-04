@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SceneObj.h"
-#include "Math.h"
-#include "Utils.h"
+#include "Scene/SceneObj.h"
+#include "SMath.h"
+#include "SUtils.h"
 #include "Image.h"
 #include "Material.h"
 

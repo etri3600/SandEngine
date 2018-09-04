@@ -1,10 +1,10 @@
 #pragma once
 
-#include "PlatformSystem.h"
-#include "Utils.h"
-#include "ModelLoader.h"
-#include "ConstantBuffer.h"
-#include "Lighting.h"
+#include "Platform/PlatformSystem.h"
+#include "SUtils.h"
+#include "Loader/ModelLoader.h"
+#include "Assets/ConstantBuffer.h"
+#include "Assets/Lighting.h"
 
 enum class EGraphicsInterfaceEnum : unsigned char
 {

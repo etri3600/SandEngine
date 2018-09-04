@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GraphicsInterface.h"
+#include "Graphics/GraphicsInterface.h"
 #include "Node.h"
 
 class SScene

@@ -3,7 +3,7 @@
 #include <vector>
 #include <map>
 
-#include "GraphicsInterface.h"
+#include "Graphics/GraphicsInterface.h"
 
 class SNode
 {

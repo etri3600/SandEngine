@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SceneObj.h"
-#include "Math.h"
-#include "GraphicsInterface.h"
+#include "Scene/SceneObj.h"
+#include "SMath.h"
+#include "Graphics/GraphicsInterface.h"
 
 struct SModelViewProjection
 {

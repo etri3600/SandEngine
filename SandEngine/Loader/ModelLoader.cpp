@@ -2,9 +2,9 @@
 
 #include <set>
 
-#include "ModelStruct.h"
-#include "Animation.h"
-#include "Bone.h"
+#include "Assets/ModelStruct.h"
+#include "Assets/Animation.h"
+#include "Assets/Bone.h"
 
 namespace {
 	const std::wstring WDirPath = LR"(..\Model\)";

@@ -47,78 +47,93 @@ message("${PROJECT_NAME}: CURR BIN DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 # Files of project and target to build                     #
 ############################################################
 
-# Source Files
-set(SRC_FILES
-    ./Animation.cpp
-    ./DirectX12.cpp
-    ./DirectX12Device.cpp
-    ./DX12DescriptorHeapAllocator.cpp
-    ./DX12Helper.cpp
-    ./DX12InputVertexAttributes.cpp
-    ./DX12ResourceAllocator.cpp
-    ./DX12Pipeline.cpp
-    ./DX12Resources.cpp
-    ./DX12RootSignature.cpp
-    ./Graphics.cpp
-    ./Image.cpp
-    ./ImageLoader.cpp
-    ./Math.cpp
-    ./ModelLoader.cpp
-    ./ModelStruct.cpp
-    ./Node.cpp
-    ./Scene.cpp
-    ./SceneManager.cpp
-    ./Utils.cpp
-    ./Vulkan.cpp
-    ./VulkanDevice.cpp
-    ./Windows.cpp
-)
-source_group("Sources" FILES ${SRC_FILES})
+include_directories(${PROJECT_DIR})
 
-# Header Files
-set(HEADERS_FILES
-    SceneObj.h
-    Lighting.h
-    SandEngine.h
-    Animation.h
-    Bone.h
-    DirectX12.h
-    DirectX12Device.h
-    DX12DescriptorHeapAllocator.h
-    DX12Helper.h
-    DX12InputVertexAttributes.h
-    DX12ResourceAllocator.h
-    DX12Pipeline.h
-    DX12Resources.h
-    DX12RootParameter.h
-    DX12RootSignature.h
-    Graphics.h
-    GraphicsInterface.h
-    SHeader.h
-    Image.h
-    Input.h
-    InputManager.h
-    Linux.h
-    Loader.h
-    Material.h
-    Math.h
-    ModelLoader.h
-    ModelStruct.h
-    ConstantBuffer.h
-    PlatformManager.h
-    PlatformSystem.h
-    Scene.h
-    SceneManager.h
-    Node.h
-    Singletone.h
-    ImageLoader.h
-    Time.h
-    Utils.h
-    Vulkan.h
-    VulkanDevice.h
-    Windows.h
+set(ASSETS_FILES
+	Assets/Animation.cpp
+	Assets/Image.cpp
+	Assets/ModelStruct.cpp
+	Assets/Lighting.h
+    Assets/Animation.h
+    Assets/Bone.h
+	Assets/Image.h
+	Assets/Material.h
+    Assets/ModelStruct.h
+    Assets/ConstantBuffer.h
+	Assets/Lighting.h
 )
-source_group("Headers" FILES ${HEADERS_FILES})
+
+set(GRAPHICS_FILES
+    Graphics/DirectX12/DirectX12.cpp
+    Graphics/DirectX12/DirectX12Device.cpp
+    Graphics/DirectX12/DX12DescriptorHeapAllocator.cpp
+	Graphics/DirectX12/DX12Helper.cpp
+    Graphics/DirectX12/DX12InputVertexAttributes.cpp
+    Graphics/DirectX12/DX12ResourceAllocator.cpp
+    Graphics/DirectX12/DX12Pipeline.cpp
+    Graphics/DirectX12/DX12Resources.cpp
+    Graphics/DirectX12/DX12RootSignature.cpp
+    Graphics/Graphics.cpp
+    Graphics/Vulkan/Vulkan.cpp
+    Graphics/Vulkan/VulkanDevice.cpp
+	Graphics/DirectX12/DirectX12.h
+    Graphics/DirectX12/DirectX12Device.h
+    Graphics/DirectX12/DX12DescriptorHeapAllocator.h
+    Graphics/DirectX12/DX12Helper.h
+    Graphics/DirectX12/DX12InputVertexAttributes.h
+    Graphics/DirectX12/DX12ResourceAllocator.h
+    Graphics/DirectX12/DX12Pipeline.h
+    Graphics/DirectX12/DX12Resources.h
+    Graphics/DirectX12/DX12RootParameter.h
+    Graphics/DirectX12/DX12RootSignature.h
+    Graphics/Graphics.h
+    Graphics/GraphicsInterface.h
+    Graphics/Vulkan/Vulkan.h
+    Graphics/Vulkan/VulkanDevice.h
+)
+
+set(INPUT_FILES
+    Input/Input.h
+    Input/InputManager.h
+)
+
+set(LOADER_FILES
+	Loader/ImageLoader.cpp
+	Loader/ModelLoader.cpp
+	Loader/Loader.h
+	Loader/ModelLoader.h
+	Loader/ImageLoader.h
+)
+
+set(PLATFORM_FILES
+	Platform/Windows.cpp
+	Platform/Linux.h
+    Platform/PlatformManager.h
+    Platform/PlatformSystem.h
+	Platform/Windows.h
+)
+
+set(SCENE_FILES
+    Scene/Node.cpp
+    Scene/Scene.cpp
+    Scene/SceneManager.cpp
+	Scene/SceneObj.h
+    Scene/Scene.h
+    Scene/SceneManager.h
+    Scene/Node.h
+)
+
+set(FILES
+    SMath.cpp
+    SUtils.cpp
+    SandEngine.h
+    SHeader.h
+    SMath.h
+    Singletone.h
+    STime.h
+    SUtils.h
+)
+source_group("Files" FILES ${FILES})
 
 # Include Library
 include_directories($ENV{VULKAN_SDK}/Include)
@@ -145,7 +160,7 @@ find_library(vulkan NAMES vulkan-1 HINTS $ENV{VULKAN_SDK}/Source/lib)
 
 # Add library to build.
 add_library(${PROJECT_NAME} STATIC
-   ${SRC_FILES} ${HEADERS_FILES}
+   ${FILES} ${ASSETS_FILES} ${GRAPHICS_FILES} ${INPUT_FILES} ${LOADER_FILES} ${PLATFORM_FILES} ${SCENE_FILES}
 )
 
 ######################### Flags ############################

@@ -1,5 +1,5 @@
 #include "SceneManager.h"
-#include "Time.h"
+#include "STime.h"
 
 extern IGraphicsInterface* gGraphics;
 

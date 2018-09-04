@@ -1,7 +1,7 @@
 #include <Windows.h>
 
 #include "Scene.h"
-#include "Time.h"
+#include "STime.h"
 
 extern IGraphicsInterface* gGraphics;
 

@@ -7,12 +7,12 @@
 #include <sstream>
 
 #include "DirectX12.h"	
-#include "Math.h"
-#include "Windows.h"
+#include "SMath.h"
 #include "DX12Helper.h"
 #include "DX12ResourceAllocator.h"
 #include "DX12DescriptorHeapAllocator.h"
 #include "DX12Pipeline.h"
+#include "Platform/Windows.h"
 
 std::wostream& operator<<(std::wostream& stream, EGBuffer buffer)
 {

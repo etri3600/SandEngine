@@ -1,6 +1,6 @@
 #include "DX12Pipeline.h"
-#include "Windows.h"
 #include "DX12Helper.h"
+#include "Platform/Windows.h"
 
 SDX12Pipeline::SDX12Pipeline(SDirectX12Device * pDevice, SDX12RootSignature* pRootSignature, EMaterialType materialType)
 	:m_MaterialType(materialType)

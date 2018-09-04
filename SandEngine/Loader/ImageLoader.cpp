@@ -1,7 +1,7 @@
 #include "ImageLoader.h"
 
 #include <cassert>
-#include "Utils.h"
+#include "SUtils.h"
 
 namespace {
 	const std::wstring DirPath = LR"(..\Model\)";

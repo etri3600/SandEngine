@@ -1,8 +1,8 @@
 #include "Image.h"
 
-#include "Graphics.h"
+#include "Graphics/Graphics.h"
 
-#include "DirectX12.h"
+#include "Graphics/DirectX12/DirectX12.h"
 
 STexture::~STexture()
 {

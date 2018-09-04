@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GraphicsInterface.h"
+#include "../GraphicsInterface.h"
 #if __WINDOWS__
 #define VK_USE_PLATFORM_WIN32_KHR
 #elif __LINUX__

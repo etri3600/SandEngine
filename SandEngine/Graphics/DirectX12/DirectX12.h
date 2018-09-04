@@ -2,7 +2,7 @@
 
 #include <ostream>
 
-#include "GraphicsInterface.h"
+#include "../GraphicsInterface.h"
 #include "DirectX12Device.h"
 
 struct SObjectProxy

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Math.h"
+#include "Scene/SceneObj.h"
+#include "SMath.h"
 
 class SLighting : public SSceneObj
 {
