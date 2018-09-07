@@ -173,7 +173,7 @@ ILboolean iLoadKtxInternal()
 	ILubyte		Bpp;
 	char		FileIdentifier[12] = {
 		//0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
-		'«', 'K', 'T', 'X', ' ', '1', '1', '»', '\r', '\n', '\x1A', '\n'
+		'Â«', 'K', 'T', 'X', ' ', '1', '1', 'Â»', '\r', '\n', '\x1A', '\n'
 	};
 
 	if (iCurImage == NULL) {

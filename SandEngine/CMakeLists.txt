@@ -135,29 +135,6 @@ set(FILES
 )
 source_group("Files" FILES ${FILES})
 
-# Include Library
-include_directories($ENV{VULKAN_SDK}/Include)
-
-include_directories(${PROJECT_DIR}/Include)
-link_directories(${PROJECT_DIR}/Lib)
-link_directories($ENV{VULKAN_SDK}/Source/lib)
-link_directories(${PROJECT_DIR}/Lib/IL)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	link_directories(${PROJECT_DIR}/Lib/assimp/Debug)
-else()
-	link_directories(${PROJECT_DIR}/Lib/assimp/Release)
-endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	find_library(assimp NAMES assimp-vc140-mt HINTS ${PROJECT_DIR}/Lib/assimp/Debug)
-else()
-	find_library(assimp NAMES assimp-vc140-mt HINTS ${PROJECT_DIR}/Lib/assimp/Release)
-endif()
-find_library(DevIL NAMES DevIL HINTS ${PROJECT_DIR}/Lib/IL)
-find_library(ILU NAMES ILU HINTS ${PROJECT_DIR}/Lib/IL)
-find_library(ILUT NAMES ILUT HINTS ${PROJECT_DIR}/Lib/IL)
-find_library(vulkan NAMES vulkan-1 HINTS $ENV{VULKAN_SDK}/Source/lib)
-
 # Add library to build.
 add_library(${PROJECT_NAME} STATIC
    ${FILES} ${ASSETS_FILES} ${GRAPHICS_FILES} ${INPUT_FILES} ${LOADER_FILES} ${PLATFORM_FILES} ${SCENE_FILES}
@@ -192,4 +169,18 @@ endif()
 # Add project dependencies and Link to project             #
 ############################################################
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${assimp} ${DevIL} ${ILU} ${ILUT} ${vulkan})
+# Include Library
+include_directories(${PROJECT_DIR}/Include)
+
+include_directories($ENV{VULKAN_SDK}/Include)
+link_directories($ENV{VULKAN_SDK}/Source/lib)
+find_library(vulkan NAMES vulkan-1 HINTS $ENV{VULKAN_SDK}/Source/lib)
+
+add_definitions(-DUNICODE -D_UNICODE)
+
+add_subdirectory(External/assimp-4.1.0)
+add_subdirectory(External/DevIL-1.8.0)
+
+remove_definitions(-DUNICODE -D_UNICODE)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC ${Assimp} ${ImageLib} ${vulkan})
