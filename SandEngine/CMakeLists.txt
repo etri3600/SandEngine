@@ -172,15 +172,24 @@ endif()
 # Include Library
 include_directories(${PROJECT_DIR}/Include)
 
+set(Libraries)
+
 include_directories($ENV{VULKAN_SDK}/Include)
 link_directories($ENV{VULKAN_SDK}/Source/lib)
 find_library(vulkan NAMES vulkan-1 HINTS $ENV{VULKAN_SDK}/Source/lib)
+list(APPEND Libraries ${vulkan})
 
 add_definitions(-DUNICODE -D_UNICODE)
 
-add_subdirectory(External/assimp-4.1.0)
-add_subdirectory(External/DevIL-1.8.0)
+add_subdirectory(External/assimp-4.1.0 Lib/assimp)
+list(APPEND Libraries assimp)
+add_dependencies(${PROJECT_NAME} assimp)
+
+add_subdirectory(External/DevIL-1.8.0 Lib/ImageLib)
+list(APPEND Libraries IL ILU)
+add_dependencies(${PROJECT_NAME} IL ILU)
 
 remove_definitions(-DUNICODE -D_UNICODE)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${Assimp} ${ImageLib} ${vulkan})
+
+target_link_libraries(${PROJECT_NAME} PUBLIC ${Libraries})

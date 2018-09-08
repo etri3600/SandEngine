@@ -1,11 +1,9 @@
 #pragma once
 
-#include "Loader.h"
-
-#include "IL\ilu.h"
-
 #include <string>
 
+#include "IL\ilu.h"
+#include "Loader.h"
 #include "Assets/Image.h"
 
 class SImageLoader : public SLoader

@@ -144,7 +144,13 @@ void SModelLoader::LoadTextures(SModel * model, std::wstring & directory, const 
 		aiString texturePath;
 		if (pMaterial)
 		{
-			if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+			aiTextureMapping* mapping = nullptr;
+			unsigned int uvindex = 0;
+			ai_real blend = 0;
+			aiTextureOp op;
+			aiTextureMapMode mapmode;
+
+			if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath, mapping, &uvindex, &blend, &op, &mapmode) == AI_SUCCESS)
 			{
 				STexture* texture = new STexture();
 				std::string texturePath(texturePath.data);
