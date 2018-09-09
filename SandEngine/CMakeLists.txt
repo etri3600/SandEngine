@@ -8,9 +8,6 @@ cmake_minimum_required (VERSION 3.8)
 get_filename_component(PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
 set(PROJECT_NAME SandEngine)
 
-# Outputs
-set(OUTPUT_DEBUG ../Lib)
-set(OUTPUT_RELEASE ../Lib)
 
 ################# CMake Project ############################
 # The main options of project                              #
@@ -24,19 +21,19 @@ if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Build type not specified: Use Release by default.")
 endif(NOT CMAKE_BUILD_TYPE)
 
+# Outputs
+set(LIBRARY_OUTPUT_DIR "../Lib/${CMAKE_BUILD_TYPE}")
+set(RUNTIME_OUTPUT_DIR "../Bin/${CMAKE_BUILD_TYPE}")
+
 ############## Artefacts Output ############################
 # Defines outputs , depending BUILD TYPE                   #
 ############################################################
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_DIR}/${OUTPUT_DEBUG}")
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${OUTPUT_DEBUG}")
-  set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${OUTPUT_DEBUG}")
-else()
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_DIR}/${OUTPUT_RELEASE}")
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${OUTPUT_RELEASE}")
-  set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${OUTPUT_RELEASE}")
-endif()
+message(STATUS ${CMAKE_BUILD_TYPE})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
+set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${RUNTIME_OUTPUT_DIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_DIR}/${RUNTIME_OUTPUT_DIR}")
 
 # Messages
 message("${PROJECT_NAME}: MAIN PROJECT: ${CMAKE_PROJECT_NAME}")
@@ -169,6 +166,28 @@ endif()
 # Add project dependencies and Link to project             #
 ############################################################
 
+set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)
+
+function(get_all_targets _result _dir)
+    get_property(_subdirs DIRECTORY "${_dir}" PROPERTY SUBDIRECTORIES)
+    foreach(_subdir IN LISTS _subdirs)
+        get_all_targets(${_result} "${_subdir}")
+    endforeach()
+    get_property(_sub_targets DIRECTORY "${_dir}" PROPERTY BUILDSYSTEM_TARGETS)
+    set(${_result} ${${_result}} ${_sub_targets} PARENT_SCOPE)
+endfunction()
+
+function(add_subdirectory_in_folder _subdirectory _folder)
+    add_subdirectory(${_subdirectory} ${ARGN})
+    get_all_targets(_targets "${_subdirectory}")
+    foreach(_target IN LISTS _targets)
+        set_target_properties(
+            ${_target}
+            PROPERTIES FOLDER "${_folder}"
+        )
+    endforeach()
+endfunction()
+
 # Include Library
 include_directories(${PROJECT_DIR}/Include)
 
@@ -180,16 +199,29 @@ find_library(vulkan NAMES vulkan-1 HINTS $ENV{VULKAN_SDK}/Source/lib)
 list(APPEND Libraries ${vulkan})
 
 add_definitions(-DUNICODE -D_UNICODE)
+set(UNICODE true)
 
-add_subdirectory(External/assimp-4.1.0 Lib/assimp)
+add_subdirectory_in_folder(External/assimp-4.1.0 External)
 list(APPEND Libraries assimp)
 add_dependencies(${PROJECT_NAME} assimp)
 
-add_subdirectory(External/DevIL-1.8.0 Lib/ImageLib)
-list(APPEND Libraries IL ILU)
-add_dependencies(${PROJECT_NAME} IL ILU)
+add_subdirectory_in_folder(External/DevIL-1.8.0 External)
+list(APPEND Libraries IL ILU ILUT)
+add_dependencies(${PROJECT_NAME} IL ILU ILUT)
 
+set_target_properties(IL PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
+set_target_properties(IL PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
+set_target_properties(IL PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_DIR}/${RUNTIME_OUTPUT_DIR}")
+
+set_target_properties(ILU PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
+set_target_properties(ILU PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
+set_target_properties(ILU PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_DIR}/${RUNTIME_OUTPUT_DIR}")
+
+set_target_properties(ILUT PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
+set_target_properties(ILUT PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
+set_target_properties(ILUT PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_DIR}/${RUNTIME_OUTPUT_DIR}")
+
+unset(UNICODE)
 remove_definitions(-DUNICODE -D_UNICODE)
-
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${Libraries})
