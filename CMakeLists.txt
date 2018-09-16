@@ -7,10 +7,11 @@ project ("SandDemo")
 
 if(WIN32)
 	add_definitions(-D_WIN32)
-elseif(LINUX)
-	add_definitions(-D__linux__)
-endif
+endif()
 
+if(LINUX)
+	add_definitions(-D__linux__)
+endif()
 
 # Include sub-projects.
 add_subdirectory ("SandEngine")
