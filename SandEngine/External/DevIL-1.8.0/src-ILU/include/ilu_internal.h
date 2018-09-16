@@ -47,8 +47,13 @@
 	#include <windows.h>
 	#define IL_TEXT(s) TEXT(s)
 #else
-	#define IL_TEXT(s) s
-	#define TEXT(s) s
+	#ifdef _UNICODE
+		#define IL_TEXT(s) L##s
+		#define TEXT(s) L##s
+	#else
+		#define IL_TEXT(s) s
+		#define TEXT(s) s
+	#endif
 #endif
 
 extern ILimage *iluCurImage;
