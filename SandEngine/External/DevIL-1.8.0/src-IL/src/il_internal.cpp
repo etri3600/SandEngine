@@ -171,7 +171,7 @@ ILboolean iFileExists(ILconst_string FileName)
 #if !defined(_UNICODE)
 	FILE *CheckFile = fopen(FileName, "rb");
 #elif !defined(_WIN32)
-	FILE *CheckFile = fopen((char*)FileName, L"rb");
+	FILE *CheckFile = fopen((char*)FileName, "rb");
 #else // Windows uses _wfopen instead.
 	FILE *CheckFile = _wfopen(FileName, L"rb");
 #endif//_UNICODE
