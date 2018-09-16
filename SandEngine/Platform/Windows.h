@@ -1,11 +1,11 @@
 #pragma once
 
+#include "PlatformSystem.h"
+
 #if __WINDOWS__
 
 #include <SDKDDKVer.h>
 #include <windows.h>
-
-#include "PlatformSystem.h"
 
 class SWindows : public SPlatformSystem
 {
