@@ -43,7 +43,11 @@ ILboolean ILAPIENTRY ilLoadPal(ILconst_string FileName)
 #ifndef _UNICODE
 	f = fopen(FileName, "rt");
 #else
-	f = _wfopen(FileName, L"rt");
+	#ifdef _WIN32
+		f = _wfopen(FileName, L"rt");
+	#else
+		f = fopen((char*)FileName, "rt");
+	#endif
 #endif//_UNICODE
 	if (f == NULL) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
@@ -86,7 +90,11 @@ ILboolean ilLoadJascPal(ILconst_string FileName)
 #ifndef _UNICODE
 	PalFile = fopen(FileName, "rt");
 #else
-	PalFile = _wfopen(FileName, L"rt");
+	#ifdef _WIN32
+		PalFile = _wfopen(FileName, L"rt");
+	#else
+		PalFile = fopen((char*)FileName, "rt");
+	#endif
 #endif//_UNICODE
 	if (PalFile == NULL) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
@@ -261,7 +269,11 @@ ILboolean ilSaveJascPal(ILconst_string FileName)
 #ifndef _UNICODE
 	PalFile = fopen(FileName, "wt");
 #else
-	PalFile = _wfopen(FileName, L"wt");
+	#ifdef _WIN32
+		PalFile = _wfopen(FileName, L"wt");
+	#else
+		PalFile = fopen((char*)FileName, "wt");
+	#endif
 #endif//_UNICODE
 	if (!PalFile) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
