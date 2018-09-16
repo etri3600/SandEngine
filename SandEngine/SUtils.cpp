@@ -1,5 +1,7 @@
 #include "SUtils.h"
 
+#include <cmath>
+
 namespace Sand
 {
 	void StringToWString(std::string* str, std::wstring* wstr)
@@ -27,7 +29,7 @@ namespace Sand
 	bool Equal(const double& a, const double& b)
 	{
 #define EPSILON (1.e-6)
-		return fabs(a - b) < EPSILON;
+		return std::abs(a - b) < EPSILON;
 	}
 
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#if __WINDOWS__
+
 #include <SDKDDKVer.h>
 #include <windows.h>
 
@@ -20,3 +22,5 @@ private:
 	HINSTANCE mhInstance;
 	HWND mhWnd;
 };
+
+#endif // __WINDOWS__

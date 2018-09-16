@@ -2,7 +2,10 @@
 #include "Bone.h"
 
 #include <cmath>
-#include <Windows.h>
+
+namespace {
+	bool s_log = true;
+}
 
 bool SAnimation::SetAnimation(const std::string clipName)
 {
@@ -12,10 +15,6 @@ bool SAnimation::SetAnimation(const std::string clipName)
 		return oldIndex != m_CurrentAnimIndex;
 	}
 	return false;
-}
-
-namespace {
-	bool s_log = true;
 }
 
 void SAnimation::Update(double delta)

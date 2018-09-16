@@ -223,7 +223,7 @@ struct alignas(16) SMatrix
 
 	static const SMatrix Identity;
 
-	SMatrix::SMatrix()
+	SMatrix()
 	{
 		m[0][0] = 1.0f;
 		m[1][1] = 1.0f;
@@ -231,7 +231,7 @@ struct alignas(16) SMatrix
 		m[3][3] = 1.0f;
 	}
 
-	SMatrix::SMatrix(const SVector3& X_Axis, const SVector3& Y_Axis, const SVector3& Z_Axis)
+	SMatrix(const SVector3& X_Axis, const SVector3& Y_Axis, const SVector3& Z_Axis)
 	{
 		m[0] = SVector4(X_Axis, 0.0f);
 		m[1] = SVector4(Y_Axis, 0.0f);
@@ -295,8 +295,7 @@ struct alignas(16) SMatrix
 
 struct SQuaternion
 {
-	SQuaternion()
-	{}
+	SQuaternion() = default;
 	SQuaternion(const float x, const float y, const float z, const float w)
 		:x(x), y(y), z(z), w(w)
 	{

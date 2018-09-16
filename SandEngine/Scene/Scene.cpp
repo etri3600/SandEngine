@@ -1,5 +1,3 @@
-#include <Windows.h>
-
 #include "Scene.h"
 #include "STime.h"
 
