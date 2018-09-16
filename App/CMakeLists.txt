@@ -67,7 +67,7 @@ set(ENGINE_DIR "${PROJECT_DIR}/../SandEngine")
 include_directories(${ENGINE_DIR}/Include)
 
 # Add executable to build.
-add_executable(${PROJECT_NAME} WIN32
+add_executable(${PROJECT_NAME}
    ${SRC_FILES} ${HEADERS_FILES}
 )
 
