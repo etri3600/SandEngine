@@ -52,7 +52,11 @@ ILimage *iCurImage = NULL;
 #ifdef _UNICODE
 	int iStrCmp(ILconst_string src1, ILconst_string src2)
 	{
+#ifndef _WIN32
+		return wcsicmp(src1, src2, wcslen(src1));
+#else
 		return wcsicmp(src1, src2);
+#endif
 	}
 #else
 	int iStrCmp(ILconst_string src1, ILconst_string src2)
@@ -164,8 +168,10 @@ ILstring iGetExtension(ILconst_string FileName)
 // Checks if the file exists
 ILboolean iFileExists(ILconst_string FileName)
 {
-#if (!defined(_UNICODE) || !defined(_WIN32))
+#if !defined(_UNICODE)
 	FILE *CheckFile = fopen(FileName, "rb");
+#elif !defined(_WIN32)
+	FILE *CheckFile = fopen((char*)FileName, L"rb");
 #else // Windows uses _wfopen instead.
 	FILE *CheckFile = _wfopen(FileName, L"rb");
 #endif//_UNICODE
