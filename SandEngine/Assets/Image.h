@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "Graphics/GraphicsFormat.h"
+
 struct SImage
 {
 
@@ -55,7 +57,7 @@ struct STexture : public SImage
 	std::vector<SMipTexture*> MipTextures;
 
 	SMipTexture GetCurrentMipTexture() const { return MipTextures.size() > CurrentMipLevel ? *MipTextures[CurrentMipLevel] : SMipTexture(); }
-	unsigned int GetTextureFormat() const;
+    EGraphicsFormat GetTextureFormat() const;
 	unsigned int GetTexelSize() const;
 	unsigned int GetWidth() const{
 		unsigned int Width = 0;

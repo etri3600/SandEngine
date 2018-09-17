@@ -82,7 +82,7 @@ void SAnimation::ReadNodeHeirarchy(double AnimationTime, const SBoneNode* pNode,
 				, ParentTransform.m[0][1], ParentTransform.m[1][1], ParentTransform.m[2][1], ParentTransform.m[3][1]
 				, ParentTransform.m[0][2], ParentTransform.m[1][2], ParentTransform.m[2][2], ParentTransform.m[3][2]
 				, ParentTransform.m[0][3], ParentTransform.m[1][3], ParentTransform.m[2][3], ParentTransform.m[3][3]);
-			wcscat_s(buffer, 256, temp);
+            wcsncat(buffer, temp, 256);
 			Sand::ConsoleLog(buffer);
 		}
 	}

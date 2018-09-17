@@ -64,7 +64,7 @@ set(GRAPHICS_FILES
     Graphics/DirectX12/DirectX12.cpp
     Graphics/DirectX12/DirectX12Device.cpp
     Graphics/DirectX12/DX12DescriptorHeapAllocator.cpp
-	Graphics/DirectX12/DX12Helper.cpp
+    Graphics/DirectX12/DX12Helper.cpp
     Graphics/DirectX12/DX12InputVertexAttributes.cpp
     Graphics/DirectX12/DX12ResourceAllocator.cpp
     Graphics/DirectX12/DX12Pipeline.cpp
@@ -73,7 +73,7 @@ set(GRAPHICS_FILES
     Graphics/Graphics.cpp
     Graphics/Vulkan/Vulkan.cpp
     Graphics/Vulkan/VulkanDevice.cpp
-	Graphics/DirectX12/DirectX12.h
+    Graphics/DirectX12/DirectX12.h
     Graphics/DirectX12/DirectX12Device.h
     Graphics/DirectX12/DX12DescriptorHeapAllocator.h
     Graphics/DirectX12/DX12Helper.h
@@ -85,6 +85,7 @@ set(GRAPHICS_FILES
     Graphics/DirectX12/DX12RootSignature.h
     Graphics/Graphics.h
     Graphics/GraphicsInterface.h
+    Graphics/GraphicsFormat.h
     Graphics/Vulkan/Vulkan.h
     Graphics/Vulkan/VulkanDevice.h
 )
@@ -103,18 +104,18 @@ set(LOADER_FILES
 )
 
 set(PLATFORM_FILES
-	Platform/Windows.cpp
-	Platform/Linux.h
+    Platform/Windows.cpp
+    Platform/Linux.h
     Platform/PlatformManager.h
     Platform/PlatformSystem.h
-	Platform/Windows.h
+    Platform/Windows.h
 )
 
 set(SCENE_FILES
     Scene/Node.cpp
     Scene/Scene.cpp
     Scene/SceneManager.cpp
-	Scene/SceneObj.h
+    Scene/SceneObj.h
     Scene/Scene.h
     Scene/SceneManager.h
     Scene/Node.h

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicsInterface.h"
+#include "GraphicsFormat.h"
 
 class SGraphics
 {

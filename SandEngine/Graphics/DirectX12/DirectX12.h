@@ -1,8 +1,8 @@
 #pragma once
 
-#include <ostream>
-
 #include "../GraphicsInterface.h"
+
+#include <ostream>
 #include "DirectX12Device.h"
 
 struct SObjectProxy

@@ -5,6 +5,7 @@
 #include "SUtils.h"
 #include "Image.h"
 #include "Material.h"
+#include "Graphics/GraphicsFormat.h"
 
 #include <queue>
 
@@ -138,8 +139,8 @@ public:
 		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetCurrentMipTexture().pTexData : nullptr;
 	}
 
-	unsigned int TextureFormat(unsigned int nTextureIndex) const {
-		return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTextureFormat() : 0;
+    EGraphicsFormat TextureFormat(unsigned int nTextureIndex) const {
+        return Textures.size() > nTextureIndex ? Textures[nTextureIndex]->GetTextureFormat() : EGraphicsFormat::None;
 	}
 
 	unsigned int TexelSize(unsigned int nTextureIndex) const {
@@ -164,7 +165,7 @@ public:
 class STriangle : public SModel
 {
 public:
-	STriangle::STriangle()
+    STriangle()
 	{
 		SSkinnedModelVertex point1, point2, point3;
 		point1.position = SVector3(0.0f, 1.0f, 0.0f);
@@ -198,7 +199,7 @@ public:
 class SCube : public SModel
 {
 public:
-	SCube::SCube()
+    SCube()
 	{
 		SSkinnedModelVertex point1, point2, point3, point4, point5, point6, point7, point8;
 		point1.position = { -1.0f, 1.0f, 1.0f };

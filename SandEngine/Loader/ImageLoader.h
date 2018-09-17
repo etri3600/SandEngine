@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "IL\ilu.h"
+#include "IL/ilu.h"
 #include "Loader.h"
 #include "Assets/Image.h"
 
