@@ -38,7 +38,6 @@ extern "C" {
 #include "il_endian.h"
 #include "il_manip.h"
 
-
 // If we do not want support for game image formats, this define removes them all.
 #ifdef IL_NO_GAMES
 	#define IL_NO_BLP

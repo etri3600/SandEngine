@@ -466,13 +466,13 @@ ILimage *iQuantizeImage(ILimage *Image, ILuint NumCols)
 	size = Width * Height * Depth;
         
         #ifdef ALTIVEC_GCC
-            register ILuint v_size = size>>4;
-            register ILuint pos = 0;
+            ILuint v_size = size>>4;
+            ILuint pos = 0;
             v_size = v_size /3;
-            register vector unsigned char d0,d1,d2;
-            register vector unsigned char red[3],blu[3],green[3];
+            vector unsigned char d0,d1,d2;
+            vector unsigned char red[3],blu[3],green[3];
             
-            register union{
+            union{
                 vector unsigned char vec;
                 vector unsigned int load;
             } mask_1, mask_2, mask_3;

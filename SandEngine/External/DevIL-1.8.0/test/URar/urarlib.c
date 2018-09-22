@@ -1746,7 +1746,7 @@ static void DecodeNumber(struct Decode *Deco)
 /* *** 52.6% of all CPU time is spent within this function!!!               */
 {
   unsigned int I;
-  register unsigned int N;
+  unsigned int N;
   GetBits();
 
 #ifdef _USE_ASM
