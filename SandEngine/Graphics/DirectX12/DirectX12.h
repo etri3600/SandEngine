@@ -2,6 +2,8 @@
 
 #include "../GraphicsInterface.h"
 
+#if __WINDOWS__
+
 #include <ostream>
 #include "DirectX12Device.h"
 
@@ -135,3 +137,4 @@ private:
 private:
 	static constexpr unsigned int c_NumDescriptorsPerHeap = 64;
 };
+#endif
