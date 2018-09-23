@@ -1,3 +1,4 @@
+#if __WINDOWS__
 #include "DX12RootSignature.h"
 #include "Windows.h"
 
@@ -29,3 +30,4 @@ unsigned int SDX12RootSignature::GetTableLocation()
 {
 	return m_pRootParameter->GetTableLocation();
 }
+#endif

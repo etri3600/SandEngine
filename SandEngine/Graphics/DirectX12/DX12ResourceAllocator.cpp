@@ -1,3 +1,4 @@
+#if __WINDOWS__
 #include "DX12ResourceAllocator.h"
 #include "DirectX12.h"
 #include "Windows.h"
@@ -100,3 +101,4 @@ unsigned int SDX12ResourceAllocator::GetHeapSize() const
 {
 	return m_HeapType == HEAP_DEFAULT ? c_DefaultWidth : c_UploadWidth;
 }
+#endif

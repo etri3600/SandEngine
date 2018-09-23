@@ -1,3 +1,5 @@
+#if __WINDOWS__
+
 #include "DirectX12Device.h"
 #include "SUtils.h"
 #include <d3d12sdklayers.h>
@@ -112,3 +114,4 @@ void SDirectX12Device::Finalize()
 		m_pDXGIFactory = nullptr;
 	}
 }
+#endif

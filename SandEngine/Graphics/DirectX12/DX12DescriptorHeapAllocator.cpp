@@ -1,3 +1,4 @@
+#if __WINDOWS__
 #include "DX12DescriptorHeapAllocator.h"
 
 D3D12_CPU_DESCRIPTOR_HANDLE SDX12DescriptorHeapAllocator::Allocate(unsigned int Count)
@@ -30,3 +31,4 @@ ID3D12DescriptorHeap* SDX12DescriptorHeapAllocator::RequestNewHeap(D3D12_DESCRIP
 	m_pDevice->GetDevice()->CreateDescriptorHeap(&Desc, IID_PPV_ARGS(&pHeap));
 	return pHeap;
 }
+#endif

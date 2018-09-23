@@ -1,3 +1,4 @@
+#if __WINDOWS__
 #include "DX12Pipeline.h"
 #include "DX12Helper.h"
 #include "Platform/Windows.h"
@@ -214,3 +215,4 @@ void SDX12Pipeline::UpdateConstantBuffer(SBatchProxy* batchProxy, unsigned int o
 {
 	m_pResources->UpdateConstantBuffer(batchProxy, objIndex, view, projection);
 }
+#endif

@@ -1,3 +1,4 @@
+#if __WINDOWS__
 #include "DX12Helper.h"
 #include <fstream>
 #include <string>
@@ -143,3 +144,4 @@ void CompileShader(const wchar_t* fileName, const char* version, const char* ent
 
 	shader.clear();
 }
+#endif

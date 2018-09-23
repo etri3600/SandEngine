@@ -1,3 +1,5 @@
+#if __WINDOWS__
+
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -914,3 +916,5 @@ void SDirectX12::InitBundle()
 {
 	m_pBundleList->Close();
 }
+
+#endif

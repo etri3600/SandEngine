@@ -1,3 +1,4 @@
+#if __WINDOWS__
 #include "DX12Resources.h"
 
 #define ALIGNED_SIZE(size, align) ((size + (align-1)) & ~(align-1))
@@ -161,3 +162,4 @@ void SDX12SsAoResources::CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12D
 	m_pCBVBuffers[0]->Map(0, &readRange, reinterpret_cast<void**>(&m_MappedConstantBuffers[0]));
 	memset(m_MappedConstantBuffers[0], 0, ALIGNED_SIZE(sizeof(SViewProjection), 256));
 }
+#endif
