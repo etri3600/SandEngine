@@ -1,5 +1,7 @@
 #include "Windows.h"
 
+#if __WINDOWS__
+
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -116,3 +118,5 @@ LRESULT __stdcall WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
+
+#endif

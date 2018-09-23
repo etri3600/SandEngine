@@ -46,96 +46,48 @@ message("${PROJECT_NAME}: CURR BIN DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 
 include_directories(${PROJECT_DIR})
 
-set(ASSETS_FILES
-	Assets/Animation.cpp
-	Assets/Image.cpp
-	Assets/ModelStruct.cpp
-	Assets/Lighting.h
-    Assets/Animation.h
-    Assets/Bone.h
-	Assets/Image.h
-	Assets/Material.h
-    Assets/ModelStruct.h
-    Assets/ConstantBuffer.h
-	Assets/Lighting.h
+file(GLOB ASSETS_FILES
+	"Assets/*.cpp"
+	"Assets/*.h"
 )
 
-set(GRAPHICS_FILES
-    Graphics/DirectX12/DirectX12.cpp
-    Graphics/DirectX12/DirectX12Device.cpp
-    Graphics/DirectX12/DX12DescriptorHeapAllocator.cpp
-    Graphics/DirectX12/DX12Helper.cpp
-    Graphics/DirectX12/DX12InputVertexAttributes.cpp
-    Graphics/DirectX12/DX12ResourceAllocator.cpp
-    Graphics/DirectX12/DX12Pipeline.cpp
-    Graphics/DirectX12/DX12Resources.cpp
-    Graphics/DirectX12/DX12RootSignature.cpp
-    Graphics/Graphics.cpp
-    Graphics/Vulkan/Vulkan.cpp
-    Graphics/Vulkan/VulkanDevice.cpp
-    Graphics/DirectX12/DirectX12.h
-    Graphics/DirectX12/DirectX12Device.h
-    Graphics/DirectX12/DX12DescriptorHeapAllocator.h
-    Graphics/DirectX12/DX12Helper.h
-    Graphics/DirectX12/DX12InputVertexAttributes.h
-    Graphics/DirectX12/DX12ResourceAllocator.h
-    Graphics/DirectX12/DX12Pipeline.h
-    Graphics/DirectX12/DX12Resources.h
-    Graphics/DirectX12/DX12RootParameter.h
-    Graphics/DirectX12/DX12RootSignature.h
-    Graphics/Graphics.h
-    Graphics/GraphicsInterface.h
-    Graphics/GraphicsFormat.h
-    Graphics/Vulkan/Vulkan.h
-    Graphics/Vulkan/VulkanDevice.h
+file(GLOB GRAPHICS_FILES
+    "Graphics/*.cpp"
+	"Graphics/*.h"
+    "Graphics/DirectX12/*.cpp"
+    "Graphics/DirectX12/*.h"
+    "Graphics/Vulkan/*.cpp"
+    "Graphics/Vulkan/*.h"
 )
 
-set(INPUT_FILES
-    Input/Input.h
-    Input/InputManager.h
+file(GLOB INPUT_FILES
+    "Input/*.h"
+    "Input/*.cpp"
 )
 
-set(LOADER_FILES
-	Loader/ImageLoader.cpp
-	Loader/ModelLoader.cpp
-	Loader/Loader.h
-	Loader/ModelLoader.h
-	Loader/ImageLoader.h
+file(GLOB LOADER_FILES
+	"Loader/*.cpp"
+	"Loader/*.h"
 )
 
-set(PLATFORM_FILES
-    Platform/Windows.cpp
-    Platform/Linux.h
-    Platform/PlatformManager.h
-    Platform/PlatformSystem.h
-    Platform/Windows.h
+file(GLOB PLATFORM_FILES
+    "Platform/*.cpp"
+    "Platform/*.h"
 )
 
-set(SCENE_FILES
-    Scene/Node.cpp
-    Scene/Scene.cpp
-    Scene/SceneManager.cpp
-    Scene/SceneObj.h
-    Scene/Scene.h
-    Scene/SceneManager.h
-    Scene/Node.h
+file(GLOB SCENE_FILES
+    "Scene/*.cpp"
+    "Scene/*.h"
 )
 
-set(FILES
-    SMath.cpp
-    SUtils.cpp
-    SandEngine.h
-    SHeader.h
-    SMath.h
-    Singletone.h
-    STime.h
-    SUtils.h
+file(GLOB GLOBAL_FILES
+	"*.cpp"
+	"*.h"
 )
-source_group("Files" FILES ${FILES})
 
 # Add library to build.
 add_library(${PROJECT_NAME} STATIC
-   ${FILES} ${ASSETS_FILES} ${GRAPHICS_FILES} ${INPUT_FILES} ${LOADER_FILES} ${PLATFORM_FILES} ${SCENE_FILES}
+   ${GLOBAL_FILES} ${ASSETS_FILES} ${GRAPHICS_FILES} ${INPUT_FILES} ${LOADER_FILES} ${PLATFORM_FILES} ${SCENE_FILES}
 )
 
 ######################### Flags ############################
