@@ -1,6 +1,7 @@
 #include "ImageLoader.h"
 
 #include <cassert>
+#include <cstring>
 #include "SUtils.h"
 
 namespace {

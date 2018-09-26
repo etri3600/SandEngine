@@ -146,7 +146,7 @@ include_directories(${PROJECT_DIR}/Include)
 
 set(Libraries)
 
-include_directories($ENV{VULKAN_SDK}/Include)
+include_directories($ENV{VULKAN_SDK}/include)
 if (MSVC)
   link_directories($ENV{VULKAN_SDK}/Source/lib)
   find_library(vulkan NAMES vulkan-1 HINTS $ENV{VULKAN_SDK}/Source/lib)
