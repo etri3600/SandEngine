@@ -1,5 +1,6 @@
 #include "Vulkan.h"
 #include "Platform/Windows.h"
+#include "Platform/Linux.h"
 
 SVulkan::SVulkan()
 {
@@ -25,9 +26,15 @@ vk::SurfaceKHR SVulkan::CreateSurface(const SPlatformSystem* pPlayformSystem)
 	vk::Win32SurfaceCreateInfoKHR surfaceInfo = vk::Win32SurfaceCreateInfoKHR()
 		.setHinstance(pWindowsSystem->GetInstance())
 		.setHwnd(pWindowsSystem->GetWindowHandle());
-#endif
 
 	return m_pDevice->GetDevice().createWin32SurfaceKHR(surfaceInfo);
+#else
+	const SLinux* pLinuxSystem = static_cast<const SLinux*>(pPlayformSystem);
+	vk::XcbSurfaceCreateInfoKHR surfaceInfo = vk::XcbSurfaceCreateInfoKHR()
+		.setConnection(pLinuxSystem->GetConnection())
+		.setWindow(pLinuxSystem->GetWindow());
+	return m_pDevice->GetDevice().createXcbSurfaceKHR(surfaceInfo);
+#endif
 }
 
 void SVulkan::Finalize()

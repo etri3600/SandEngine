@@ -7,8 +7,8 @@
 #include "Assets/Bone.h"
 
 namespace {
-	const std::wstring WDirPath = LR"(..\Model\)";
-	const std::string DirPath = R"(..\Model\)";
+	const std::wstring WDirPath = LR"(../Model/)";
+	const std::string DirPath = R"(../Model/)";
 }
 
 bool SModelLoader::Initialize()
@@ -22,7 +22,7 @@ SModel* SModelLoader::LoadModelFromFile(const wchar_t* file)
 {
 	Assimp::Importer importer;
 	std::wstring wfullPath = WDirPath + file;
-	size_t lastPos = wfullPath.find_last_of(L"\\");
+	size_t lastPos = wfullPath.find_last_of(L"/");
 	std::wstring directory;
 	if (std::wstring::npos != lastPos)
 	{
