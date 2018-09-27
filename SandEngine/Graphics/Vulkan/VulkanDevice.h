@@ -4,7 +4,7 @@
 #if __WINDOWS__
 #define VK_USE_PLATFORM_WIN32_KHR
 #elif __LINUX__
-#define VK_USE_PLATFORM_
+#define VK_USE_PLATFORM_XCB_KHR
 #endif
 #include <vulkan/vulkan.hpp>
 

@@ -9,7 +9,6 @@
 enum class EGraphicsInterfaceEnum : unsigned char
 {
 	DX12,
-	//GL4,
 	VULKAN
 };
 

@@ -12,7 +12,7 @@ public:
 	bool Init() override;
 	bool Tick() override;
 
-	xcb_connection_t* GetConnection() const { return connectoin; }
+    xcb_connection_t* GetConnection() const { return connection; }
 	xcb_window_t GetWindow() const { return window; }
 
 protected:

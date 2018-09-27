@@ -7,7 +7,7 @@ bool SLinux::Init()
 	connection = xcb_connect(NULL, &screenp);
 
 	if (xcb_connection_has_error(connection))
-		exitOnError("Failed to connect to X server using XCB.");
+        return false;
 
 	xcb_screen_iterator_t iter = xcb_setup_roots_iterator(xcb_get_setup(connection));
 
@@ -27,8 +27,8 @@ bool SLinux::Init()
 		screen->root,
 		0,
 		0,
-		windowWidth,
-		windowHeight,
+        1280,
+        720,
 		0,
 		XCB_WINDOW_CLASS_INPUT_OUTPUT,
 		screen->root_visual,
@@ -44,7 +44,7 @@ bool SLinux::Tick()
 	xcb_generic_event_t *event;
 	xcb_client_message_event_t *cm;
 
-	while ((event = xcb_poll_for_event(connection, 0))) {
+    while ((event = xcb_poll_for_event(connection))) {
 		switch (event->response_type & ~0x80) {
 			case XCB_CLIENT_MESSAGE: {
 				cm = (xcb_client_message_event_t *)event;
