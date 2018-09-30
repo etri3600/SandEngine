@@ -143,13 +143,17 @@ endfunction()
 
 # Include Library
 include_directories(${PROJECT_DIR}/Include)
+if(LINUX)
 find_package(PkgConfig)
+endif(LINUX)
 
 set(Libraries)
 
+if(LINUX)
 pkg_check_modules(XCB REQUIRED xcb)
 target_include_directories(${PROJECT_NAME} PRIVATE ${XCB_INCLUDEDIR})
 list(APPEND Libraries ${XCB_LIBRARIES})
+endif(LINUX)
 
 include_directories($ENV{VULKAN_SDK}/include)
 if (MSVC)
