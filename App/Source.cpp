@@ -1,10 +1,7 @@
 
 #include "../SandEngine/SandEngine.h"
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPWSTR    lpCmdLine,
-	_In_ int       nCmdShow)
+auto internal_main() -> int
 {
 	auto framework = SPlatformManager::CreateFramework();
 	if (framework && framework->Init())
@@ -49,6 +46,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		SGraphics::Fianalize();
 	}
-
 	return 0;
 }
+
+
+#ifdef _WIN32
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPWSTR    lpCmdLine,
+	_In_ int       nCmdShow)
+{
+
+	return internal_main();
+}
+#else
+int main()
+{
+	return internal_main();
+}
+#endif

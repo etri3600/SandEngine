@@ -64,6 +64,7 @@ source_group("Headers" FILES ${HEADERS_FILES})
 set(SOLUTION_DIR "${PROJECT_DIR}/..")
 set(ENGINE_DIR "${PROJECT_DIR}/../SandEngine")
 
+include_directories(${ENGINE_DIR})
 include_directories(${ENGINE_DIR}/Include)
 
 # Add executable to build.

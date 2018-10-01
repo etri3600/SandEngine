@@ -53,7 +53,7 @@ file(GLOB ASSETS_FILES
 
 file(GLOB GRAPHICS_FILES
     "Graphics/*.cpp"
-	"Graphics/*.h"
+    "Graphics/*.h"
     "Graphics/DirectX12/*.cpp"
     "Graphics/DirectX12/*.h"
     "Graphics/Vulkan/*.cpp"
@@ -89,6 +89,8 @@ file(GLOB GLOBAL_FILES
 add_library(${PROJECT_NAME} STATIC
    ${GLOBAL_FILES} ${ASSETS_FILES} ${GRAPHICS_FILES} ${INPUT_FILES} ${LOADER_FILES} ${PLATFORM_FILES} ${SCENE_FILES}
 )
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_DIR}) 
 
 ######################### Flags ############################
 # Defines Flags for Windows and Linux                      #
@@ -143,26 +145,33 @@ endfunction()
 
 # Include Library
 include_directories(${PROJECT_DIR}/Include)
-if(LINUX)
+if(NOT WIN32)
 find_package(PkgConfig)
-endif(LINUX)
+endif()
 
 set(Libraries)
 
-if(LINUX)
+if(NOT WIN32)
 pkg_check_modules(XCB REQUIRED xcb)
 target_include_directories(${PROJECT_NAME} PRIVATE ${XCB_INCLUDEDIR})
+message(STATUS "XCB_LIBRARIES ${XCB_LIBRARIES}")
 list(APPEND Libraries ${XCB_LIBRARIES})
-endif(LINUX)
+endif()
 
 include_directories($ENV{VULKAN_SDK}/include)
 if (MSVC)
-  link_directories($ENV{VULKAN_SDK}/Source/lib)
-  find_library(vulkan NAMES vulkan-1 HINTS $ENV{VULKAN_SDK}/Source/lib)
-else (MSVC)
+  pkg_check_modules(vulkan vulkan)
+  if (vulkan_FOUND)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${vulkan_INCLUDEDIR})
+    list(APPEND Libraries ${vulkan_LIBRARIES})
+  else()
+    link_directories($ENV{VULKAN_SDK}/Source/lib)
+    find_library(vulkan NAMES vulkan-1 HINTS $ENV{VULKAN_SDK}/Source/lib)
+  endif()
+else ()
   link_directories($ENV{VULKAN_SDK}/lib)
   find_library(vulkan NAMES vulkan HINTS $ENV{VULKAN_SDK}/lib)
-endif (MSVC)
+endif ()
 message(STATUS $ENV{VULKAN_SDK}/lib)
 message(STATUS ${vulkan})
 list(APPEND Libraries ${vulkan})
