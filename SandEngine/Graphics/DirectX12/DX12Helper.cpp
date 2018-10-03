@@ -80,9 +80,9 @@ unsigned __int64 UpdateSubresource(ID3D12GraphicsCommandList* pCmdList, ID3D12Re
 void CompileShader(const wchar_t* fileName, const char* version, const char* entrypointName, ID3DBlob** pBlob)
 {
 	std::vector<byte> shader;
-	constexpr auto shaderFolder = LR"(..\SandEngine\Shaders\)";
+	constexpr auto shaderFolder = LR"(../../SandEngine/Shaders/)";
 	constexpr auto shaderExtension = L".hlsl";
-	constexpr auto csoFolder = LR"(..\Shaders\)";
+	constexpr auto csoFolder = LR"(../../Shaders/)";
 	constexpr auto csoExtension = L".cso";
 	std::wstring file(fileName);
 

@@ -28,10 +28,10 @@ public:
 	EMaterialType GetMaterialType() const { return m_MaterialType; }
 
 private:
-	SDirectX12Device* m_pDevice;
-	SDX12Resources* m_pResources;
-	SDX12RootSignature* m_pRootSignature;
-	ID3D12PipelineState* m_pPipelineState;
+	SDirectX12Device* m_pDevice = nullptr;
+	SDX12Resources* m_pResources = nullptr;
+	SDX12RootSignature* m_pRootSignature = nullptr;
+	ID3D12PipelineState* m_pPipelineState = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW m_VertexBufferView;
 	D3D12_INDEX_BUFFER_VIEW m_IndexBufferView;
 	EMaterialType m_MaterialType;

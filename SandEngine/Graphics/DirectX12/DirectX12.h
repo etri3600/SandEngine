@@ -1,10 +1,8 @@
 #pragma once
 
-#include "../GraphicsInterface.h"
-
-#if __WINDOWS__
-
 #include <ostream>
+
+#include "../GraphicsInterface.h"
 #include "DirectX12Device.h"
 
 struct SObjectProxy
@@ -88,45 +86,41 @@ private:
 	std::vector<SDX12RootSignature*> m_RootSignatures;
 	std::vector<SDX12Pipeline*> m_pipelines;
 
-	ID3D12CommandQueue* m_pCommandQueue;
+	ID3D12CommandQueue* m_pCommandQueue = nullptr;
 	ID3D12CommandAllocator* m_pCommandAllocator[c_BufferingCount];
-	ID3D12GraphicsCommandList* m_pCommandList;
+	ID3D12GraphicsCommandList* m_pCommandList = nullptr;
 
 	ID3D12CommandAllocator* m_pBundleAllocator;
 	ID3D12GraphicsCommandList* m_pBundleList;
 
-	//ID3D12PipelineState* m_pPipelineState;
-	ID3D12Fence* m_pFence;
+	ID3D12Fence* m_pFence = nullptr;
 	unsigned __int64 m_nFenceValue[c_BufferingCount];
-	IDXGISwapChain4* m_pSwapChain;
+	IDXGISwapChain4* m_pSwapChain = nullptr;
 	unsigned int m_RenderTargetViewDescriptorSize = 0;
 	D3D12_VIEWPORT m_Viewport;
 
-	ID3D12DescriptorHeap* m_pRenderTargetViewHeap;
+	ID3D12DescriptorHeap* m_pRenderTargetViewHeap = nullptr;
 	ID3D12Resource* m_pBackBufferRenterTarget[c_BufferingCount];
 
-	ID3D12Resource* m_pVertexBuffer;
+	ID3D12Resource* m_pVertexBuffer = nullptr;
 	std::vector<byte> m_vertexShader;
 
 	std::vector<byte> m_pixelShader;
 
-	ID3D12Resource* m_pIndexBuffer;
+	ID3D12Resource* m_pIndexBuffer = nullptr;
 
 	ID3D12DescriptorHeap* m_pShaderBufferHeap;
 	unsigned int m_uiShaderBufferDescriptorSize = 0;
-	//ID3D12Resource* m_pCBVBuffer[2];
-	//unsigned int m_uiCBVDescriptorOffset = 0;
-	//ID3D12Resource* m_pSRVBuffer;
 
-	ID3D12DescriptorHeap* m_pSamplerHeap;
+	ID3D12DescriptorHeap* m_pSamplerHeap = nullptr;
 
-	ID3D12DescriptorHeap* m_pGBufferRTVHeap;
-	ID3D12DescriptorHeap* m_pGBufferCbvSrvHeap;
+	ID3D12DescriptorHeap* m_pGBufferRTVHeap = nullptr;
+	ID3D12DescriptorHeap* m_pGBufferCbvSrvHeap = nullptr;
 	ID3D12Resource* m_pGBuffers[static_cast<unsigned short>(EGBuffer::GB_NUM)];
 
-	ID3D12DescriptorHeap* m_pPostProcessRTVHeap;
-	ID3D12DescriptorHeap* m_pPostProcessCbvSrvHeap;
-	ID3D12Resource* m_pPostProcessResource;
+	ID3D12DescriptorHeap* m_pPostProcessRTVHeap = nullptr;
+	ID3D12DescriptorHeap* m_pPostProcessCbvSrvHeap = nullptr;
+	ID3D12Resource* m_pPostProcessResource = nullptr;
 
 	SSceneProxy m_SceneProxy;
 
@@ -137,4 +131,3 @@ private:
 private:
 	static constexpr unsigned int c_NumDescriptorsPerHeap = 64;
 };
-#endif

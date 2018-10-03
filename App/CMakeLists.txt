@@ -68,7 +68,7 @@ include_directories(${ENGINE_DIR})
 include_directories(${ENGINE_DIR}/Include)
 
 # Add executable to build.
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} WIN32
    ${SRC_FILES} ${HEADERS_FILES}
 )
 
@@ -84,19 +84,11 @@ endif(NOT MSVC)
 target_compile_definitions(${PROJECT_NAME} PRIVATE _UNICODE UNICODE)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE 
-    )
-    if(MSVC)
-        target_compile_options(${PROJECT_NAME} PRIVATE  /W3 /MDd /Od /Zi /EHsc)
-    endif()
+    target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG _DEBUG)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE 
-    )
-    if(MSVC)
-        target_compile_options(${PROJECT_NAME} PRIVATE  /W3 /MD /GL /Oi /Gy /Zi /EHsc)
-    endif()
+    target_compile_definitions(${PROJECT_NAME} PRIVATE )
 endif()
 
 ########### Link & Dependencies ############################

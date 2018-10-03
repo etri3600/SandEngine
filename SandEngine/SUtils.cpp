@@ -1,29 +1,37 @@
 #include "SUtils.h"
 
 #include <cmath>
+#include <algorithm>
 
 namespace Sand
 {
-	void StringToWString(std::string* str, std::wstring* wstr)
+	void string_to_wstring(std::string* str, std::wstring* wstr)
 	{
-		*wstr = StringToWString(str);
+		*wstr = string_to_wstring(str);
 	}
 
-	std::wstring StringToWString(std::string* str)
+	std::wstring string_to_wstring(std::string* str)
 	{
 		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 		return converter.from_bytes(*str);
 	}
 
-	void WStringToString(std::wstring* wstr, std::string* str)
+	void wstring_to_string(std::wstring* wstr, std::string* str)
 	{
-		*str = WStringToString(wstr);
+		*str = wstring_to_string(wstr);
 	}
 	
-	std::string WStringToString(std::wstring* wstr)
+	std::string wstring_to_string(std::wstring* wstr)
 	{
 		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 		return converter.to_bytes(*wstr);
+	}
+
+	void PlatformPath(std::wstring& wstr)
+	{
+#if __WINDOWS__
+		std::replace(wstr.begin(), wstr.end(), L'/', L'\\');
+#endif
 	}
 
 	bool Equal(const double& a, const double& b)

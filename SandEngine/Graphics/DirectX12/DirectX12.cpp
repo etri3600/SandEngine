@@ -1,5 +1,4 @@
 #if __WINDOWS__
-
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -10,11 +9,11 @@
 
 #include "DirectX12.h"	
 #include "SMath.h"
+#include "Platform/Windows.h"
 #include "DX12Helper.h"
 #include "DX12ResourceAllocator.h"
 #include "DX12DescriptorHeapAllocator.h"
 #include "DX12Pipeline.h"
-#include "Platform/Windows.h"
 
 std::wostream& operator<<(std::wostream& stream, EGBuffer buffer)
 {
@@ -916,5 +915,4 @@ void SDirectX12::InitBundle()
 {
 	m_pBundleList->Close();
 }
-
 #endif

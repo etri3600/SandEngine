@@ -11,10 +11,11 @@ IGraphicsInterface* SGraphics::Initialize(const EGraphicsInterfaceEnum giInterfa
 {
 	s_eGraphicInterface = giInterface;
 #if __WINDOWS__
-    return new SDirectX12;
+	gGraphics = new SDirectX12;
 #else
-    return new SVulkan;
+	gGraphics = new SVulkan;
 #endif
+	return gGraphics;
 }
 
 void SGraphics::Fianalize()

@@ -17,7 +17,7 @@ auto internal_main() -> int
 
 			SNode* root_node = scene->GetRootNode();
 
-			auto model = ModelLoader->LoadModelFromFile(LR"(boblampclean\boblampclean.md5mesh)");
+			auto model = ModelLoader->LoadModelFromFile(LR"(boblampclean/boblampclean.md5mesh)");
 			model->Scale = {0.3f, 0.3f, 0.3f};
 			model->Location = { 0.0f, -10.0f, -10.0f };
 			model->Material.Type = EMaterialType::SKINNING;
@@ -56,7 +56,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
-
 	return internal_main();
 }
 #else

@@ -1,8 +1,8 @@
 #if __WINDOWS__
-
 #include "DirectX12Device.h"
-#include "SUtils.h"
 #include <d3d12sdklayers.h>
+
+#include "SUtils.h"
 
 SDirectX12Device::~SDirectX12Device()
 {

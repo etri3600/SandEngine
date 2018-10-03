@@ -7,8 +7,8 @@
 #include "Assets/Bone.h"
 
 namespace {
-	const std::wstring WDirPath = LR"(../Model/)";
-	const std::string DirPath = R"(../Model/)";
+	const std::wstring WDirPath = LR"(../../Model/)";
+	const std::string DirPath = R"(../../Model/)";
 }
 
 bool SModelLoader::Initialize()
@@ -28,8 +28,9 @@ SModel* SModelLoader::LoadModelFromFile(const wchar_t* file)
 	{
 		directory = wfullPath.substr(0, lastPos + 1);
 	}
-
-	const aiScene* pScene = importer.ReadFile(Sand::WStringToString(&wfullPath),
+	
+	//Sand::PlatformPath(wfullPath);
+	const aiScene* pScene = importer.ReadFile(Sand::wstring_to_string(&wfullPath),
 		aiProcess_CalcTangentSpace |
 		aiProcess_Triangulate |
 		//aiProcess_JoinIdenticalVertices | 
@@ -154,7 +155,7 @@ void SModelLoader::LoadTextures(SModel * model, std::wstring & directory, const 
 			{
 				STexture* texture = new STexture();
                 std::string textureStr(texturePath.data);
-                std::wstring fullPath = directory + Sand::StringToWString(&textureStr);
+                std::wstring fullPath = directory + Sand::string_to_wstring(&textureStr);
 				m_ImageLoader->LoadTextureFromFile(fullPath.c_str(), texture);
 				model->Textures.push_back(texture);
 			}
