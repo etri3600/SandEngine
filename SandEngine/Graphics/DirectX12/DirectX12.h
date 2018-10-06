@@ -3,6 +3,8 @@
 #include <ostream>
 
 #include "../GraphicsInterface.h"
+
+#if __WINDOWS__
 #include "DirectX12Device.h"
 
 struct SObjectProxy
@@ -131,3 +133,4 @@ private:
 private:
 	static constexpr unsigned int c_NumDescriptorsPerHeap = 64;
 };
+#endif

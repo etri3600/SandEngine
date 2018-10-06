@@ -4,6 +4,7 @@
 #include <math.h>
 #include <cassert>
 #include <algorithm>
+#include <stdexcept>
 
 #include "SUtils.h"
 
@@ -70,6 +71,7 @@ struct SVector3
 		case 0: return x;
 		case 1: return y;
 		case 2: return z;
+		default: throw std::out_of_range("Index must be between [0,2]");
 		}
 	}
 
@@ -81,6 +83,7 @@ struct SVector3
 		case 0: return x;
 		case 1: return y;
 		case 2: return z;
+		default: throw std::out_of_range("Index must be between [0,2]");
 		}
 	}
 	
