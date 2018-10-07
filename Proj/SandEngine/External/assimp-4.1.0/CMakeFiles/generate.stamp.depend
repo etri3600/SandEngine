@@ -1,0 +1,21 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-3.12/Modules/CheckFunctionExists.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/CheckIncludeFile.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/CheckIncludeFileCXX.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/CheckTypeSize.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindOpenGL.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindPkgConfig.cmake
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/CMakeLists.txt
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/assimp-config-version.cmake.in
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/assimp-config.cmake.in
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/assimp.pc.in
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/cmake-modules/FindDevIL.cmake
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/cmake-modules/FindDirectX.cmake
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/cmake-modules/FindPkgMacros.cmake
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/cmake-modules/FindZLIB.cmake
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/cmake-modules/PrecompiledHeader.cmake
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/cmake-modules/cmake_uninstall.cmake.in
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/include/assimp/config.h.in
+D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/revision.h.in

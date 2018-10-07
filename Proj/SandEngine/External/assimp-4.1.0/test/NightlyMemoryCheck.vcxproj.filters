@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Repos\SandEngine\Proj\CMakeFiles\8eabc1bc47bb25f315ccc6794c07e07b\NightlyMemoryCheck.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="D:\Repos\SandEngine\SandEngine\External\assimp-4.1.0\test\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\Repos\SandEngine\Proj\SandEngine\External\assimp-4.1.0\test\CMakeFiles\NightlyMemoryCheck" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{95171FC8-074E-3401-8212-4B79D394910F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

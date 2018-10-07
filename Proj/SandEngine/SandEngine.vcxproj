@@ -1,0 +1,363 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{66269826-BDA6-30CB-A911-B699CEAFE757}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>SandEngine</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Repos\SandEngine\Lib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SandEngine.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SandEngine</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Repos\SandEngine\Lib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SandEngine.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SandEngine</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Repos\SandEngine\Lib\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">SandEngine.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">SandEngine</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Repos\SandEngine\Lib\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">SandEngine.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">SandEngine</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_UNICODE;UNICODE;__WINDOWS__;_WIN32;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_UNICODE;UNICODE;__WINDOWS__;_WIN32;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_UNICODE;UNICODE;__WINDOWS__;_WIN32;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_UNICODE;UNICODE;__WINDOWS__;_WIN32;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_UNICODE;UNICODE;__WINDOWS__;_WIN32;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_UNICODE;UNICODE;__WINDOWS__;_WIN32;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_UNICODE;UNICODE;__WINDOWS__;_WIN32;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_UNICODE;UNICODE;__WINDOWS__;_WIN32;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Repos\SandEngine\SandEngine;D:\Repos\SandEngine\SandEngine\Include;C:\VulkanSDK\1.1.82.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Repos\SandEngine\SandEngine\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Repos/SandEngine/SandEngine/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Repos/SandEngine -BD:/Repos/SandEngine/Proj --check-stamp-file D:/Repos/SandEngine/Proj/SandEngine/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:/Repos/SandEngine/SandEngine/CMakeLists.txt;D:\Repos\SandEngine\SandEngine\CMakeLists.txt;D:\Repos\SandEngine\SandEngine\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Repos\SandEngine\Proj\SandEngine\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Repos/SandEngine/SandEngine/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Repos/SandEngine -BD:/Repos/SandEngine/Proj --check-stamp-file D:/Repos/SandEngine/Proj/SandEngine/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:/Repos/SandEngine/SandEngine/CMakeLists.txt;D:\Repos\SandEngine\SandEngine\CMakeLists.txt;D:\Repos\SandEngine\SandEngine\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Repos\SandEngine\Proj\SandEngine\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Repos/SandEngine/SandEngine/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Repos/SandEngine -BD:/Repos/SandEngine/Proj --check-stamp-file D:/Repos/SandEngine/Proj/SandEngine/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:/Repos/SandEngine/SandEngine/CMakeLists.txt;D:\Repos\SandEngine\SandEngine\CMakeLists.txt;D:\Repos\SandEngine\SandEngine\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Repos\SandEngine\Proj\SandEngine\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Repos/SandEngine/SandEngine/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HD:/Repos/SandEngine -BD:/Repos/SandEngine/Proj --check-stamp-file D:/Repos/SandEngine/Proj/SandEngine/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:/Repos/SandEngine/SandEngine/CMakeLists.txt;D:\Repos\SandEngine\SandEngine\CMakeLists.txt;D:\Repos\SandEngine\SandEngine\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Repos\SandEngine\Proj\SandEngine\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Assets\Animation.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Assets\Animation.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Assets\Bone.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Assets\ConstantBuffer.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Assets\Image.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Assets\Image.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Assets\Lighting.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Assets\Material.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Assets\ModelStruct.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Assets\ModelStruct.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12DescriptorHeapAllocator.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12DescriptorHeapAllocator.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12Helper.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12Helper.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12InputVertexAttributes.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12InputVertexAttributes.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12Pipeline.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12Pipeline.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12ResourceAllocator.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12ResourceAllocator.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12Resources.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12Resources.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12RootParameter.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12RootSignature.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DX12RootSignature.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DirectX12.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DirectX12.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DirectX12Device.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\DirectX12\DirectX12Device.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\Graphics.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\Graphics.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\GraphicsFormat.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\GraphicsInterface.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\Vulkan\Vulkan.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\Vulkan\Vulkan.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Graphics\Vulkan\VulkanDevice.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Graphics\Vulkan\VulkanDevice.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Input\Input.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Input\InputManager.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Loader\ImageLoader.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Loader\ImageLoader.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Loader\Loader.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Loader\ModelLoader.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Loader\ModelLoader.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Platform\Linux.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Platform\Linux.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Platform\PlatformManager.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Platform\PlatformSystem.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Platform\Windows.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Platform\Windows.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Scene\Node.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Scene\Node.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Scene\Scene.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Scene\Scene.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\Scene\SceneManager.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Scene\SceneManager.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Scene\SceneObj.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\SHeader.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\SMath.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\SMath.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\STime.h" />
+    <ClCompile Include="D:\Repos\SandEngine\SandEngine\SUtils.cpp" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\SUtils.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\SandEngine.h" />
+    <ClInclude Include="D:\Repos\SandEngine\SandEngine\Singletone.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\Repos\SandEngine\Proj\ZERO_CHECK.vcxproj">
+      <Project>{F0C82A64-5223-3A39-A185-4462A3437AA4}</Project>
+      <Name>ZERO_CHECK</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Repos\SandEngine\Proj\SandEngine\External\DevIL-1.8.0\src-IL\IL.vcxproj">
+      <Project>{12F52D6B-DEE4-353C-8B05-053AE8DAEC5C}</Project>
+      <Name>IL</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Repos\SandEngine\Proj\SandEngine\External\DevIL-1.8.0\src-ILU\ILU.vcxproj">
+      <Project>{CCD8ED7E-6113-3A30-AA8E-11C9434EA0ED}</Project>
+      <Name>ILU</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Repos\SandEngine\Proj\SandEngine\External\DevIL-1.8.0\src-ILUT\ILUT.vcxproj">
+      <Project>{EB701ACA-A455-33FD-B8FE-BCB1E92725AF}</Project>
+      <Name>ILUT</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Repos\SandEngine\Proj\SandEngine\External\assimp-4.1.0\contrib\irrXML\IrrXML.vcxproj">
+      <Project>{728174DF-F33B-3F8E-A0F1-285DBB35C4BE}</Project>
+      <Name>IrrXML</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Repos\SandEngine\Proj\SandEngine\External\assimp-4.1.0\code\assimp.vcxproj">
+      <Project>{AA786B02-3D9C-369D-94CA-ADADF5428CB1}</Project>
+      <Name>assimp</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Repos\SandEngine\Proj\SandEngine\External\assimp-4.1.0\contrib\zlib\zlibstatic.vcxproj">
+      <Project>{A2B97379-4B88-31BD-B8B4-B9A34E2D8285}</Project>
+      <Name>zlibstatic</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -44,8 +44,6 @@ message("${PROJECT_NAME}: CURR BIN DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 # Files of project and target to build                     #
 ############################################################
 
-include_directories(${PROJECT_DIR})
-
 file(GLOB ASSETS_FILES
 	"Assets/*.cpp"
 	"Assets/*.h"
@@ -85,10 +83,10 @@ file(GLOB GLOBAL_FILES
 	"*.h"
 )
 
+list(APPEND SRC_FILES ${ASSETS_FILES} ${GRAPHICS_FILES} ${INPUT_FILES} ${LOADER_FILES} ${PLATFORM_FILES} ${SCENE_FILES} ${GLOBAL_FILES})
+
 # Add library to build.
-add_library(${PROJECT_NAME} STATIC
-   ${GLOBAL_FILES} ${ASSETS_FILES} ${GRAPHICS_FILES} ${INPUT_FILES} ${LOADER_FILES} ${PLATFORM_FILES} ${SCENE_FILES}
-)
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_DIR}) 
 
@@ -144,7 +142,7 @@ function(add_subdirectory_in_folder _subdirectory _folder)
 endfunction()
 
 # Include Library
-include_directories(${PROJECT_DIR}/Include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_DIR}/Include)
 if(NOT WIN32)
 find_package(PkgConfig)
 endif()
@@ -153,14 +151,13 @@ set(Libraries)
 
 if(NOT WIN32)
 pkg_check_modules(XCB REQUIRED xcb)
-target_include_directories(${PROJECT_NAME} PRIVATE ${XCB_INCLUDEDIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${XCB_INCLUDEDIR})
 message(STATUS "XCB_LIBRARIES ${XCB_LIBRARIES}")
 list(APPEND Libraries ${XCB_LIBRARIES})
 endif()
 
-include_directories($ENV{VULKAN_SDK}/include)
+target_include_directories(${PROJECT_NAME} PUBLIC $ENV{VULKAN_SDK}/include)
 if (WIN32)
-    link_directories($ENV{VULKAN_SDK}/lib)
     find_library(vulkan NAMES vulkan-1 HINTS $ENV{VULKAN_SDK}/lib)
 	if (vulkan_NOTFOUND)
 		message(WARNING "vulkan not found")
@@ -169,10 +166,9 @@ if (WIN32)
 else ()
 	pkg_check_modules(VULKAN vulkan)
 	if (VULKAN_FOUND)
-		include_directories(${VULKAN_INCLUDEDIR})
+		target_include_directories(${PROJECT_NAME} ${VULKAN_INCLUDEDIR})
 		list(APPEND Libraries ${VULKAN_LIBRARIES})
 	else()
-		link_directories($ENV{VULKAN_SDK}/lib)
 		find_library(vulkan NAMES vulkan HINTS $ENV{VULKAN_SDK}/lib)
 		if (vulkan_NOTFOUND)
 			message(FATAL_ERROR "vulkan not found")
@@ -180,9 +176,6 @@ else ()
 		list(APPEND Libraries ${vulkan})
 	endif()
 endif ()
-
-add_definitions(-DUNICODE -D_UNICODE)
-set(UNICODE true)
 
 add_subdirectory_in_folder(External/assimp-4.1.0 External)
 list(APPEND Libraries assimp)
@@ -192,19 +185,19 @@ add_subdirectory_in_folder(External/DevIL-1.8.0 External)
 list(APPEND Libraries IL ILU ILUT)
 add_dependencies(${PROJECT_NAME} IL ILU ILUT)
 
+target_compile_definitions(IL PRIVATE -DUNICODE -D_UNICODE)
 set_target_properties(IL PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
 set_target_properties(IL PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
 set_target_properties(IL PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_DIR}/${RUNTIME_OUTPUT_DIR}")
 
+target_compile_definitions(ILU PRIVATE -DUNICODE -D_UNICODE)
 set_target_properties(ILU PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
 set_target_properties(ILU PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
 set_target_properties(ILU PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_DIR}/${RUNTIME_OUTPUT_DIR}")
 
+target_compile_definitions(ILUT PRIVATE -DUNICODE -D_UNICODE)
 set_target_properties(ILUT PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
 set_target_properties(ILUT PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PROJECT_DIR}/${LIBRARY_OUTPUT_DIR}")
 set_target_properties(ILUT PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_DIR}/${RUNTIME_OUTPUT_DIR}")
-
-unset(UNICODE)
-remove_definitions(-DUNICODE -D_UNICODE)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${Libraries})

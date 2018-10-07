@@ -1,0 +1,21 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-3.12/Modules/CheckIncludeFile.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/CheckIncludeFileCXX.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/CheckTypeSize.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindJPEG.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindJasper.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindPNG.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindTIFF.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/FindZLIB.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/SelectLibraryConfigurations.cmake
+C:/Program Files/CMake/share/cmake-3.12/Modules/TestBigEndian.cmake
+D:/Repos/SandEngine/SandEngine/External/DevIL-1.8.0/cmake/Modules/FindLCMS2.cmake
+D:/Repos/SandEngine/SandEngine/External/DevIL-1.8.0/cmake/Modules/FindMNG.cmake
+D:/Repos/SandEngine/SandEngine/External/DevIL-1.8.0/cmake/Modules/FindlibSquish.cmake
+D:/Repos/SandEngine/SandEngine/External/DevIL-1.8.0/src-IL/CMakeLists.txt
+D:/Repos/SandEngine/SandEngine/External/DevIL-1.8.0/src-IL/cmake/FindNVTT.cmake
+D:/Repos/SandEngine/SandEngine/External/DevIL-1.8.0/src-IL/cmake/FindOpenEXR.cmake
+D:/Repos/SandEngine/SandEngine/External/DevIL-1.8.0/src-IL/include/config.h.cmake.in
+D:/Repos/SandEngine/SandEngine/External/DevIL-1.8.0/src-IL/pkgconfig/IL.pc.cmake.in
