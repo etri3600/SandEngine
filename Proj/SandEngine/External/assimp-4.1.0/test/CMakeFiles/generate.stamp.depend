@@ -1,6 +1,0 @@
-# CMake generation dependency list for this directory.
-C:/Program Files/CMake/share/cmake-3.12/Modules/CTest.cmake
-C:/Program Files/CMake/share/cmake-3.12/Modules/CTestTargets.cmake
-C:/Program Files/CMake/share/cmake-3.12/Modules/CTestUseLaunchers.cmake
-C:/Program Files/CMake/share/cmake-3.12/Modules/DartConfiguration.tcl.in
-D:/Repos/SandEngine/SandEngine/External/assimp-4.1.0/test/CMakeLists.txt
