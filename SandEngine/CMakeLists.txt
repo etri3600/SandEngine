@@ -88,7 +88,14 @@ list(APPEND SRC_FILES ${ASSETS_FILES} ${GRAPHICS_FILES} ${INPUT_FILES} ${LOADER_
 # Add library to build.
 add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 
+foreach(_src IN ITEMS ${SRC_FILES})
+    get_filename_component(_src_path "${_src}" PATH)
+    file(RELATIVE_PATH _src_path_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_src_path}")
+    string(REPLACE "/" "\\" _group_path "${_src_path_rel}")
+    source_group("${_group_path}" FILES "${_src}")
+endforeach()
 target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_DIR}) 
+
 
 ######################### Flags ############################
 # Defines Flags for Windows and Linux                      #
@@ -166,11 +173,11 @@ if (WIN32)
 else ()
 	pkg_check_modules(VULKAN vulkan)
 	if (VULKAN_FOUND)
-		target_include_directories(${PROJECT_NAME} ${VULKAN_INCLUDEDIR})
+		target_include_directories(${PROJECT_NAME} PUBLIC ${VULKAN_INCLUDEDIR})
 		list(APPEND Libraries ${VULKAN_LIBRARIES})
 	else()
 		find_library(vulkan NAMES vulkan HINTS $ENV{VULKAN_SDK}/lib)
-		if (vulkan_NOTFOUND)
+		if (vulkan-NOTFOUND)
 			message(FATAL_ERROR "vulkan not found")
 		endif()
 		list(APPEND Libraries ${vulkan})
