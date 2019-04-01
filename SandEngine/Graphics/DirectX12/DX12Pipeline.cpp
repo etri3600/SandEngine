@@ -2,6 +2,7 @@
 #include "DX12Pipeline.h"
 #include "DX12Helper.h"
 #include "Platform/Windows.h"
+#include "DX12DescriptorHeap.h"
 
 SDX12Pipeline::SDX12Pipeline(SDirectX12Device * pDevice, SDX12RootSignature* pRootSignature, EMaterialType materialType)
 	:m_MaterialType(materialType)
@@ -103,15 +104,14 @@ void SDX12Pipeline::Populate(ID3D12GraphicsCommandList * commandList, unsigned i
 	}
 }
 
-void SDX12Pipeline::CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy)
+void SDX12Pipeline::CreateConstantBuffer(SDX12DescriptorHeap* pDescriptorHeap, unsigned int descriptorSize, SBatchProxy* batchProxy)
 {
-	m_pResources->CreateConstantBuffer(m_pDevice, pDescriptorHeap, descriptorOffset, descriptorSize, batchProxy);
+	m_pResources->CreateConstantBuffer(m_pDevice, pDescriptorHeap, descriptorSize, batchProxy);
 }
 
-unsigned int SDX12Pipeline::CreateShaderResources(ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* heap, SBatchProxy* batchProxy, unsigned int offset)
+unsigned int SDX12Pipeline::CreateShaderResources(ID3D12GraphicsCommandList* commandList, SDX12DescriptorHeap* heap, SBatchProxy* batchProxy)
 {
 	unsigned int nTextureCount = 0;
-	unsigned int cbvDescriptorOffset = offset;
 	const unsigned int svr_descriptor_size = m_pDevice->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	for (unsigned int i = 0; i < batchProxy->ObjectProxies.size(); ++i)
 	{
@@ -187,8 +187,7 @@ unsigned int SDX12Pipeline::CreateShaderResources(ID3D12GraphicsCommandList* com
 			srvDesc.Format = static_cast<DXGI_FORMAT>(texture->GetTextureFormat());
 			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 			srvDesc.Texture2D.MipLevels = 1;
-			D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = heap->GetCPUDescriptorHandleForHeapStart();
-			cpuHandle.ptr += cbvDescriptorOffset + nTextureCount * svr_descriptor_size;
+			auto cpuHandle = heap->GetHandleOffsetCPU(nTextureCount);
 			m_pDevice->GetDevice()->CreateShaderResourceView(pSRVBuffer, &srvDesc, cpuHandle);
 			++nTextureCount;
 		}

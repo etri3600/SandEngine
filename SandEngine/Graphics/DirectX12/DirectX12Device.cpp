@@ -4,6 +4,18 @@
 
 #include "SUtils.h"
 
+SDirectX12Device::SDirectX12Device()
+	: m_DescriptorHeaps
+	{
+		{ this },
+		{ this },
+		{ this },
+		{ this }
+	}
+{
+
+}
+
 SDirectX12Device::~SDirectX12Device()
 {
 	Finalize();

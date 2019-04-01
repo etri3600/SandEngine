@@ -212,3 +212,8 @@ ModelManifest.xml
 *.opendb
 *.ipdb
 /SandEngine.VC.db
+*.filters
+*.vcxproj
+*.sln
+*.depend
+*.stamp

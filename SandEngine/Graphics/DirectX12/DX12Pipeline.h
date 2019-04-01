@@ -12,8 +12,8 @@ public:
 
 	void Init(std::wstring vertexShader, std::wstring fragmentShader, std::string vertexEntrypointName, std::string fragmentEntrypointName, SDX12Resources* pResources, UINT renderTargetCount, DXGI_FORMAT* renderTargetFormat);
 
-	void CreateConstantBuffer(ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy);
-	unsigned int CreateShaderResources(ID3D12GraphicsCommandList* commandList, ID3D12DescriptorHeap* heap, SBatchProxy* batchProxy, unsigned int offset);
+	void CreateConstantBuffer(class SDX12DescriptorHeap* pDescriptorHeap, unsigned int descriptorSize, SBatchProxy* batchProxy);
+	unsigned int CreateShaderResources(ID3D12GraphicsCommandList* commandList, class SDX12DescriptorHeap* heap, SBatchProxy* batchProxy);
 	void SetVertexBufferView(D3D12_GPU_VIRTUAL_ADDRESS bufferLocation, unsigned int sizeInBytes, unsigned int strideInBytes);
 	void SetIndexBufferView(D3D12_GPU_VIRTUAL_ADDRESS bufferLocation, unsigned int sizeInBytes, DXGI_FORMAT format);
 	void UpdateConstantBuffer(SBatchProxy* batchProxy, unsigned int objIndex, SMatrix view, SMatrix projection);

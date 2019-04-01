@@ -7,7 +7,7 @@ class SDX12Resources
 public:
 	virtual ~SDX12Resources() {}
 	
-	virtual void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy) = 0;
+	virtual void CreateConstantBuffer(SDirectX12Device* pDevice, class SDX12DescriptorHeap* pDescriptorHeap, unsigned int descriptorSize, SBatchProxy* batchProxy) = 0;
 	virtual ID3D12Resource** GetCBVBuffers(int& count) = 0;
 	virtual unsigned int GetCBVOffset() = 0;
 	virtual char* GetMappedConstantBuffer(unsigned int index) = 0;
@@ -48,7 +48,7 @@ public:
 		}
 	}
 
-	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
+	void CreateConstantBuffer(SDirectX12Device* pDevice, class SDX12DescriptorHeap* pDescriptorHeap, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
 
 	ID3D12Resource** GetCBVBuffers(int& count) override
 	{
@@ -126,7 +126,7 @@ public:
 		}
 	}
 
-	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
+	void CreateConstantBuffer(SDirectX12Device* pDevice, class SDX12DescriptorHeap* pDescriptorHeap, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
 
 	ID3D12Resource** GetCBVBuffers(int& count) override
 	{
@@ -189,7 +189,7 @@ public:
 		}
 	}
 
-	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
+	void CreateConstantBuffer(SDirectX12Device* pDevice, class SDX12DescriptorHeap* pDescriptorHeap, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
 
 	ID3D12Resource** GetCBVBuffers(int& count) override
 	{
@@ -248,7 +248,7 @@ public:
 		}
 	}
 
-	void CreateConstantBuffer(SDirectX12Device* pDevice, ID3D12DescriptorHeap* pDescriptorHeap, unsigned int descriptorOffset, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
+	void CreateConstantBuffer(SDirectX12Device* pDevice, class SDX12DescriptorHeap* pDescriptorHeap, unsigned int descriptorSize, SBatchProxy* batchProxy) override;
 
 	ID3D12Resource** GetCBVBuffers(int& count) override
 	{

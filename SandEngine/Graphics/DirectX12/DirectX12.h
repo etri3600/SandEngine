@@ -45,8 +45,7 @@ enum class EGBuffer : unsigned short
 
 std::wostream& operator<<(std::wostream& stream, EGBuffer buffer);
 
-class SDX12ResourceAllocator;
-class SDX12DescriptorHeapAllocator;
+class SDX12DescriptorHeap;
 class SDX12Pipeline;
 class SDX12RootSignature;
 class SDirectX12 : public IGraphicsInterface
@@ -69,10 +68,6 @@ public:
 	bool Render() override;
 	void Present() override;
 
-protected:
-	void CreateGBuffers();
-	void CreatePostProcessResources();
-
 private:
 	void WaitForGPU(unsigned long long fenceValue);
 	void WaitForIdle();
@@ -83,10 +78,6 @@ private:
 
 private:
 	SDirectX12Device* m_pDevice;
-	SDX12ResourceAllocator* m_pResourceAllocator[2];
-	SDX12DescriptorHeapAllocator* m_pDescriptorAllocator[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
-	std::vector<SDX12RootSignature*> m_RootSignatures;
-	std::vector<SDX12Pipeline*> m_pipelines;
 
 	ID3D12CommandQueue* m_pCommandQueue = nullptr;
 	ID3D12CommandAllocator* m_pCommandAllocator[c_BufferingCount];
@@ -101,6 +92,8 @@ private:
 	unsigned int m_RenderTargetViewDescriptorSize = 0;
 	D3D12_VIEWPORT m_Viewport;
 
+	IRendering* Rendering;
+
 	ID3D12DescriptorHeap* m_pRenderTargetViewHeap = nullptr;
 	ID3D12Resource* m_pBackBufferRenterTarget[c_BufferingCount];
 
@@ -111,18 +104,8 @@ private:
 
 	ID3D12Resource* m_pIndexBuffer = nullptr;
 
-	ID3D12DescriptorHeap* m_pShaderBufferHeap;
-	unsigned int m_uiShaderBufferDescriptorSize = 0;
-
-	ID3D12DescriptorHeap* m_pSamplerHeap = nullptr;
-
-	ID3D12DescriptorHeap* m_pGBufferRTVHeap = nullptr;
-	ID3D12DescriptorHeap* m_pGBufferCbvSrvHeap = nullptr;
-	ID3D12Resource* m_pGBuffers[static_cast<unsigned short>(EGBuffer::GB_NUM)];
-
 	ID3D12DescriptorHeap* m_pPostProcessRTVHeap = nullptr;
 	ID3D12DescriptorHeap* m_pPostProcessCbvSrvHeap = nullptr;
-	ID3D12Resource* m_pPostProcessResource = nullptr;
 
 	SSceneProxy m_SceneProxy;
 
